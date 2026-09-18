@@ -1,12 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { trends } from '../data';
 import { Search, ThreeDots } from './Icons';
 
-export default function Explore() {
+interface ExploreProps {
+  onNavigate: (page: string) => void;
+}
+
+export default function Explore({ onNavigate }: ExploreProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('trending');
 
   const tabs = ['trending', 'news', 'sports', 'entertainment'];
+
+  const filteredTrends = useMemo(() => {
+    if (!searchQuery.trim()) return trends;
+    return trends.filter(t =>
+      t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.category.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
 
   return (
     <div>
@@ -32,6 +44,13 @@ export default function Explore() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-transparent text-[15px] text-white placeholder-gray-500 outline-none flex-1"
             />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery('')} className="text-blue-400 bg-blue-500/20 rounded-full p-0.5">
+                <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="currentColor">
+                  <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"/>
+                </svg>
+              </button>
+            )}
           </div>
         </div>
 
@@ -55,40 +74,69 @@ export default function Explore() {
       </div>
 
       {/* Featured */}
-      <div className="relative h-[250px] bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900 overflow-hidden">
-        <div className="absolute inset-0 flex items-end p-6">
-          <div>
-            <p className="text-[13px] text-gray-300 font-medium">TECHNOLOGY · TRENDING</p>
-            <h2 className="text-2xl font-extrabold text-white mt-1">#AIRevolution</h2>
-            <p className="text-[13px] text-gray-300 mt-1">125K posts</p>
-          </div>
-        </div>
-        <div className="absolute top-4 right-4">
-          <button className="p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors">
-            <ThreeDots />
-          </button>
-        </div>
-      </div>
-
-      {/* Trends */}
-      <div>
-        {trends.map((trend, index) => (
-          <div key={trend.id} className="px-4 py-3 hover:bg-gray-900/30 transition-colors cursor-pointer border-b border-gray-800/30">
-            <div className="flex items-start justify-between">
-              <div>
-                <div className="flex items-center gap-1">
-                  <span className="text-[13px] text-gray-500">{index + 1} · {trend.category}</span>
-                </div>
-                <p className="font-bold text-[15px] text-white mt-0.5">{trend.name}</p>
-                <p className="text-[13px] text-gray-500 mt-0.5">{trend.posts}</p>
-              </div>
-              <button className="p-1.5 rounded-full hover:bg-blue-500/10 hover:text-blue-400 text-gray-500 transition-colors">
-                <ThreeDots />
-              </button>
+      {!searchQuery && (
+        <div className="relative h-[250px] bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900 overflow-hidden">
+          <div className="absolute inset-0 flex items-end p-6">
+            <div>
+              <p className="text-[13px] text-gray-300 font-medium">TECHNOLOGY · TRENDING</p>
+              <h2 className="text-2xl font-extrabold text-white mt-1">#AIRevolution</h2>
+              <p className="text-[13px] text-gray-300 mt-1">125K posts</p>
             </div>
           </div>
-        ))}
-      </div>
+          <div className="absolute top-4 right-4">
+            <button className="p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors">
+              <ThreeDots />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Search Results / Trends */}
+      {searchQuery ? (
+        <div>
+          {filteredTrends.length > 0 ? (
+            filteredTrends.map((trend, index) => (
+              <div key={trend.id} className="px-4 py-3 hover:bg-gray-900/30 transition-colors cursor-pointer border-b border-gray-800/30">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <span className="text-[13px] text-gray-500">{index + 1} · {trend.category}</span>
+                    <p className="font-bold text-[15px] text-white mt-0.5">{trend.name}</p>
+                    <p className="text-[13px] text-gray-500 mt-0.5">{trend.posts}</p>
+                    {trend.description && <p className="text-[13px] text-gray-400 mt-1">{trend.description}</p>}
+                  </div>
+                  <button className="p-1.5 rounded-full hover:bg-blue-500/10 hover:text-blue-400 text-gray-500 transition-colors">
+                    <ThreeDots />
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16 px-8">
+              <h3 className="text-2xl font-extrabold text-white">No results for "{searchQuery}"</h3>
+              <p className="text-gray-500 text-[15px] mt-2 text-center">Try searching for something else.</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div>
+          {trends.map((trend, index) => (
+            <div key={trend.id} className="px-4 py-3 hover:bg-gray-900/30 transition-colors cursor-pointer border-b border-gray-800/30">
+              <div className="flex items-start justify-between">
+                <div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-[13px] text-gray-500">{index + 1} · {trend.category}</span>
+                  </div>
+                  <p className="font-bold text-[15px] text-white mt-0.5">{trend.name}</p>
+                  <p className="text-[13px] text-gray-500 mt-0.5">{trend.posts}</p>
+                </div>
+                <button className="p-1.5 rounded-full hover:bg-blue-500/10 hover:text-blue-400 text-gray-500 transition-colors">
+                  <ThreeDots />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

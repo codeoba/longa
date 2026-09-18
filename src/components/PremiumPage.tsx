@@ -1,9 +1,18 @@
-import React from 'react';
-import { ArrowLeft, Verified, Sparkles } from './Icons';
+import React, { useState } from 'react';
+import { ArrowLeft, Sparkles } from './Icons';
 
-export default function PremiumPage() {
+interface PremiumPageProps {
+  selectedPlan: string | null;
+  onSelectPlan: (plan: string | null) => void;
+}
+
+export default function PremiumPage({ selectedPlan, onSelectPlan }: PremiumPageProps) {
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+  const [subscribedPlan, setSubscribedPlan] = useState<string | null>(selectedPlan);
+
   const plans = [
     {
+      id: 'basic',
       name: 'Basic',
       price: '$3',
       period: '/month',
@@ -11,6 +20,7 @@ export default function PremiumPage() {
       color: 'from-blue-500 to-blue-700',
     },
     {
+      id: 'premium',
       name: 'Premium',
       price: '$8',
       period: '/month',
@@ -19,6 +29,7 @@ export default function PremiumPage() {
       popular: true,
     },
     {
+      id: 'premium-plus',
       name: 'Premium+',
       price: '$16',
       period: '/month',
@@ -26,6 +37,12 @@ export default function PremiumPage() {
       color: 'from-yellow-500 to-amber-700',
     },
   ];
+
+  const handleSubscribe = (planId: string) => {
+    setSubscribedPlan(planId);
+    onSelectPlan(planId);
+    setShowSubscribeModal(true);
+  };
 
   return (
     <div>
@@ -38,6 +55,18 @@ export default function PremiumPage() {
           <h1 className="text-xl font-bold text-white">Premium</h1>
         </div>
       </div>
+
+      {/* Already subscribed banner */}
+      {subscribedPlan && (
+        <div className="mx-4 mt-4 p-4 rounded-xl bg-green-500/10 border border-green-500/30">
+          <div className="flex items-center gap-2">
+            <svg viewBox="0 0 24 24" className="w-5 h-5 text-green-400" fill="currentColor">
+              <path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81C14.67 2.63 13.43 1.75 12 1.75S9.33 2.63 8.66 3.94c-1.39-.46-2.9-.2-3.91.81s-1.27 2.52-.81 3.91C2.63 9.33 1.75 10.57 1.75 12s.88 2.67 2.19 3.34c-.46 1.39-.2 2.9.81 3.91s2.52 1.27 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.67-.88 3.34-2.19c1.39.46 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34z"/>
+            </svg>
+            <span className="text-green-400 font-bold text-sm">You're subscribed to {plans.find(p => p.id === subscribedPlan)?.name}</span>
+          </div>
+        </div>
+      )}
 
       {/* Hero */}
       <div className="relative overflow-hidden">
@@ -57,7 +86,7 @@ export default function PremiumPage() {
       <div className="px-4 pb-8 space-y-4">
         {plans.map((plan) => (
           <div
-            key={plan.name}
+            key={plan.id}
             className={`relative rounded-2xl border ${plan.popular ? 'border-blue-500/50 bg-blue-500/5' : 'border-gray-800/50 bg-gray-900/30'} p-5 transition-all hover:border-gray-700`}
           >
             {plan.popular && (
@@ -74,7 +103,9 @@ export default function PremiumPage() {
                 </div>
               </div>
               <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${plan.color} flex items-center justify-center`}>
-                <Verified />
+                <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor">
+                  <path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81C14.67 2.63 13.43 1.75 12 1.75S9.33 2.63 8.66 3.94c-1.39-.46-2.9-.2-3.91.81s-1.27 2.52-.81 3.91C2.63 9.33 1.75 10.57 1.75 12s.88 2.67 2.19 3.34c-.46 1.39-.2 2.9.81 3.91s2.52 1.27 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.67-.88 3.34-2.19c1.39.46 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34z"/>
+                </svg>
               </div>
             </div>
             <ul className="space-y-2 mb-4">
@@ -87,18 +118,24 @@ export default function PremiumPage() {
                 </li>
               ))}
             </ul>
-            <button className={`w-full py-2.5 rounded-full font-bold text-[15px] transition-all ${
-              plan.popular
-                ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                : 'bg-white text-black hover:bg-gray-200'
-            }`}>
-              Subscribe
+            <button
+              onClick={() => handleSubscribe(plan.id)}
+              className={`w-full py-2.5 rounded-full font-bold text-[15px] transition-all ${
+                subscribedPlan === plan.id
+                  ? 'bg-green-500 text-white cursor-default'
+                  : plan.popular
+                    ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                    : 'bg-white text-black hover:bg-gray-200'
+              }`}
+              disabled={subscribedPlan === plan.id}
+            >
+              {subscribedPlan === plan.id ? '✓ Subscribed' : 'Subscribe'}
             </button>
           </div>
         ))}
       </div>
 
-      {/* Features */}
+      {/* Features Grid */}
       <div className="px-4 pb-8">
         <h3 className="text-xl font-extrabold text-white mb-4">Why Premium?</h3>
         <div className="grid grid-cols-2 gap-3">
@@ -118,6 +155,30 @@ export default function PremiumPage() {
           ))}
         </div>
       </div>
+
+      {/* Subscribe Modal */}
+      {showSubscribeModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowSubscribeModal(false)} />
+          <div className="relative bg-black rounded-2xl border border-gray-800/50 p-6 max-w-[400px] mx-4 text-center">
+            <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
+              <svg viewBox="0 0 24 24" className="w-8 h-8 text-green-400" fill="currentColor">
+                <path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81C14.67 2.63 13.43 1.75 12 1.75S9.33 2.63 8.66 3.94c-1.39-.46-2.9-.2-3.91.81s-1.27 2.52-.81 3.91C2.63 9.33 1.75 10.57 1.75 12s.88 2.67 2.19 3.34c-.46 1.39-.2 2.9.81 3.91s2.52 1.27 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.67-.88 3.34-2.19c1.39.46 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34z"/>
+              </svg>
+            </div>
+            <h3 className="text-xl font-extrabold text-white mb-2">Welcome to Premium!</h3>
+            <p className="text-gray-400 text-[15px] mb-4">
+              You're now subscribed to {plans.find(p => p.id === subscribedPlan)?.name}. Enjoy all the exclusive features!
+            </p>
+            <button
+              onClick={() => setShowSubscribeModal(false)}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-6 py-2.5 rounded-full transition-colors"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

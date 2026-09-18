@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Post } from '../types';
 import PostComponent from './Post';
 import ComposeTweet from './ComposeTweet';
@@ -9,10 +9,30 @@ interface FeedProps {
   onRetweet: (id: string) => void;
   onBookmark: (id: string) => void;
   onNewPost: (content: string) => void;
+  onReply: (postId: string, content: string) => void;
+  onDelete: (id: string) => void;
+  onPin: (id: string) => void;
+  onViewThread: (id: string) => void;
+  onUserClick: (userId: string) => void;
+  incrementViews: (id: string) => void;
 }
 
-export default function Feed({ posts, onLike, onRetweet, onBookmark, onNewPost }: FeedProps) {
+export default function Feed({ posts, onLike, onRetweet, onBookmark, onNewPost, onReply, onDelete, onPin, onViewThread, onUserClick, incrementViews }: FeedProps) {
   const [activeTab, setActiveTab] = useState<'for-you' | 'following'>('for-you');
+
+  // For-you: all posts sorted by engagement
+  // Following: only posts from followed users
+  const filteredPosts = useMemo(() => {
+    if (activeTab === 'following') {
+      return posts.filter(p => p.user.isFollowing);
+    }
+    return [...posts].sort((a, b) => {
+      // Sort by engagement (likes + retweets + replies)
+      const engagementA = a.likes + a.retweets + a.replies;
+      const engagementB = b.likes + b.retweets + b.replies;
+      return engagementB - engagementA;
+    });
+  }, [posts, activeTab]);
 
   return (
     <div>
@@ -58,15 +78,30 @@ export default function Feed({ posts, onLike, onRetweet, onBookmark, onNewPost }
 
       {/* Posts */}
       <div>
-        {posts.map((post) => (
-          <PostComponent
-            key={post.id}
-            post={post}
-            onLike={onLike}
-            onRetweet={onRetweet}
-            onBookmark={onBookmark}
-          />
-        ))}
+        {filteredPosts.length > 0 ? (
+          filteredPosts.map((post) => (
+            <PostComponent
+              key={post.id}
+              post={post}
+              onLike={onLike}
+              onRetweet={onRetweet}
+              onBookmark={onBookmark}
+              onReply={onReply}
+              onDelete={onDelete}
+              onPin={onPin}
+              onViewThread={onViewThread}
+              onUserClick={onUserClick}
+              incrementViews={incrementViews}
+            />
+          ))
+        ) : (
+          <div className="flex flex-col items-center justify-center py-16 px-8">
+            <h3 className="text-2xl font-extrabold text-white">No posts to show</h3>
+            <p className="text-gray-500 text-[15px] mt-2 text-center">
+              {activeTab === 'following' ? 'Follow more accounts to see their posts here.' : 'Check back later for new posts.'}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

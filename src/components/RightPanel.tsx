@@ -1,25 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { trends, users, currentUser } from '../data';
 import { Search, Verified, Premium, ThreeDots, Sparkles } from './Icons';
 
 interface RightPanelProps {
   onNavigate: (page: string) => void;
+  followedUsers: string[];
+  onFollowUser: (userId: string) => void;
 }
 
-export default function RightPanel({ onNavigate }: RightPanelProps) {
+export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: RightPanelProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
-  const [followedUsers, setFollowedUsers] = useState<string[]>([]);
 
-  const suggestedUsers = users.filter(u => u.id !== currentUser.id).slice(0, 3);
+  const suggestedUsers = useMemo(() =>
+    users.filter(u => u.id !== currentUser.id).slice(0, 3),
+    []
+  );
 
-  const toggleFollow = (userId: string) => {
-    setFollowedUsers(prev =>
-      prev.includes(userId)
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId]
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return null;
+    return users.filter(u =>
+      u.id !== currentUser.id && (
+        u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u.handle.toLowerCase().includes(searchQuery.toLowerCase())
+      )
     );
-  };
+  }, [searchQuery]);
 
   return (
     <aside className="hidden lg:block w-[350px] flex-shrink-0 pl-7 py-2">
@@ -33,7 +39,7 @@ export default function RightPanel({ onNavigate }: RightPanelProps) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setSearchFocused(true)}
-            onBlur={() => setSearchFocused(false)}
+            onBlur={() => { setSearchFocused(false); setTimeout(() => setSearchQuery(''), 200); }}
             className="bg-transparent text-[15px] text-white placeholder-gray-500 outline-none flex-1"
           />
           {searchQuery && (
@@ -44,6 +50,30 @@ export default function RightPanel({ onNavigate }: RightPanelProps) {
             </button>
           )}
         </div>
+
+        {/* Search Results */}
+        {searchResults && searchResults.length > 0 && (
+          <div className="absolute left-0 right-0 top-14 bg-black border border-gray-800 rounded-2xl shadow-xl overflow-hidden z-50 mx-2">
+            {searchResults.map(user => (
+              <button
+                key={user.id}
+                onClick={() => { onNavigate('user-profile'); setSearchQuery(''); }}
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-900/50 transition-colors"
+              >
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg">
+                  {user.avatar}
+                </div>
+                <div className="text-left">
+                  <div className="flex items-center gap-1">
+                    <span className="font-bold text-[15px] text-white">{user.name}</span>
+                    {user.verified && <Verified />}
+                  </div>
+                  <span className="text-[13px] text-gray-500">{user.handle}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Premium Card */}
@@ -91,7 +121,10 @@ export default function RightPanel({ onNavigate }: RightPanelProps) {
         {suggestedUsers.map((user) => (
           <div key={user.id} className="px-4 py-3 hover:bg-gray-800/30 transition-colors cursor-pointer">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 min-w-0">
+              <div
+                className="flex items-center gap-3 min-w-0"
+                onClick={() => onNavigate('user-profile')}
+              >
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg flex-shrink-0">
                   {user.avatar}
                 </div>
@@ -105,7 +138,7 @@ export default function RightPanel({ onNavigate }: RightPanelProps) {
                 </div>
               </div>
               <button
-                onClick={() => toggleFollow(user.id)}
+                onClick={() => onFollowUser(user.id)}
                 className={`px-4 py-1.5 rounded-full font-bold text-sm transition-all duration-200 flex-shrink-0 ${
                   followedUsers.includes(user.id)
                     ? 'bg-transparent border border-gray-600 text-white hover:border-red-500/50 hover:text-red-500'

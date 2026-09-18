@@ -12,6 +12,19 @@ export interface User {
   joinedDate: string;
   location?: string;
   website?: string;
+  isFollowing?: boolean;
+  isMuted?: boolean;
+  isBlocked?: boolean;
+}
+
+export interface Reply {
+  id: string;
+  user: User;
+  content: string;
+  timestamp: Date;
+  likes: number;
+  liked: boolean;
+  replies: number;
 }
 
 export interface Post {
@@ -28,7 +41,10 @@ export interface Post {
   liked: boolean;
   retweeted: boolean;
   bookmarked: boolean;
+  pinned?: boolean;
   isPremium?: boolean;
+  replyList?: Reply[];
+  isOwn?: boolean;
 }
 
 export interface Notification {
@@ -36,6 +52,7 @@ export interface Notification {
   type: 'like' | 'retweet' | 'reply' | 'follow' | 'mention';
   user: User;
   content?: string;
+  postContent?: string;
   timestamp: Date;
   read: boolean;
 }
@@ -46,6 +63,15 @@ export interface Message {
   lastMessage: string;
   timestamp: Date;
   unread: boolean;
+  messages?: ChatMessage[];
+}
+
+export interface ChatMessage {
+  id: string;
+  text: string;
+  sent: boolean;
+  time: string;
+  read?: boolean;
 }
 
 export interface Trend {
@@ -53,6 +79,17 @@ export interface Trend {
   category: string;
   name: string;
   posts: string;
+  description?: string;
 }
 
-export type Page = 'home' | 'explore' | 'notifications' | 'messages' | 'bookmarks' | 'profile' | 'settings' | 'lists' | 'premium';
+export interface UserList {
+  id: string;
+  name: string;
+  members: number;
+  description: string;
+  isPrivate: boolean;
+  followers: number;
+  memberUsers?: User[];
+}
+
+export type Page = 'home' | 'explore' | 'notifications' | 'messages' | 'bookmarks' | 'profile' | 'settings' | 'lists' | 'premium' | 'user-profile' | 'thread';

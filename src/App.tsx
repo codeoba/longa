@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { Page, Post } from './types';
-import { posts as initialPosts, currentUser, notifications, messages } from './data';
+import { Page, Post, Reply, User } from './types';
+import { posts as initialPosts, currentUser, notifications as initialNotifications, messages as initialMessages, users, userLists as initialLists, suggestedLists } from './data';
 import Sidebar from './components/Sidebar';
 import Feed from './components/Feed';
 import Explore from './components/Explore';
@@ -13,16 +13,39 @@ import Settings from './components/Settings';
 import Lists from './components/Lists';
 import RightPanel from './components/RightPanel';
 import ComposeTweet from './components/ComposeTweet';
-import { Close, Verified, Premium } from './components/Icons';
+import ThreadView from './components/ThreadView';
+import UserProfile from './components/UserProfile';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [showComposeModal, setShowComposeModal] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [notifications, setNotifications] = useState(initialNotifications);
+  const [followedUsers, setFollowedUsers] = useState<string[]>(users.filter(u => u.isFollowing).map(u => u.id));
+  const [mutedUsers, setMutedUsers] = useState<string[]>([]);
+  const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
+  const [lists, setLists] = useState(initialLists);
+  const [followedLists, setFollowedLists] = useState<string[]>([]);
+  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [settings, setSettings] = useState({
+    darkMode: true,
+    notifications: true,
+    soundEffects: false,
+    autoplay: true,
+    language: 'English',
+    contentFilter: 'medium',
+  });
+  const [premiumPlan, setPremiumPlan] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
   const unreadNotifications = notifications.filter(n => !n.read).length;
-  const unreadMessages = messages.filter(m => m.unread).length;
+  const unreadMessages = initialMessages.filter(m => m.unread).length;
+
+  const showToast = (message: string) => {
+    setToast(message);
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const handleLike = useCallback((id: string) => {
     setPosts(prev => prev.map(post =>
@@ -41,11 +64,14 @@ export default function App() {
   }, []);
 
   const handleBookmark = useCallback((id: string) => {
-    setPosts(prev => prev.map(post =>
-      post.id === id
-        ? { ...post, bookmarked: !post.bookmarked, bookmarks: post.bookmarked ? post.bookmarks - 1 : post.bookmarks + 1 }
-        : post
-    ));
+    setPosts(prev => prev.map(post => {
+      if (post.id === id) {
+        const newBookmarked = !post.bookmarked;
+        showToast(newBookmarked ? 'Post added to Bookmarks' : 'Post removed from Bookmarks');
+        return { ...post, bookmarked: newBookmarked, bookmarks: newBookmarked ? post.bookmarks + 1 : post.bookmarks - 1 };
+      }
+      return post;
+    }));
   }, []);
 
   const handleNewPost = useCallback((content: string) => {
@@ -63,37 +89,255 @@ export default function App() {
       retweeted: false,
       bookmarked: false,
       isPremium: true,
+      isOwn: true,
+      replyList: [],
     };
     setPosts(prev => [newPost, ...prev]);
+    showToast('Your post was sent');
+  }, []);
+
+  const handleReply = useCallback((postId: string, content: string) => {
+    const newReply: Reply = {
+      id: 'r' + Date.now(),
+      user: currentUser,
+      content,
+      timestamp: new Date(),
+      likes: 0,
+      liked: false,
+      replies: 0,
+    };
+    setPosts(prev => prev.map(post =>
+      post.id === postId
+        ? { ...post, replies: post.replies + 1, replyList: [...(post.replyList || []), newReply] }
+        : post
+    ));
+    showToast('Your reply was sent');
+  }, []);
+
+  const handleDeletePost = useCallback((id: string) => {
+    setPosts(prev => prev.filter(post => post.id !== id));
+    showToast('Your post was deleted');
+  }, []);
+
+  const handlePinPost = useCallback((id: string) => {
+    setPosts(prev => prev.map(post => {
+      if (post.id === id) {
+        const newPinned = !post.pinned;
+        showToast(newPinned ? 'Pinned to your profile' : 'Unpinned from profile');
+        return { ...post, pinned: newPinned };
+      }
+      // Unpin other posts when pinning a new one
+      if (post.isOwn || post.user.id === currentUser.id) {
+        return { ...post, pinned: false };
+      }
+      return post;
+    }));
+  }, []);
+
+  const handleViewThread = useCallback((id: string) => {
+    setSelectedThreadId(id);
+    setCurrentPage('thread');
+  }, []);
+
+  const handleUserClick = useCallback((userId: string) => {
+    setSelectedUserId(userId);
+    setCurrentPage('user-profile');
+  }, []);
+
+  const incrementViews = useCallback((id: string) => {
+    setPosts(prev => prev.map(post =>
+      post.id === id ? { ...post, views: post.views + 1 } : post
+    ));
+  }, []);
+
+  const handleFollowUser = useCallback((userId: string) => {
+    setFollowedUsers(prev => {
+      const isFollowing = prev.includes(userId);
+      if (isFollowing) {
+        showToast('Unfollowed');
+        return prev.filter(id => id !== userId);
+      } else {
+        showToast('Following');
+        return [...prev, userId];
+      }
+    });
+  }, []);
+
+  const handleMuteUser = useCallback((userId: string) => {
+    setMutedUsers(prev => {
+      const isMuted = prev.includes(userId);
+      showToast(isMuted ? 'Unmuted' : 'Muted');
+      return isMuted ? prev.filter(id => id !== userId) : [...prev, userId];
+    });
+  }, []);
+
+  const handleBlockUser = useCallback((userId: string) => {
+    setBlockedUsers(prev => {
+      const isBlocked = prev.includes(userId);
+      showToast(isBlocked ? 'Unblocked' : 'Blocked');
+      return isBlocked ? prev.filter(id => id !== userId) : [...prev, userId];
+    });
+  }, []);
+
+  const handleMarkNotificationsRead = useCallback(() => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  }, []);
+
+  const handleCreateList = useCallback((name: string, description: string, isPrivate: boolean) => {
+    const newList = {
+      id: 'l' + Date.now(),
+      name,
+      members: 1,
+      description,
+      isPrivate,
+      followers: 0,
+      memberUsers: [currentUser],
+    };
+    setLists(prev => [...prev, newList]);
+    showToast('List created successfully');
+  }, []);
+
+  const handleFollowList = useCallback((listId: string) => {
+    setFollowedLists(prev => {
+      const isFollowing = prev.includes(listId);
+      showToast(isFollowing ? 'Unfollowed list' : 'Following list');
+      return isFollowing ? prev.filter(id => id !== listId) : [...prev, listId];
+    });
+  }, []);
+
+  const handleDeleteList = useCallback((listId: string) => {
+    setLists(prev => prev.filter(l => l.id !== listId));
+    showToast('List deleted');
   }, []);
 
   const handleNavigate = useCallback((page: Page | string) => {
     setCurrentPage(page as Page);
-    setShowMobileMenu(false);
   }, []);
 
   const renderPage = () => {
     switch (currentPage) {
       case 'home':
-        return <Feed posts={posts} onLike={handleLike} onRetweet={handleRetweet} onBookmark={handleBookmark} onNewPost={handleNewPost} />;
+        return (
+          <Feed
+            posts={posts}
+            onLike={handleLike}
+            onRetweet={handleRetweet}
+            onBookmark={handleBookmark}
+            onNewPost={handleNewPost}
+            onReply={handleReply}
+            onDelete={handleDeletePost}
+            onPin={handlePinPost}
+            onViewThread={handleViewThread}
+            onUserClick={handleUserClick}
+            incrementViews={incrementViews}
+          />
+        );
       case 'explore':
-        return <Explore />;
+        return <Explore onNavigate={handleNavigate} />;
       case 'notifications':
-        return <Notifications />;
+        return (
+          <Notifications
+            notifications={notifications}
+            onMarkAllRead={handleMarkNotificationsRead}
+            onFollowUser={handleFollowUser}
+            followedUsers={followedUsers}
+          />
+        );
       case 'messages':
         return <Messages />;
       case 'profile':
-        return <Profile onLike={handleLike} onRetweet={handleRetweet} onBookmark={handleBookmark} />;
+        return (
+          <Profile
+            user={currentUser}
+            posts={posts.filter(p => p.user.id === currentUser.id || p.isOwn)}
+            onLike={handleLike}
+            onRetweet={handleRetweet}
+            onBookmark={handleBookmark}
+            onReply={handleReply}
+            onDelete={handleDeletePost}
+            onPin={handlePinPost}
+            onViewThread={handleViewThread}
+            onUserClick={handleUserClick}
+            incrementViews={incrementViews}
+            isOwnProfile
+          />
+        );
+      case 'user-profile':
+        const selectedUser = users.find(u => u.id === selectedUserId);
+        if (selectedUser) {
+          return (
+            <UserProfile
+              user={selectedUser}
+              posts={posts.filter(p => p.user.id === selectedUser.id)}
+              isFollowing={followedUsers.includes(selectedUser.id)}
+              onFollow={() => handleFollowUser(selectedUser.id)}
+              onLike={handleLike}
+              onRetweet={handleRetweet}
+              onBookmark={handleBookmark}
+              onReply={handleReply}
+              onViewThread={handleViewThread}
+              onUserClick={handleUserClick}
+              incrementViews={incrementViews}
+              onBack={() => setCurrentPage('home')}
+              isMuted={mutedUsers.includes(selectedUser.id)}
+              isBlocked={blockedUsers.includes(selectedUser.id)}
+              onMute={() => handleMuteUser(selectedUser.id)}
+              onBlock={() => handleBlockUser(selectedUser.id)}
+            />
+          );
+        }
+        return null;
       case 'bookmarks':
-        return <Bookmarks posts={posts} onLike={handleLike} onRetweet={handleRetweet} onBookmark={handleBookmark} />;
+        return (
+          <Bookmarks
+            posts={posts}
+            onLike={handleLike}
+            onRetweet={handleRetweet}
+            onBookmark={handleBookmark}
+            onReply={handleReply}
+            onViewThread={handleViewThread}
+            onUserClick={handleUserClick}
+            incrementViews={incrementViews}
+          />
+        );
       case 'premium':
-        return <PremiumPage />;
+        return <PremiumPage selectedPlan={premiumPlan} onSelectPlan={setPremiumPlan} />;
       case 'settings':
-        return <Settings />;
+        return <Settings settings={settings} onSettingsChange={setSettings} />;
       case 'lists':
-        return <Lists />;
+        return (
+          <Lists
+            lists={lists}
+            suggestedLists={suggestedLists}
+            followedLists={followedLists}
+            onCreateList={handleCreateList}
+            onFollowList={handleFollowList}
+            onDeleteList={handleDeleteList}
+          />
+        );
+      case 'thread':
+        const threadPost = posts.find(p => p.id === selectedThreadId);
+        if (threadPost) {
+          return (
+            <ThreadView
+              post={threadPost}
+              allPosts={posts}
+              onLike={handleLike}
+              onRetweet={handleRetweet}
+              onBookmark={handleBookmark}
+              onReply={handleReply}
+              onDelete={handleDeletePost}
+              onPin={handlePinPost}
+              onViewThread={handleViewThread}
+              onUserClick={handleUserClick}
+              incrementViews={incrementViews}
+              onBack={() => setCurrentPage('home')}
+            />
+          );
+        }
+        return null;
       default:
-        return <Feed posts={posts} onLike={handleLike} onRetweet={handleRetweet} onBookmark={handleBookmark} onNewPost={handleNewPost} />;
+        return null;
     }
   };
 
@@ -149,7 +393,7 @@ export default function App() {
         <div className="w-full max-w-[600px] min-h-screen border-r border-gray-800/50 pb-16 md:pb-0">
           {renderPage()}
         </div>
-        <RightPanel onNavigate={handleNavigate} />
+        <RightPanel onNavigate={handleNavigate} followedUsers={followedUsers} onFollowUser={handleFollowUser} />
       </main>
 
       {/* Compose Modal */}
@@ -175,6 +419,13 @@ export default function App() {
           <path d="M23 3c-6.62 0-10.69 2.68-13.04 5.95-2.33 3.26-3.76 7.78-3.76 14.05h2c0-5.53 1.23-9.5 3.15-12.19C13.24 8.19 16.38 6 22 6v4.5l5-5-5-5V3z"/>
         </svg>
       </button>
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[200] bg-blue-500 text-white px-6 py-3 rounded-lg shadow-xl animate-fade-in text-sm font-medium">
+          {toast}
+        </div>
+      )}
     </div>
   );
 }

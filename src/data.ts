@@ -1,4 +1,4 @@
-import { User, Post, Notification, Message, Trend } from './types';
+import { User, Post, Notification, Message, Trend, UserList, Reply } from './types';
 
 export const currentUser: User = {
   id: '1',
@@ -14,6 +14,7 @@ export const currentUser: User = {
   joinedDate: 'March 2019',
   location: 'Dar es Salaam, Tanzania',
   website: 'amanitech.dev',
+  isFollowing: false,
 };
 
 export const users: User[] = [
@@ -31,32 +32,36 @@ export const users: User[] = [
     posts: 12500,
     joinedDate: 'January 2018',
     location: 'Nairobi, Kenya',
+    isFollowing: true,
   },
   {
     id: '3',
     name: 'Baraka Digital',
     handle: '@barakadigital',
     avatar: '🎨',
-    bio: 'UI/UX Designer | Creative Director | Making pixels beautiful',
+    bio: 'UI/UX Designer | Creative Director | Making pixels beautiful ✨',
     verified: true,
     premium: false,
     followers: 45600,
     following: 1200,
     posts: 8900,
     joinedDate: 'June 2020',
+    isFollowing: false,
   },
   {
     id: '4',
     name: 'Neema AI',
     handle: '@neema_ai',
     avatar: '🤖',
-    bio: 'Artificial Intelligence Researcher | Deep Learning | NLP',
+    bio: 'Artificial Intelligence Researcher | Deep Learning | NLP | Building the future of AI',
     verified: true,
     premium: true,
     followers: 125000,
     following: 234,
     posts: 5600,
     joinedDate: 'September 2017',
+    location: 'San Francisco, CA',
+    isFollowing: true,
   },
   {
     id: '5',
@@ -70,34 +75,69 @@ export const users: User[] = [
     following: 567,
     posts: 2340,
     joinedDate: 'February 2021',
+    isFollowing: false,
   },
   {
     id: '6',
     name: 'Upendo Crypto',
     handle: '@upendo_crypto',
     avatar: '💎',
-    bio: 'Blockchain Developer | Web3 Enthusiast | DeFi Builder',
+    bio: 'Blockchain Developer | Web3 Enthusiast | DeFi Builder | Ethereum Maximalist',
     verified: true,
     premium: true,
     followers: 67800,
     following: 345,
     posts: 9800,
     joinedDate: 'April 2019',
+    isFollowing: true,
   },
   {
     id: '7',
     name: 'Rehema Cloud',
     handle: '@rehemacloud',
     avatar: '☁️',
-    bio: 'Cloud Architect | AWS | GCP | DevOps | Infrastructure',
+    bio: 'Cloud Architect | AWS | GCP | DevOps | Infrastructure as Code',
     verified: true,
     premium: false,
     followers: 34500,
     following: 678,
     posts: 6700,
     joinedDate: 'July 2018',
+    isFollowing: false,
+  },
+  {
+    id: '8',
+    name: 'Jabali Security',
+    handle: '@jabali_sec',
+    avatar: '🛡️',
+    bio: 'Cybersecurity Expert | Penetration Testing | Bug Bounty Hunter | CTF Player',
+    verified: true,
+    premium: true,
+    followers: 52300,
+    following: 189,
+    posts: 4200,
+    joinedDate: 'November 2019',
+    isFollowing: false,
   },
 ];
+
+export const replies: Record<string, Reply[]> = {
+  '1': [
+    { id: 'r1', user: users[4], content: 'This is incredible! Can\'t wait to try it out 🚀', timestamp: new Date(Date.now() - 1000 * 60 * 3), likes: 23, liked: false, replies: 2 },
+    { id: 'r2', user: users[6], content: 'Does it support multi-language codebases?', timestamp: new Date(Date.now() - 1000 * 60 * 2), likes: 8, liked: false, replies: 0 },
+    { id: 'r3', user: users[2], content: 'The UI looks amazing! Great work team 👏', timestamp: new Date(Date.now() - 1000 * 60 * 1), likes: 45, liked: false, replies: 1 },
+  ],
+  '3': [
+    { id: 'r4', user: users[0], content: 'This is groundbreaking! When can we access the API?', timestamp: new Date(Date.now() - 1000 * 60 * 25), likes: 156, liked: false, replies: 12 },
+    { id: 'r5', user: users[5], content: 'The implications for blockchain are enormous too', timestamp: new Date(Date.now() - 1000 * 60 * 20), likes: 89, liked: false, replies: 5 },
+    { id: 'r6', user: users[7], content: 'What about safety measures? This needs careful deployment.', timestamp: new Date(Date.now() - 1000 * 60 * 15), likes: 234, liked: false, replies: 18 },
+    { id: 'r7', user: users[4], content: 'I\'ve been testing the beta and it\'s phenomenal!', timestamp: new Date(Date.now() - 1000 * 60 * 10), likes: 67, liked: false, replies: 3 },
+  ],
+  '7': [
+    { id: 'r8', user: users[1], content: 'Congratulations! Well deserved 🎉', timestamp: new Date(Date.now() - 1000 * 60 * 150), likes: 345, liked: false, replies: 4 },
+    { id: 'r9', user: users[3], content: 'Open source for the win! 🙌', timestamp: new Date(Date.now() - 1000 * 60 * 140), likes: 178, liked: false, replies: 2 },
+  ],
+};
 
 export const posts: Post[] = [
   {
@@ -114,6 +154,7 @@ export const posts: Post[] = [
     retweeted: false,
     bookmarked: false,
     isPremium: true,
+    replyList: replies['1'],
   },
   {
     id: '2',
@@ -143,6 +184,7 @@ export const posts: Post[] = [
     retweeted: true,
     bookmarked: true,
     isPremium: true,
+    replyList: replies['3'],
   },
   {
     id: '4',
@@ -200,7 +242,10 @@ export const posts: Post[] = [
     liked: false,
     retweeted: false,
     bookmarked: false,
+    pinned: true,
     isPremium: true,
+    isOwn: true,
+    replyList: replies['7'],
   },
 ];
 
@@ -210,6 +255,7 @@ export const notifications: Notification[] = [
     type: 'like',
     user: users[1],
     content: 'liked your post',
+    postContent: '🌍 Excited to announce that our open-source project...',
     timestamp: new Date(Date.now() - 1000 * 60 * 2),
     read: false,
   },
@@ -218,6 +264,7 @@ export const notifications: Notification[] = [
     type: 'retweet',
     user: users[3],
     content: 'reposted your post',
+    postContent: '🌍 Excited to announce that our open-source project...',
     timestamp: new Date(Date.now() - 1000 * 60 * 10),
     read: false,
   },
@@ -234,6 +281,7 @@ export const notifications: Notification[] = [
     type: 'mention',
     user: users[2],
     content: 'mentioned you in a post',
+    postContent: 'Great insights from @amanitech on open source development!',
     timestamp: new Date(Date.now() - 1000 * 60 * 45),
     read: true,
   },
@@ -242,6 +290,7 @@ export const notifications: Notification[] = [
     type: 'reply',
     user: users[5],
     content: 'replied to your post',
+    postContent: 'What do you think about the future of Web3?',
     timestamp: new Date(Date.now() - 1000 * 60 * 60),
     read: true,
   },
@@ -253,6 +302,14 @@ export const notifications: Notification[] = [
     timestamp: new Date(Date.now() - 1000 * 60 * 90),
     read: true,
   },
+  {
+    id: '7',
+    type: 'follow',
+    user: users[7],
+    content: 'followed you',
+    timestamp: new Date(Date.now() - 1000 * 60 * 120),
+    read: true,
+  },
 ];
 
 export const messages: Message[] = [
@@ -262,6 +319,13 @@ export const messages: Message[] = [
     lastMessage: 'Hey! Did you see the new AI features?',
     timestamp: new Date(Date.now() - 1000 * 60 * 5),
     unread: true,
+    messages: [
+      { id: 'm1', text: 'Hey Amani! 👋', sent: false, time: '10:15 AM' },
+      { id: 'm2', text: 'Hi Zawadi! How are you?', sent: true, time: '10:18 AM' },
+      { id: 'm3', text: 'I\'m great! We just shipped something exciting', sent: false, time: '10:20 AM' },
+      { id: 'm4', text: 'Oh really? Tell me more!', sent: true, time: '10:22 AM' },
+      { id: 'm5', text: 'Hey! Did you see the new AI features?', sent: false, time: '10:30 AM' },
+    ],
   },
   {
     id: '2',
@@ -269,6 +333,11 @@ export const messages: Message[] = [
     lastMessage: 'The design mockups are ready for review 🎨',
     timestamp: new Date(Date.now() - 1000 * 60 * 30),
     unread: true,
+    messages: [
+      { id: 'm6', text: 'Hey, I\'ve been working on the new UI', sent: false, time: '9:00 AM' },
+      { id: 'm7', text: 'Awesome! Can\'t wait to see it', sent: true, time: '9:05 AM' },
+      { id: 'm8', text: 'The design mockups are ready for review 🎨', sent: false, time: '9:30 AM' },
+    ],
   },
   {
     id: '3',
@@ -276,6 +345,11 @@ export const messages: Message[] = [
     lastMessage: 'Let\'s schedule a call about the research paper',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
     unread: false,
+    messages: [
+      { id: 'm9', text: 'The paper is almost done', sent: false, time: '8:00 AM' },
+      { id: 'm10', text: 'Great progress! When can we review?', sent: true, time: '8:15 AM' },
+      { id: 'm11', text: 'Let\'s schedule a call about the research paper', sent: false, time: '8:30 AM' },
+    ],
   },
   {
     id: '4',
@@ -283,16 +357,38 @@ export const messages: Message[] = [
     lastMessage: 'Check out this smart contract pattern I found',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5),
     unread: false,
+    messages: [
+      { id: 'm12', text: 'Found something interesting in DeFi', sent: false, time: '5:00 AM' },
+      { id: 'm13', text: 'Check out this smart contract pattern I found', sent: false, time: '5:30 AM' },
+    ],
   },
 ];
 
 export const trends: Trend[] = [
-  { id: '1', category: 'Technology · Trending', name: '#AIRevolution', posts: '125K posts' },
-  { id: '2', category: 'Trending in Tanzania', name: '#TechAfrica', posts: '89.2K posts' },
-  { id: '3', category: 'Programming · Trending', name: 'TypeScript 6.0', posts: '67.8K posts' },
-  { id: '4', category: 'Business · Trending', name: '#StartupLife', posts: '45.6K posts' },
-  { id: '5', category: 'Science · Trending', name: 'Quantum Computing', posts: '34.5K posts' },
-  { id: '6', category: 'Trending in East Africa', name: '#Innovation2026', posts: '28.9K posts' },
-  { id: '7', category: 'Technology · Trending', name: '#WebDevelopment', posts: '23.4K posts' },
-  { id: '8', category: 'Entertainment · Trending', name: '#OpenSource', posts: '19.8K posts' },
+  { id: '1', category: 'Technology · Trending', name: '#AIRevolution', posts: '125K posts', description: 'Artificial Intelligence is transforming every industry' },
+  { id: '2', category: 'Trending in Tanzania', name: '#TechAfrica', posts: '89.2K posts', description: 'African tech ecosystem growing rapidly' },
+  { id: '3', category: 'Programming · Trending', name: 'TypeScript 6.0', posts: '67.8K posts', description: 'New features in the latest TypeScript release' },
+  { id: '4', category: 'Business · Trending', name: '#StartupLife', posts: '45.6K posts', description: 'Entrepreneurs sharing their journey' },
+  { id: '5', category: 'Science · Trending', name: 'Quantum Computing', posts: '34.5K posts', description: 'Breakthroughs in quantum technology' },
+  { id: '6', category: 'Trending in East Africa', name: '#Innovation2026', posts: '28.9K posts', description: 'New innovations shaping the future' },
+  { id: '7', category: 'Technology · Trending', name: '#WebDevelopment', posts: '23.4K posts', description: 'Latest trends in web development' },
+  { id: '8', category: 'Entertainment · Trending', name: '#OpenSource', posts: '19.8K posts', description: 'Open source projects making impact' },
+  { id: '9', category: 'Sports · Trending', name: '#eSports2026', posts: '15.6K posts', description: 'Competitive gaming reaches new heights' },
+  { id: '10', category: 'Music · Trending', name: '#Afrobeats', posts: '12.3K posts', description: 'African music taking over the world' },
 ];
+
+export const userLists: UserList[] = [
+  { id: '1', name: 'Tech Leaders', members: 45, description: 'Top tech influencers and innovators', isPrivate: false, followers: 1200, memberUsers: [users[1], users[3], users[4]] },
+  { id: '2', name: 'AI Researchers', members: 23, description: 'Artificial intelligence experts', isPrivate: false, followers: 890, memberUsers: [users[3], users[7]] },
+  { id: '3', name: 'Design Inspiration', members: 67, description: 'Creative designers and artists', isPrivate: true, followers: 2300, memberUsers: [users[2]] },
+  { id: '4', name: 'Startup Founders', members: 34, description: 'Entrepreneurs building the future', isPrivate: false, followers: 560, memberUsers: [users[5], users[6]] },
+];
+
+export const suggestedLists: UserList[] = [
+  { id: 's1', name: 'Top Tech Voices', members: 250, description: 'The most influential voices in tech', isPrivate: false, followers: 12500 },
+  { id: 's2', name: 'AI & Machine Learning', members: 180, description: 'Everything about AI and ML', isPrivate: false, followers: 8200 },
+  { id: 's3', name: 'Startup Ecosystem', members: 120, description: 'Startups, VCs, and innovation', isPrivate: false, followers: 5700 },
+  { id: 's4', name: 'Web3 Builders', members: 95, description: 'Blockchain and DeFi developers', isPrivate: false, followers: 4300 },
+];
+
+export const emojiList = ['😀', '😂', '🥰', '😎', '🤔', '👍', '👏', '🙌', '🔥', '💯', '🚀', '💡', '🎉', '❤️', '💪', '✨', '🌟', '🎯', '💻', '🤖', '☁️', '🔗', '🛡️', '📱', '⚡', '🌍', '🇹🇿', '🇰🇪', '🏆', '📊'];

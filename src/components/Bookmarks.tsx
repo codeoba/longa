@@ -8,9 +8,13 @@ interface BookmarksProps {
   onLike: (id: string) => void;
   onRetweet: (id: string) => void;
   onBookmark: (id: string) => void;
+  onReply: (postId: string, content: string) => void;
+  onViewThread: (id: string) => void;
+  onUserClick: (userId: string) => void;
+  incrementViews: (id: string) => void;
 }
 
-export default function Bookmarks({ posts, onLike, onRetweet, onBookmark }: BookmarksProps) {
+export default function Bookmarks({ posts, onLike, onRetweet, onBookmark, onReply, onViewThread, onUserClick, incrementViews }: BookmarksProps) {
   const bookmarkedPosts = posts.filter(p => p.bookmarked);
 
   return (
@@ -38,6 +42,10 @@ export default function Bookmarks({ posts, onLike, onRetweet, onBookmark }: Book
               onLike={onLike}
               onRetweet={onRetweet}
               onBookmark={onBookmark}
+              onReply={onReply}
+              onViewThread={onViewThread}
+              onUserClick={onUserClick}
+              incrementViews={incrementViews}
             />
           ))}
         </div>
