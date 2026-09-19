@@ -3,6 +3,7 @@ import { Post as PostType } from '../types';
 import { Heart, Retweet, Reply as ReplyIcon, Views, Share, ThreeDots, Verified, Premium } from './Icons';
 import { currentUser } from '../data';
 import { useTheme } from '../ThemeContext';
+import PollComponent from './PollComponent';
 
 interface PostProps {
   post: PostType;
@@ -210,6 +211,26 @@ export default function PostComponent({ post, onLike, onRetweet, onBookmark, onR
           {post.image && (
             <div className="mt-3 rounded-2xl overflow-hidden border border-gray-800/50">
               <img src={post.image} alt="" className="w-full max-h-[500px] object-cover" />
+            </div>
+          )}
+
+          {/* Poll */}
+          {post.poll && (
+            <PollComponent poll={post.poll} onVote={() => {}} />
+          )}
+
+          {/* Quote Post */}
+          {post.quotePost && (
+            <div className={`mt-3 rounded-2xl border p-3 ${isDark ? 'border-gray-800/50 hover:bg-gray-900/50' : 'border-gray-200 hover:bg-gray-50'} transition-colors cursor-pointer`}>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-[10px]">
+                  {post.quotePost.user.avatar}
+                </div>
+                <span className={`font-bold text-[13px] ${isDark ? 'text-white' : 'text-gray-900'}`}>{post.quotePost.user.name}</span>
+                {post.quotePost.user.verified && <Verified />}
+                <span className="text-gray-500 text-[13px]">{post.quotePost.user.handle}</span>
+              </div>
+              <p className={`text-[14px] ${isDark ? 'text-gray-300' : 'text-gray-700'} line-clamp-3`}>{post.quotePost.content}</p>
             </div>
           )}
 

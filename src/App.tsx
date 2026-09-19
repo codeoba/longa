@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { Page, Post, Reply, User } from './types';
-import { posts as initialPosts, currentUser, notifications as initialNotifications, messages as initialMessages, users, userLists as initialLists, suggestedLists } from './data';
+import { Page, Post, Reply, User, Draft } from './types';
+import { posts as initialPosts, currentUser, notifications as initialNotifications, messages as initialMessages, users, userLists as initialLists, suggestedLists, initialDrafts } from './data';
 import Sidebar from './components/Sidebar';
 import Feed from './components/Feed';
 import Explore from './components/Explore';
@@ -15,6 +15,12 @@ import RightPanel from './components/RightPanel';
 import ComposeTweet from './components/ComposeTweet';
 import ThreadView from './components/ThreadView';
 import UserProfile from './components/UserProfile';
+import Grok from './components/Grok';
+import Spaces from './components/Spaces';
+import Communities from './components/Communities';
+import Analytics from './components/Analytics';
+import Drafts from './components/Drafts';
+import { useKeyboardShortcuts } from './components/KeyboardShortcuts';
 import { useTheme } from './ThemeContext';
 
 export default function App() {
@@ -40,6 +46,7 @@ export default function App() {
   });
   const [premiumPlan, setPremiumPlan] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [drafts, setDrafts] = useState<Draft[]>([]);
 
   const unreadNotifications = notifications.filter(n => !n.read).length;
   const unreadMessages = initialMessages.filter(m => m.unread).length;
@@ -97,6 +104,22 @@ export default function App() {
     setPosts(prev => [newPost, ...prev]);
     showToast('Your post was sent');
   }, []);
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts({
+    onNavigate: (page) => setCurrentPage(page),
+    onCompose: () => setShowComposeModal(true),
+  });
+
+  const handleDeleteDraft = useCallback((id: string) => {
+    setDrafts(prev => prev.filter(d => d.id !== id));
+    showToast('Draft deleted');
+  }, []);
+
+  const handlePostDraft = useCallback((draft: Draft) => {
+    handleNewPost(draft.content);
+    setDrafts(prev => prev.filter(d => d.id !== draft.id));
+  }, [handleNewPost]);
 
   const handleReply = useCallback((postId: string, content: string) => {
     const newReply: Reply = {
@@ -338,6 +361,16 @@ export default function App() {
           );
         }
         return null;
+      case 'grok':
+        return <Grok />;
+      case 'spaces':
+        return <Spaces />;
+      case 'communities':
+        return <Communities />;
+      case 'analytics':
+        return <Analytics />;
+      case 'drafts':
+        return <Drafts drafts={drafts} onDeleteDraft={handleDeleteDraft} onPostDraft={handlePostDraft} />;
       default:
         return null;
     }

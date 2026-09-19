@@ -27,6 +27,54 @@ const navItems: { icon: React.ReactNode; label: string; page: Page; badge?: stri
   { icon: <Settings />, label: 'Settings', page: 'settings' },
 ];
 
+const extraNavItems: { icon: React.ReactNode; label: string; page: Page }[] = [
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-[26px] h-[26px]" fill="currentColor">
+        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+      </svg>
+    ),
+    label: 'Grok',
+    page: 'grok',
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-[26px] h-[26px]" fill="currentColor">
+        <path d="M12 1a9 9 0 0 0-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7a9 9 0 0 0-9-9z"/>
+      </svg>
+    ),
+    label: 'Spaces',
+    page: 'spaces',
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-[26px] h-[26px]" fill="currentColor">
+        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+      </svg>
+    ),
+    label: 'Communities',
+    page: 'communities',
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-[26px] h-[26px]" fill="currentColor">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+      </svg>
+    ),
+    label: 'Analytics',
+    page: 'analytics',
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-[26px] h-[26px]" fill="currentColor">
+        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+      </svg>
+    ),
+    label: 'Drafts',
+    page: 'drafts',
+  },
+];
+
 export default function Sidebar({ currentPage, onNavigate, onCompose, unreadNotifications, unreadMessages }: SidebarProps) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -70,6 +118,26 @@ export default function Sidebar({ currentPage, onNavigate, onCompose, unreadNoti
             </button>
           );
         })}
+        {/* Extra navigation items - visible on larger screens */}
+        <div className="hidden xl:block border-t border-gray-800/30 mt-2 pt-2">
+          {extraNavItems.map((item) => {
+            const isActive = currentPage === item.page;
+            return (
+              <button
+                key={item.page}
+                onClick={() => onNavigate(item.page)}
+                className={`flex items-center gap-4 px-3 py-3 rounded-full transition-all duration-200 group w-full ${
+                  isActive
+                    ? `font-bold ${isDark ? 'text-white' : 'text-gray-900'}`
+                    : `${isDark ? 'text-gray-300 hover:text-white hover:bg-gray-800/40' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'}`
+                }`}
+              >
+                <span>{item.icon}</span>
+                <span className="text-[17px]">{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </nav>
 
       {/* Post Button */}

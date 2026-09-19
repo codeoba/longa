@@ -1,4 +1,4 @@
-import { User, Post, Notification, Message, Trend, UserList, Reply } from './types';
+import { User, Post, Notification, Message, Trend, UserList, Reply, Draft, Space, Community, AnalyticsData } from './types';
 
 export const currentUser: User = {
   id: '1',
@@ -189,7 +189,7 @@ export const posts: Post[] = [
   {
     id: '4',
     user: users[4],
-    content: '💡 Hot take: TypeScript is not just "JavaScript with types." It\'s a completely different way of thinking about software architecture.\n\nOnce you go TS, you never go back. The confidence it gives you when refactoring is unmatched.\n\nWho agrees? 👇',
+    content: '💡 Hot take: TypeScript is not just "JavaScript with types." It\'s a completely different way of thinking about software architecture.\n\nOnce you go TS, you never go back. The confidence it gives you when refactoring is unmatched.',
     timestamp: new Date(Date.now() - 1000 * 60 * 60),
     likes: 3456,
     retweets: 789,
@@ -199,6 +199,19 @@ export const posts: Post[] = [
     liked: false,
     retweeted: false,
     bookmarked: false,
+    poll: {
+      id: 'poll1',
+      question: 'What\'s your primary programming language?',
+      options: [
+        { id: 'opt1', text: 'TypeScript/JavaScript', votes: 4521, percentage: 45, voted: false },
+        { id: 'opt2', text: 'Python', votes: 2890, percentage: 29, voted: false },
+        { id: 'opt3', text: 'Go', votes: 1456, percentage: 15, voted: false },
+        { id: 'opt4', text: 'Rust', votes: 1133, percentage: 11, voted: false },
+      ],
+      totalVotes: 10000,
+      endsAt: new Date(Date.now() + 1000 * 60 * 60 * 18),
+      hasVoted: false,
+    },
   },
   {
     id: '5',
@@ -392,3 +405,115 @@ export const suggestedLists: UserList[] = [
 ];
 
 export const emojiList = ['😀', '😂', '🥰', '😎', '🤔', '👍', '👏', '🙌', '🔥', '💯', '🚀', '💡', '🎉', '❤️', '💪', '✨', '🌟', '🎯', '💻', '🤖', '☁️', '🔗', '🛡️', '📱', '⚡', '🌍', '🇹🇿', '🇰🇪', '🏆', '📊'];
+
+export const initialDrafts: Draft[] = [
+  {
+    id: 'd1',
+    content: 'Thinking about writing a thread on AI safety...',
+    createdAt: new Date(Date.now() - 1000 * 60 * 30),
+  },
+  {
+    id: 'd2',
+    content: 'Great insights from today\'s tech conference! Key takeaways:\n\n1. AI is transforming everything\n2. Open source is winning\n3. Community matters most',
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
+  },
+];
+
+export const spaces: Space[] = [
+  {
+    id: 'sp1',
+    title: 'The Future of AI in Africa',
+    host: users[3],
+    speakers: [users[1], users[3], users[7]],
+    listeners: 2340,
+    isLive: true,
+    startedAt: new Date(Date.now() - 1000 * 60 * 45),
+    description: 'Discussing how AI will shape the African tech ecosystem in the next decade',
+    tags: ['AI', 'Africa', 'Tech', 'Future'],
+  },
+  {
+    id: 'sp2',
+    title: 'Web3 Builders Roundtable',
+    host: users[5],
+    speakers: [users[5], users[6]],
+    listeners: 890,
+    isLive: true,
+    startedAt: new Date(Date.now() - 1000 * 60 * 20),
+    description: 'Weekly discussion on blockchain development and DeFi',
+    tags: ['Web3', 'Blockchain', 'DeFi'],
+  },
+  {
+    id: 'sp3',
+    title: 'Design Systems at Scale',
+    host: users[2],
+    speakers: [users[2]],
+    listeners: 567,
+    isLive: false,
+    startedAt: new Date(Date.now() - 1000 * 60 * 60 * 3),
+    description: 'How to build and maintain design systems for large organizations',
+    tags: ['Design', 'UI/UX', 'Systems'],
+  },
+];
+
+export const communities: Community[] = [
+  {
+    id: 'c1',
+    name: 'React Developers',
+    description: 'A community for React developers to share knowledge, ask questions, and discuss best practices.',
+    avatar: '⚛️',
+    members: 45600,
+    isMember: true,
+    isPrivate: false,
+    admin: users[4],
+    rules: ['Be respectful', 'No spam', 'Stay on topic', 'Help others'],
+    topics: ['React', 'JavaScript', 'Frontend', 'Web Development'],
+  },
+  {
+    id: 'c2',
+    name: 'AI & Machine Learning',
+    description: 'Explore the latest in artificial intelligence and machine learning research and applications.',
+    avatar: '🤖',
+    members: 89200,
+    isMember: true,
+    isPrivate: false,
+    admin: users[3],
+    rules: ['Scientific discussions only', 'Cite sources', 'No misinformation'],
+    topics: ['AI', 'ML', 'Deep Learning', 'NLP', 'Computer Vision'],
+  },
+  {
+    id: 'c3',
+    name: 'African Tech Hub',
+    description: 'Connecting tech innovators across Africa. Share opportunities, collaborate on projects.',
+    avatar: '🌍',
+    members: 23400,
+    isMember: false,
+    isPrivate: false,
+    admin: users[1],
+    rules: ['Africa-focused content', 'Support local talent', 'Share opportunities'],
+    topics: ['Africa', 'Tech', 'Startups', 'Innovation'],
+  },
+  {
+    id: 'c4',
+    name: 'Open Source Contributors',
+    description: 'For developers who contribute to open source projects. Share your work and find collaborators.',
+    avatar: '💻',
+    members: 67800,
+    isMember: false,
+    isPrivate: false,
+    admin: users[0],
+    rules: ['Share your contributions', 'Help newcomers', 'No self-promotion spam'],
+    topics: ['Open Source', 'GitHub', 'Contributing', 'FOSS'],
+  },
+];
+
+export const analyticsData: AnalyticsData = {
+  period: '30d',
+  impressions: 1250000,
+  engagements: 89000,
+  engagementRate: 7.12,
+  followers: 15420,
+  followersChange: 1240,
+  topPosts: posts.slice(0, 3),
+  profileVisits: 34500,
+  mentions: 2340,
+};

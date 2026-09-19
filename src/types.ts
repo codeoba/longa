@@ -27,6 +27,23 @@ export interface Reply {
   replies: number;
 }
 
+export interface Poll {
+  id: string;
+  question: string;
+  options: PollOption[];
+  totalVotes: number;
+  endsAt: Date;
+  hasVoted: boolean;
+}
+
+export interface PollOption {
+  id: string;
+  text: string;
+  votes: number;
+  percentage: number;
+  voted: boolean;
+}
+
 export interface Post {
   id: string;
   user: User;
@@ -45,6 +62,8 @@ export interface Post {
   isPremium?: boolean;
   replyList?: Reply[];
   isOwn?: boolean;
+  poll?: Poll;
+  quotePost?: Post;
 }
 
 export interface Notification {
@@ -92,4 +111,57 @@ export interface UserList {
   memberUsers?: User[];
 }
 
-export type Page = 'home' | 'explore' | 'notifications' | 'messages' | 'bookmarks' | 'profile' | 'settings' | 'lists' | 'premium' | 'user-profile' | 'thread';
+export interface Draft {
+  id: string;
+  content: string;
+  image?: string;
+  poll?: Poll;
+  createdAt: Date;
+}
+
+export interface Space {
+  id: string;
+  title: string;
+  host: User;
+  speakers: User[];
+  listeners: number;
+  isLive: boolean;
+  startedAt: Date;
+  description?: string;
+  tags: string[];
+}
+
+export interface Community {
+  id: string;
+  name: string;
+  description: string;
+  avatar: string;
+  banner?: string;
+  members: number;
+  isMember: boolean;
+  isPrivate: boolean;
+  admin: User;
+  rules: string[];
+  topics: string[];
+}
+
+export interface AnalyticsData {
+  period: '7d' | '30d' | '90d';
+  impressions: number;
+  engagements: number;
+  engagementRate: number;
+  followers: number;
+  followersChange: number;
+  topPosts: Post[];
+  profileVisits: number;
+  mentions: number;
+}
+
+export interface GrokMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
+export type Page = 'home' | 'explore' | 'notifications' | 'messages' | 'bookmarks' | 'profile' | 'settings' | 'lists' | 'premium' | 'user-profile' | 'thread' | 'grok' | 'spaces' | 'communities' | 'analytics' | 'drafts';
