@@ -6,7 +6,7 @@
   }
 
   html {
-    background-color: #000;
+    background-color: #15202b;
     color: #fff;
     color-scheme: dark;
   }
@@ -35,7 +35,7 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #333;
+    background: #38444d;
     border-radius: 10px;
   }
 
