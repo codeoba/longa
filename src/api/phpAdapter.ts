@@ -5,7 +5,7 @@
  * Badilisha API_URL na URL ya backend yako
  */
 
-const API_URL = 'https://yourdomain.com/api'; // Badilisha na URL yako
+const API_URL = 'https://api.longa.app'; // Badilisha na URL ya Longa backend yako
 
 interface ApiOptions extends RequestInit {
   headers?: Record<string, string>;

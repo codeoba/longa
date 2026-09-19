@@ -31,7 +31,7 @@ return [
     
     // Application Settings
     'app' => [
-        'name' => 'X App API',
+        'name' => 'Longa API',
         'debug' => true, // Badilisha kuwa false kwa production
         'url' => 'http://localhost:8000',
         'timezone' => 'Africa/Dar_es_Salaam',

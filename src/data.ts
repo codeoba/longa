@@ -3,7 +3,7 @@ import { User, Post, Notification, Message, Trend, UserList, Reply, Draft, Space
 export const currentUser: User = {
   id: '1',
   name: 'Amani Tech',
-  handle: '@amanitech',
+  handle: '@longa_user',
   avatar: '👨‍💻',
   bio: '🚀 Full Stack Developer | Building the future | Open Source Contributor | Tech Enthusiast from Tanzania 🇹🇿',
   verified: true,
@@ -294,7 +294,7 @@ export const notifications: Notification[] = [
     type: 'mention',
     user: users[2],
     content: 'mentioned you in a post',
-    postContent: 'Great insights from @amanitech on open source development!',
+    postContent: 'Great insights from @longa_user on open source development!',
     timestamp: new Date(Date.now() - 1000 * 60 * 45),
     read: true,
   },

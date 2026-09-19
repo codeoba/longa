@@ -1,4 +1,4 @@
-# Database Layer - X App
+# Database Layer - Longa
 
 Sistema ya database inayoweza kufanya kazi na database mbali mbali.
 

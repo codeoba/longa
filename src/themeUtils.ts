@@ -25,7 +25,7 @@ export function useThemeClasses(): ThemeClasses {
   const isDark = theme === 'dark';
 
   return {
-    // Dark mode: Twitter-style dark blue-gray (60% less dark than pure black)
+    // Dark mode: Longa-style dark blue-gray (60% less dark than pure black)
     // Light mode: Pure white
     bg: isDark ? 'bg-[#15202b]' : 'bg-white',
     bgSecondary: isDark ? 'bg-[#192734]' : 'bg-gray-50',

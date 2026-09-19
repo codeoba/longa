@@ -59,7 +59,7 @@ export default function RegisterPage({ onSwitchToLogin }: RegisterPageProps) {
         </div>
 
         <h1 className={`text-3xl font-extrabold ${tc.text} mb-2`}>Create your account</h1>
-        <p className={`text-sm ${tc.textMuted} mb-6`}>Join X and start connecting with the world.</p>
+        <p className={`text-sm ${tc.textMuted} mb-6`}>Join Longa and start connecting with the world.</p>
 
         {error && (
           <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-500 text-sm">

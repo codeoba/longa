@@ -1,6 +1,6 @@
-# X App - Twitter/X Clone ya Premium
+# Longa - Premium Social Platform
 
-Twitter/X clone kamili yenye backend ya PHP inayofanya kazi kwenye aaPanel au cPanel na MySQL/PostgreSQL.
+Longa ni premium social platform kamili yenye backend ya PHP inayofanya kazi kwenye aaPanel au cPanel na MySQL/PostgreSQL.
 
 ## 🎯 Features
 

@@ -39,7 +39,7 @@ export default function LoginPage({ onSwitchToRegister, onForgotPassword }: Logi
           <XLogo />
         </div>
 
-        <h1 className={`text-3xl font-extrabold ${tc.text} mb-2`}>Sign in to X</h1>
+        <h1 className={`text-3xl font-extrabold ${tc.text} mb-2`}>Sign in to Longa</h1>
         <p className={`text-sm ${tc.textMuted} mb-6`}>Welcome back! Please enter your details.</p>
 
         {error && (

@@ -1,4 +1,4 @@
-# 🚀 Deployment Guide - X App (Twitter/X Clone)
+# 🚀 Deployment Guide - Longa Social Platform
 
 ## ✅ Hali ya Project: **TAYARI KWA DEPLOYMENT!**
 
@@ -180,7 +180,7 @@ return [
     
     // Application Settings
     'app' => [
-        'name' => 'X App API',
+        'name' => 'Longa API',
         'debug' => false, // Set to false in production!
         'url' => 'https://yourdomain.com',
         'timezone' => 'Africa/Dar_es_Salaam',
@@ -240,7 +240,7 @@ Expected response:
 ```json
 {
   "status": "ok",
-  "message": "X App API is running",
+  "message": "Longa API is running",
   "version": "1.0.0",
   "endpoints": {
     "auth": "/auth",

@@ -29,7 +29,7 @@ export default function Bookmarks({ posts, onLike, onRetweet, onBookmark, onRepl
           </button>
           <div>
             <h1 className={`text-xl font-bold ${tc.text}`}>Bookmarks</h1>
-            <p className="text-[13px] text-gray-500">@amanitech</p>
+            <p className="text-[13px] text-gray-500">@longa_user</p>
           </div>
         </div>
       </div>

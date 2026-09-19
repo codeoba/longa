@@ -94,7 +94,7 @@ export default function OfflineMode() {
               <div className="text-4xl">📱</div>
               <div className="flex-1">
                 <h3 className={`text-lg font-bold ${tc.text} mb-1`}>
-                  Install X App
+                  Install Longa
                 </h3>
                 <p className={`text-sm ${tc.textSecondary}`}>
                   Install this app on your device for a native experience with offline support and push notifications.

@@ -170,7 +170,7 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
           <a href="#" className="hover:underline">Accessibility</a>
           <a href="#" className="hover:underline">Ads info</a>
           <a href="#" className="hover:underline">More</a>
-          <span>© 2026 X Corp.</span>
+          <span>© 2026 Longa Inc.</span>
         </div>
       </div>
     </aside>

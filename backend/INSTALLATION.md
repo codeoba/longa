@@ -1,4 +1,4 @@
-# X App - Installation Guide
+# Longa - Installation Guide
 
 ## 🚀 Installation kwenye aaPanel au cPanel
 
@@ -80,7 +80,7 @@ Unapaswa kuona:
 ```json
 {
   "status": "ok",
-  "message": "X App API is running",
+  "message": "Longa API is running",
   "version": "1.0.0"
 }
 ```

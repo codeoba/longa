@@ -1,6 +1,6 @@
 <?php
 /**
- * X App API - Main Entry Point
+ * Longa API - Main Entry Point
  * 
  * Installation:
  * 1. Upload this folder to your aaPanel/cPanel (e.g., /home/username/public_html/api/)
@@ -38,7 +38,7 @@ $messagesController = new MessagesController();
 $router->get('/', function() {
     jsonResponse([
         'status' => 'ok',
-        'message' => 'X App API is running',
+        'message' => 'Longa API is running',
         'version' => '1.0.0',
         'endpoints' => [
             'auth' => '/auth',

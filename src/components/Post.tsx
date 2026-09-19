@@ -56,7 +56,7 @@ export default function PostComponent({ post, onLike, onRetweet, onBookmark, onR
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard?.writeText(`https://x.com${post.user.handle}/status/${post.id}`);
+    navigator.clipboard?.writeText(`https://longa.app${post.user.handle}/status/${post.id}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -66,7 +66,7 @@ export default function PostComponent({ post, onLike, onRetweet, onBookmark, onR
       navigator.share({
         title: `${post.user.name} on X`,
         text: post.content,
-        url: `https://x.com${post.user.handle}/status/${post.id}`,
+        url: `https://longa.app${post.user.handle}/status/${post.id}`,
       });
     }
   };
