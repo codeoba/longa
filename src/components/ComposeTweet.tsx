@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { currentUser, emojiList } from '../data';
 import { Image, Gif, Emoji, Poll, Schedule, Location, Close, Verified, Premium } from './Icons';
+import { useTheme } from '../ThemeContext';
 
 interface ComposeTweetProps {
   onClose?: () => void;
@@ -19,6 +20,8 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
   const maxChars = 280;
   const remaining = maxChars - content.length;
   const progress = (content.length / maxChars) * 100;
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const handleSubmit = () => {
     if (content.trim() && content.length <= maxChars) {
@@ -56,9 +59,9 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
   };
 
   return (
-    <div className={`${isModal ? '' : 'border-b border-gray-800/50 px-4 py-3'}`}>
+    <div className={`${isModal ? '' : `px-4 py-3 border-b ${isDark ? 'border-gray-800/50' : 'border-gray-200'}`}`}>
       {isModal && (
-        <div className="flex items-center justify-between p-3 border-b border-gray-800/50">
+        <div className={`flex items-center justify-between p-3 border-b ${isDark ? 'border-gray-800/50' : 'border-gray-200'}`}>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-800/50 transition-colors">
             <Close />
           </button>
@@ -91,7 +94,7 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
             onChange={handleTextareaChange}
             onFocus={() => setIsFocused(true)}
             placeholder="What is happening?!"
-            className="w-full bg-transparent text-xl text-white placeholder-gray-600 resize-none outline-none min-h-[52px] max-h-[300px] py-2"
+            className={`w-full bg-transparent text-xl resize-none outline-none min-h-[52px] max-h-[300px] py-2 ${isDark ? 'text-white placeholder-gray-600' : 'text-gray-900 placeholder-gray-400'}`}
             rows={isModal ? 5 : 2}
           />
 

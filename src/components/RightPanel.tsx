@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { trends, users, currentUser } from '../data';
 import { Search, Verified, Premium, ThreeDots, Sparkles } from './Icons';
+import { useTheme } from '../ThemeContext';
 
 interface RightPanelProps {
   onNavigate: (page: string) => void;
@@ -11,6 +12,8 @@ interface RightPanelProps {
 export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: RightPanelProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const suggestedUsers = useMemo(() =>
     users.filter(u => u.id !== currentUser.id).slice(0, 3),
@@ -31,7 +34,11 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
     <aside className="hidden lg:block w-[350px] flex-shrink-0 pl-7 py-2">
       <div className="sticky top-0 pt-1 pb-3 bg-black z-40">
         {/* Search */}
-        <div className={`flex items-center gap-3 px-4 py-2.5 rounded-full border ${searchFocused ? 'border-blue-500 bg-black' : 'border-transparent bg-gray-900'} transition-colors`}>
+        <div className={`flex items-center gap-3 px-4 py-2.5 rounded-full border transition-colors ${
+          searchFocused
+            ? 'border-blue-500'
+            : isDark ? 'border-transparent bg-gray-900' : 'border-transparent bg-gray-100'
+        } ${!searchFocused && (isDark ? 'bg-gray-900' : 'bg-gray-100')}`}>
           <Search />
           <input
             type="text"
@@ -40,7 +47,7 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setSearchFocused(true)}
             onBlur={() => { setSearchFocused(false); setTimeout(() => setSearchQuery(''), 200); }}
-            className="bg-transparent text-[15px] text-white placeholder-gray-500 outline-none flex-1"
+            className={`bg-transparent text-[15px] outline-none flex-1 ${isDark ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
           />
           {searchQuery && (
             <button onClick={() => setSearchQuery('')} className="text-blue-400 bg-blue-500/20 rounded-full p-0.5">
@@ -77,9 +84,9 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
       </div>
 
       {/* Premium Card */}
-      <div className="mb-4 p-4 rounded-2xl border border-gray-800/50 bg-gradient-to-br from-gray-900 to-gray-900/50">
-        <h2 className="text-xl font-extrabold text-white mb-1">Subscribe to Premium</h2>
-        <p className="text-[15px] text-gray-300 mb-3">
+      <div className={`mb-4 p-4 rounded-2xl border ${isDark ? 'border-gray-800/50 bg-gradient-to-br from-gray-900 to-gray-900/50' : 'border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100/50'}`}>
+        <h2 className={`text-xl font-extrabold mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>Subscribe to Premium</h2>
+        <p className={`text-[15px] mb-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
           Subscribe to unlock new features and if eligible, receive a share of revenue.
         </p>
         <button
@@ -91,14 +98,14 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
       </div>
 
       {/* Trends */}
-      <div className="mb-4 rounded-2xl border border-gray-800/50 bg-gray-900/40 overflow-hidden">
-        <h2 className="text-xl font-extrabold text-white px-4 pt-3 pb-2">What's happening</h2>
+      <div className={`mb-4 rounded-2xl border overflow-hidden ${isDark ? 'border-gray-800/50 bg-gray-900/40' : 'border-gray-200 bg-gray-50'}`}>
+        <h2 className={`text-xl font-extrabold px-4 pt-3 pb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>What's happening</h2>
         {trends.slice(0, 5).map((trend) => (
-          <div key={trend.id} className="px-4 py-3 hover:bg-gray-800/30 transition-colors cursor-pointer">
+          <div key={trend.id} className={`px-4 py-3 transition-colors cursor-pointer ${isDark ? 'hover:bg-gray-800/30' : 'hover:bg-gray-100'}`}>
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-[13px] text-gray-500">{trend.category}</p>
-                <p className="font-bold text-[15px] text-white mt-0.5">{trend.name}</p>
+                <p className={`font-bold text-[15px] mt-0.5 ${isDark ? 'text-white' : 'text-gray-900'}`}>{trend.name}</p>
                 <p className="text-[13px] text-gray-500 mt-0.5">{trend.posts}</p>
               </div>
               <button className="p-1.5 rounded-full hover:bg-blue-500/10 hover:text-blue-400 text-gray-500 transition-colors">
@@ -116,10 +123,10 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
       </div>
 
       {/* Who to follow */}
-      <div className="mb-4 rounded-2xl border border-gray-800/50 bg-gray-900/40 overflow-hidden">
-        <h2 className="text-xl font-extrabold text-white px-4 pt-3 pb-2">Who to follow</h2>
+      <div className={`mb-4 rounded-2xl border overflow-hidden ${isDark ? 'border-gray-800/50 bg-gray-900/40' : 'border-gray-200 bg-gray-50'}`}>
+        <h2 className={`text-xl font-extrabold px-4 pt-3 pb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Who to follow</h2>
         {suggestedUsers.map((user) => (
-          <div key={user.id} className="px-4 py-3 hover:bg-gray-800/30 transition-colors cursor-pointer">
+          <div key={user.id} className={`px-4 py-3 transition-colors cursor-pointer ${isDark ? 'hover:bg-gray-800/30' : 'hover:bg-gray-100'}`}>
             <div className="flex items-center justify-between">
               <div
                 className="flex items-center gap-3 min-w-0"
@@ -130,7 +137,7 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-1">
-                    <span className="font-bold text-[15px] text-white truncate hover:underline">{user.name}</span>
+                    <span className={`font-bold text-[15px] truncate hover:underline ${isDark ? 'text-white' : 'text-gray-900'}`}>{user.name}</span>
                     {user.verified && <Verified />}
                     {user.premium && <Premium />}
                   </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Post as PostType } from '../types';
 import { Heart, Retweet, Reply as ReplyIcon, Views, Share, ThreeDots, Verified, Premium } from './Icons';
 import { currentUser } from '../data';
+import { useTheme } from '../ThemeContext';
 
 interface PostProps {
   post: PostType;
@@ -43,6 +44,8 @@ export default function PostComponent({ post, onLike, onRetweet, onBookmark, onR
   const [showShareModal, setShowShareModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const isOwnPost = post.user.id === currentUser.id || post.isOwn;
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const handleReply = () => {
     if (replyText.trim() && onReply) {
@@ -75,7 +78,9 @@ export default function PostComponent({ post, onLike, onRetweet, onBookmark, onR
 
   return (
     <article
-      className="px-4 py-3 border-b border-gray-800/50 hover:bg-gray-900/30 transition-colors cursor-pointer"
+      className={`px-4 py-3 border-b transition-colors cursor-pointer ${
+        isDark ? 'border-gray-800/50 hover:bg-gray-900/30' : 'border-gray-200 hover:bg-gray-50'
+      }`}
       onClick={() => {
         if (incrementViews) incrementViews(post.id);
         if (onViewThread) onViewThread(post.id);
@@ -115,7 +120,7 @@ export default function PostComponent({ post, onLike, onRetweet, onBookmark, onR
             <div className="flex items-center gap-1 min-w-0">
               <span
                 onClick={(e) => { e.stopPropagation(); onUserClick?.(post.user.id); }}
-                className="font-bold text-[15px] text-white truncate hover:underline"
+                className={`font-bold text-[15px] truncate hover:underline ${isDark ? 'text-white' : 'text-gray-900'}`}
               >
                 {post.user.name}
               </span>
@@ -192,7 +197,7 @@ export default function PostComponent({ post, onLike, onRetweet, onBookmark, onR
           )}
 
           {/* Text */}
-          <div className="mt-0.5 text-[15px] text-gray-100 leading-relaxed whitespace-pre-wrap break-words">
+          <div className={`mt-0.5 text-[15px] leading-relaxed whitespace-pre-wrap break-words ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
             {post.content.split(/(#\w+|@\w+|https?:\/\/\S+)/g).map((part, i) => {
               if (part.startsWith('#')) return <span key={i} className="text-blue-400 hover:underline cursor-pointer">{part}</span>;
               if (part.startsWith('@')) return <span key={i} className="text-blue-400 hover:underline cursor-pointer">{part}</span>;
