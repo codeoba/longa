@@ -18,6 +18,7 @@ require_once __DIR__ . '/core/Router.php';
 require_once __DIR__ . '/core/Database.php';
 
 // Load controllers
+require_once __DIR__ . '/controllers/AuthController.php';
 require_once __DIR__ . '/controllers/PostsController.php';
 require_once __DIR__ . '/controllers/UsersController.php';
 require_once __DIR__ . '/controllers/NotificationsController.php';
@@ -27,6 +28,7 @@ require_once __DIR__ . '/controllers/MessagesController.php';
 $router = new Router();
 
 // Initialize controllers
+$authController = new AuthController();
 $postsController = new PostsController();
 $usersController = new UsersController();
 $notificationsController = new NotificationsController();
@@ -39,6 +41,7 @@ $router->get('/', function() {
         'message' => 'X App API is running',
         'version' => '1.0.0',
         'endpoints' => [
+            'auth' => '/auth',
             'posts' => '/posts',
             'users' => '/users',
             'notifications' => '/notifications',
@@ -46,6 +49,16 @@ $router->get('/', function() {
         ]
     ]);
 });
+
+// ==================== AUTH ROUTES ====================
+$router->post('/auth/register', [$authController, 'register']);
+$router->post('/auth/login', [$authController, 'login']);
+$router->post('/auth/logout', [$authController, 'logout']);
+$router->get('/auth/me', [$authController, 'me']);
+$router->post('/auth/verify-email', [$authController, 'verifyEmail']);
+$router->post('/auth/forgot-password', [$authController, 'forgotPassword']);
+$router->post('/auth/reset-password', [$authController, 'resetPassword']);
+$router->put('/auth/change-password', [$authController, 'changePassword']);
 
 // ==================== POSTS ROUTES ====================
 $router->get('/posts', [$postsController, 'index']);

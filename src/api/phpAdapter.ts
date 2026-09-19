@@ -7,11 +7,15 @@
 
 const API_URL = 'https://yourdomain.com/api'; // Badilisha na URL yako
 
+interface ApiOptions extends RequestInit {
+  headers?: Record<string, string>;
+}
+
 // Helper function kwa API calls
-async function apiCall(endpoint, options = {}) {
+async function apiCall(endpoint: string, options: ApiOptions = {}) {
   const url = `${API_URL}${endpoint}`;
   
-  const config = {
+  const config: ApiOptions = {
     headers: {
       'Content-Type': 'application/json',
       ...options.headers,
@@ -177,8 +181,60 @@ export const MessagesAPI = {
   }),
 };
 
+// ==================== AUTH API ====================
+export const AuthAPI = {
+  // Register new user
+  register: (name: string, handle: string, email: string, password: string) =>
+    apiCall('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ name, handle, email, password }),
+    }),
+
+  // Login user
+  login: (email: string, password: string) =>
+    apiCall('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    }),
+
+  // Logout user
+  logout: () => apiCall('/auth/logout', { method: 'POST' }),
+
+  // Get current user
+  me: () => apiCall('/auth/me'),
+
+  // Verify email
+  verifyEmail: (token: string) =>
+    apiCall('/auth/verify-email', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    }),
+
+  // Forgot password
+  forgotPassword: (email: string) =>
+    apiCall('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }),
+
+  // Reset password
+  resetPassword: (token: string, password: string) =>
+    apiCall('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, password }),
+    }),
+
+  // Change password
+  changePassword: (currentPassword: string, newPassword: string) =>
+    apiCall('/auth/change-password', {
+      method: 'PUT',
+      body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+    }),
+};
+
 // Export all APIs
 export default {
+  auth: AuthAPI,
   posts: PostsAPI,
   users: UsersAPI,
   notifications: NotificationsAPI,
