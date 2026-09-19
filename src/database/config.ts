@@ -11,7 +11,7 @@ export const databaseConfig: DatabaseConfig = {
   // IndexedDB (for larger data)
   // type: 'indexedDB',
   // config: {
-  //   dbName: 'x_app_db',
+  //   dbName: 'longa_db',
   //   dbVersion: 1
   // }
   

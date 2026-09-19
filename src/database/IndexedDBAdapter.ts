@@ -6,7 +6,7 @@ export class IndexedDBAdapter implements DatabaseAdapter {
   private dbVersion: number;
   private db: IDBDatabase | null = null;
   
-  constructor(dbName: string = 'x_app_db', dbVersion: number = 1) {
+  constructor(dbName: string = 'longa_db', dbVersion: number = 1) {
     this.dbName = dbName;
     this.dbVersion = dbVersion;
   }

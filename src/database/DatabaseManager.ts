@@ -27,7 +27,7 @@ export class DatabaseManager {
         break;
       case 'indexedDB':
         this.adapter = new IndexedDBAdapter(
-          config.config?.dbName || 'x_app_db',
+          config.config?.dbName || 'longa_db',
           config.config?.dbVersion || 1
         );
         break;

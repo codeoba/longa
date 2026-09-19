@@ -12,7 +12,7 @@ return [
     'mysql' => [
         'host' => 'localhost',
         'port' => 3306,
-        'database' => 'x_app_db',
+        'database' => 'longa_db',
         'username' => 'root',
         'password' => '',
         'charset' => 'utf8mb4',
@@ -23,7 +23,7 @@ return [
     'pgsql' => [
         'host' => 'localhost',
         'port' => 5432,
-        'database' => 'x_app_db',
+        'database' => 'longa_db',
         'username' => 'postgres',
         'password' => '',
         'charset' => 'utf8',

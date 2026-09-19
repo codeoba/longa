@@ -20,14 +20,14 @@
 
 #### MySQL:
 1. Fungua phpMyPanel au phpMyAdmin
-2. Tengeneza database mpya: `x_app_db`
+2. Tengeneza database mpya: `longa_db`
 3. Import file: `backend/database/migrations.sql`
 
 #### PostgreSQL:
 ```bash
 # Kwenye terminal
-createdb x_app_db
-psql x_app_db < backend/database/migrations_pgsql.sql
+createdb longa_db
+psql longa_db < backend/database/migrations_pgsql.sql
 ```
 
 ### 3. Configure Database Connection
@@ -41,7 +41,7 @@ return [
     'mysql' => [
         'host' => 'localhost',
         'port' => 3306,
-        'database' => 'x_app_db',      // Database yako
+        'database' => 'longa_db',      // Database yako
         'username' => 'your_username',  // Username yako
         'password' => 'your_password',  // Password yako
         'charset' => 'utf8mb4',
@@ -52,7 +52,7 @@ return [
     'pgsql' => [
         'host' => 'localhost',
         'port' => 5432,
-        'database' => 'x_app_db',
+        'database' => 'longa_db',
         'username' => 'postgres',
         'password' => 'your_password',
         'charset' => 'utf8',

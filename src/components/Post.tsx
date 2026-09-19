@@ -64,7 +64,7 @@ export default function PostComponent({ post, onLike, onRetweet, onBookmark, onR
   const handleShareNative = () => {
     if (navigator.share) {
       navigator.share({
-        title: `${post.user.name} on X`,
+        title: `${post.user.name} on Longa`,
         text: post.content,
         url: `https://longa.app${post.user.handle}/status/${post.id}`,
       });

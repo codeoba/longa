@@ -1,5 +1,5 @@
--- PostgreSQL Database Migration for X App
--- Run: psql -U postgres -d x_app_db -f migrations_pgsql.sql
+-- PostgreSQL Database Migration for Longa
+-- Run: psql -U postgres -d longa_db -f migrations_pgsql.sql
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (

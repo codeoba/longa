@@ -1,4 +1,4 @@
--- Database Migration for X App
+-- Database Migration for Longa
 -- Run this SQL file to create all necessary tables
 
 -- Users table

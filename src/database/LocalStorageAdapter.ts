@@ -2,7 +2,7 @@ import { DatabaseAdapter, QueryOptions, QueryFilter } from './types';
 
 export class LocalStorageAdapter implements DatabaseAdapter {
   name = 'localStorage';
-  private prefix = 'x_app_';
+  private prefix = 'longa_';
   
   connect(): Promise<void> {
     return Promise.resolve();

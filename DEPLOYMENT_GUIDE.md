@@ -122,28 +122,28 @@ App hii imekamilika 100% na iko tayari ku-install kwenye server.
 ```bash
 # 1. Create database
 mysql -u root -p
-CREATE DATABASE x_app_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE longa_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 # 2. Import migrations
-mysql -u root -p x_app_db < backend/database/migrations.sql
+mysql -u root -p longa_db < backend/database/migrations.sql
 
 # 3. Create user (optional but recommended)
-CREATE USER 'x_app_user'@'localhost' IDENTIFIED BY 'your_secure_password';
-GRANT ALL PRIVILEGES ON x_app_db.* TO 'x_app_user'@'localhost';
+CREATE USER 'longa_user'@'localhost' IDENTIFIED BY 'your_secure_password';
+GRANT ALL PRIVILEGES ON longa_db.* TO 'longa_user'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
 #### PostgreSQL:
 ```bash
 # 1. Create database
-createdb x_app_db
+createdb longa_db
 
 # 2. Import migrations
-psql x_app_db < backend/database/migrations_pgsql.sql
+psql longa_db < backend/database/migrations_pgsql.sql
 
 # 3. Create user (optional but recommended)
-CREATE USER x_app_user WITH PASSWORD 'your_secure_password';
-GRANT ALL PRIVILEGES ON DATABASE x_app_db TO x_app_user;
+CREATE USER longa_user WITH PASSWORD 'your_secure_password';
+GRANT ALL PRIVILEGES ON DATABASE longa_db TO longa_user;
 ```
 
 ---
@@ -161,8 +161,8 @@ return [
     'mysql' => [
         'host' => 'localhost',
         'port' => 3306,
-        'database' => 'x_app_db',        // Your database name
-        'username' => 'x_app_user',      // Your database username
+        'database' => 'longa_db',        // Your database name
+        'username' => 'longa_user',      // Your database username
         'password' => 'your_password',   // Your database password
         'charset' => 'utf8mb4',
         'collation' => 'utf8mb4_unicode_ci',
@@ -172,8 +172,8 @@ return [
     'pgsql' => [
         'host' => 'localhost',
         'port' => 5432,
-        'database' => 'x_app_db',
-        'username' => 'x_app_user',
+        'database' => 'longa_db',
+        'username' => 'longa_user',
         'password' => 'your_password',
         'charset' => 'utf8',
     ],
@@ -358,7 +358,7 @@ npm run build
 ```bash
 # Upload backend/ to server
 # Run migrations if needed
-mysql -u root -p x_app_db < backend/database/migrations.sql
+mysql -u root -p longa_db < backend/database/migrations.sql
 ```
 
 ---

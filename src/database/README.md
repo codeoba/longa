@@ -46,7 +46,7 @@ export const databaseConfig: DatabaseConfig = {
 export const databaseConfig: DatabaseConfig = {
   type: 'indexedDB',
   config: {
-    dbName: 'x_app_db',
+    dbName: 'longa_db',
     dbVersion: 1
   }
 };

@@ -119,14 +119,14 @@ return [
     
     'mysql' => [
         'host' => 'localhost',
-        'database' => 'x_app_db',
+        'database' => 'longa_db',
         'username' => 'root',
         'password' => '',
     ],
     
     'pgsql' => [
         'host' => 'localhost',
-        'database' => 'x_app_db',
+        'database' => 'longa_db',
         'username' => 'postgres',
         'password' => '',
     ],
