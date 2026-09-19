@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { trends, users, currentUser } from '../data';
 import { Search, Verified, Premium, ThreeDots, Sparkles } from './Icons';
-import { useTheme } from '../ThemeContext';
+import { useThemeClasses } from '../themeUtils';
 
 interface RightPanelProps {
   onNavigate: (page: string) => void;
@@ -12,8 +12,7 @@ interface RightPanelProps {
 export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: RightPanelProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const tc = useThemeClasses();
 
   const suggestedUsers = useMemo(() =>
     users.filter(u => u.id !== currentUser.id).slice(0, 3),
@@ -32,13 +31,13 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
 
   return (
     <aside className="hidden lg:block w-[350px] flex-shrink-0 pl-7 py-2">
-      <div className="sticky top-0 pt-1 pb-3 bg-black z-40">
+      <div className={`sticky top-0 pt-1 pb-3 ${tc.bgBackdrop} backdrop-blur-xl z-40`}>
         {/* Search */}
         <div className={`flex items-center gap-3 px-4 py-2.5 rounded-full border transition-colors ${
           searchFocused
             ? 'border-blue-500'
-            : isDark ? 'border-transparent bg-gray-900' : 'border-transparent bg-gray-100'
-        } ${!searchFocused && (isDark ? 'bg-gray-900' : 'bg-gray-100')}`}>
+            : tc.border
+        } ${tc.bgInput}`}>
           <Search />
           <input
             type="text"
@@ -47,7 +46,7 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => setSearchFocused(true)}
             onBlur={() => { setSearchFocused(false); setTimeout(() => setSearchQuery(''), 200); }}
-            className={`bg-transparent text-[15px] outline-none flex-1 ${isDark ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
+            className={`bg-transparent text-[15px] outline-none flex-1 ${tc.text} placeholder-gray-500`}
           />
           {searchQuery && (
             <button onClick={() => setSearchQuery('')} className="text-blue-400 bg-blue-500/20 rounded-full p-0.5">
@@ -60,19 +59,19 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
 
         {/* Search Results */}
         {searchResults && searchResults.length > 0 && (
-          <div className="absolute left-0 right-0 top-14 bg-black border border-gray-800 rounded-2xl shadow-xl overflow-hidden z-50 mx-2">
+          <div className={`absolute left-0 right-0 top-14 ${tc.bgModal} border ${tc.border} rounded-2xl shadow-xl overflow-hidden z-50 mx-2`}>
             {searchResults.map(user => (
               <button
                 key={user.id}
                 onClick={() => { onNavigate('user-profile'); setSearchQuery(''); }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-900/50 transition-colors"
+                className={`w-full flex items-center gap-3 px-4 py-3 ${tc.bgHoverSecondary} transition-colors`}
               >
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg">
                   {user.avatar}
                 </div>
                 <div className="text-left">
                   <div className="flex items-center gap-1">
-                    <span className="font-bold text-[15px] text-white">{user.name}</span>
+                    <span className={`font-bold text-[15px] ${tc.text}`}>{user.name}</span>
                     {user.verified && <Verified />}
                   </div>
                   <span className="text-[13px] text-gray-500">{user.handle}</span>
@@ -84,9 +83,9 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
       </div>
 
       {/* Premium Card */}
-      <div className={`mb-4 p-4 rounded-2xl border ${isDark ? 'border-gray-800/50 bg-gradient-to-br from-gray-900 to-gray-900/50' : 'border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100/50'}`}>
-        <h2 className={`text-xl font-extrabold mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>Subscribe to Premium</h2>
-        <p className={`text-[15px] mb-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+      <div className={`mb-4 p-4 rounded-2xl border ${tc.border} ${tc.bgCard}`}>
+        <h2 className={`text-xl font-extrabold ${tc.text} mb-1`}>Subscribe to Premium</h2>
+        <p className={`text-[15px] ${tc.textSecondary} mb-3`}>
           Subscribe to unlock new features and if eligible, receive a share of revenue.
         </p>
         <button
@@ -98,17 +97,17 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
       </div>
 
       {/* Trends */}
-      <div className={`mb-4 rounded-2xl border overflow-hidden ${isDark ? 'border-gray-800/50 bg-gray-900/40' : 'border-gray-200 bg-gray-50'}`}>
-        <h2 className={`text-xl font-extrabold px-4 pt-3 pb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>What's happening</h2>
+      <div className={`mb-4 rounded-2xl border ${tc.border} ${tc.bgCard} overflow-hidden`}>
+        <h2 className={`text-xl font-extrabold ${tc.text} px-4 pt-3 pb-2`}>What's happening</h2>
         {trends.slice(0, 5).map((trend) => (
-          <div key={trend.id} className={`px-4 py-3 transition-colors cursor-pointer ${isDark ? 'hover:bg-gray-800/30' : 'hover:bg-gray-100'}`}>
+          <div key={trend.id} className={`px-4 py-3 ${tc.bgHover} transition-colors cursor-pointer`}>
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-[13px] text-gray-500">{trend.category}</p>
-                <p className={`font-bold text-[15px] mt-0.5 ${isDark ? 'text-white' : 'text-gray-900'}`}>{trend.name}</p>
+                <p className={`font-bold text-[15px] ${tc.text} mt-0.5`}>{trend.name}</p>
                 <p className="text-[13px] text-gray-500 mt-0.5">{trend.posts}</p>
               </div>
-              <button className="p-1.5 rounded-full hover:bg-blue-500/10 hover:text-blue-400 text-gray-500 transition-colors">
+              <button className={`p-1.5 rounded-full ${tc.bgHoverSecondary} hover:text-blue-400 text-gray-500 transition-colors`}>
                 <ThreeDots />
               </button>
             </div>
@@ -116,17 +115,17 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
         ))}
         <button
           onClick={() => onNavigate('explore')}
-          className="px-4 py-3 text-blue-400 hover:bg-gray-800/30 transition-colors text-[15px] w-full text-left"
+          className={`px-4 py-3 text-blue-400 ${tc.bgHover} transition-colors text-[15px] w-full text-left`}
         >
           Show more
         </button>
       </div>
 
       {/* Who to follow */}
-      <div className={`mb-4 rounded-2xl border overflow-hidden ${isDark ? 'border-gray-800/50 bg-gray-900/40' : 'border-gray-200 bg-gray-50'}`}>
-        <h2 className={`text-xl font-extrabold px-4 pt-3 pb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>Who to follow</h2>
+      <div className={`mb-4 rounded-2xl border ${tc.border} ${tc.bgCard} overflow-hidden`}>
+        <h2 className={`text-xl font-extrabold ${tc.text} px-4 pt-3 pb-2`}>Who to follow</h2>
         {suggestedUsers.map((user) => (
-          <div key={user.id} className={`px-4 py-3 transition-colors cursor-pointer ${isDark ? 'hover:bg-gray-800/30' : 'hover:bg-gray-100'}`}>
+          <div key={user.id} className={`px-4 py-3 ${tc.bgHover} transition-colors cursor-pointer`}>
             <div className="flex items-center justify-between">
               <div
                 className="flex items-center gap-3 min-w-0"
@@ -137,7 +136,7 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-1">
-                    <span className={`font-bold text-[15px] truncate hover:underline ${isDark ? 'text-white' : 'text-gray-900'}`}>{user.name}</span>
+                    <span className={`font-bold text-[15px] ${tc.text} truncate hover:underline`}>{user.name}</span>
                     {user.verified && <Verified />}
                     {user.premium && <Premium />}
                   </div>
@@ -157,7 +156,7 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
             </div>
           </div>
         ))}
-        <button className="px-4 py-3 text-blue-400 hover:bg-gray-800/30 transition-colors text-[15px] w-full text-left">
+        <button className={`px-4 py-3 text-blue-400 ${tc.bgHover} transition-colors text-[15px] w-full text-left`}>
           Show more
         </button>
       </div>

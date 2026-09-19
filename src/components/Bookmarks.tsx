@@ -2,6 +2,7 @@ import React from 'react';
 import { Post } from '../types';
 import PostComponent from './Post';
 import { ArrowLeft } from './Icons';
+import { useThemeClasses } from '../themeUtils';
 
 interface BookmarksProps {
   posts: Post[];
@@ -16,17 +17,18 @@ interface BookmarksProps {
 
 export default function Bookmarks({ posts, onLike, onRetweet, onBookmark, onReply, onViewThread, onUserClick, incrementViews }: BookmarksProps) {
   const bookmarkedPosts = posts.filter(p => p.bookmarked);
+  const tc = useThemeClasses();
 
   return (
     <div>
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-black/80 backdrop-blur-xl border-b border-gray-800/50">
+      <div className={`sticky top-0 z-30 ${tc.bgBackdrop} backdrop-blur-xl border-b ${tc.border}`}>
         <div className="flex items-center gap-6 px-4 py-2">
-          <button className="p-2 rounded-full hover:bg-gray-800/50 transition-colors">
+          <button className={`p-2 rounded-full transition-colors ${tc.bgHoverSecondary}`}>
             <ArrowLeft />
           </button>
           <div>
-            <h1 className="text-xl font-bold text-white">Bookmarks</h1>
+            <h1 className={`text-xl font-bold ${tc.text}`}>Bookmarks</h1>
             <p className="text-[13px] text-gray-500">@amanitech</p>
           </div>
         </div>
@@ -51,7 +53,7 @@ export default function Bookmarks({ posts, onLike, onRetweet, onBookmark, onRepl
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-20 px-8">
-          <h3 className="text-3xl font-extrabold text-white">Save posts for later</h3>
+          <h3 className={`text-3xl font-extrabold ${tc.text}`}>Save posts for later</h3>
           <p className="text-gray-500 text-[15px] mt-2 text-center max-w-[360px]">
             Bookmark posts to easily find them again in the future.
           </p>

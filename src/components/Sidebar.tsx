@@ -5,7 +5,7 @@ import {
   Home, Search, Bell, Mail, Bookmark, Users, User, Settings,
   MoreHorizontal, Feather, Sparkles, List, XLogo
 } from './Icons';
-import { useTheme } from '../ThemeContext';
+import { useThemeClasses } from '../themeUtils';
 
 interface SidebarProps {
   currentPage: Page;
@@ -76,15 +76,12 @@ const extraNavItems: { icon: React.ReactNode; label: string; page: Page }[] = [
 ];
 
 export default function Sidebar({ currentPage, onNavigate, onCompose, unreadNotifications, unreadMessages }: SidebarProps) {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const tc = useThemeClasses();
 
   return (
-    <aside className={`fixed left-0 top-0 h-full w-[68px] xl:w-[275px] flex flex-col items-center xl:items-start px-2 xl:px-3 py-3 border-r z-50 ${
-      isDark ? 'border-gray-800/50 bg-black/80' : 'border-gray-200 bg-white/80'
-    } backdrop-blur-xl`}>
+    <aside className={`fixed left-0 top-0 h-full w-[68px] xl:w-[275px] flex flex-col items-center xl:items-start px-2 xl:px-3 py-3 border-r ${tc.border} z-50 ${tc.bgBackdrop} backdrop-blur-xl`}>
       {/* Logo */}
-      <div className={`p-3 mb-1 rounded-full cursor-pointer transition-colors ${isDark ? 'hover:bg-gray-800/50' : 'hover:bg-gray-100'}`}>
+      <div className={`p-3 mb-1 rounded-full cursor-pointer transition-colors ${tc.bgHoverSecondary}`}>
         <XLogo />
       </div>
 
@@ -102,8 +99,8 @@ export default function Sidebar({ currentPage, onNavigate, onCompose, unreadNoti
               onClick={() => onNavigate(item.page)}
               className={`flex items-center gap-4 px-3 py-3 rounded-full transition-all duration-200 group w-full relative ${
                 isActive
-                  ? `font-bold ${isDark ? 'text-white' : 'text-gray-900'}`
-                  : `${isDark ? 'text-gray-300 hover:text-white hover:bg-gray-800/40' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'}`
+                  ? `font-bold ${tc.text}`
+                  : `text-gray-500 ${tc.bgHoverSecondary} ${tc.textSecondary}`
               }`}
             >
               <span className="relative">
@@ -119,7 +116,7 @@ export default function Sidebar({ currentPage, onNavigate, onCompose, unreadNoti
           );
         })}
         {/* Extra navigation items - visible on larger screens */}
-        <div className="hidden xl:block border-t border-gray-800/30 mt-2 pt-2">
+        <div className={`hidden xl:block border-t ${tc.borderSecondary} mt-2 pt-2`}>
           {extraNavItems.map((item) => {
             const isActive = currentPage === item.page;
             return (
@@ -128,8 +125,8 @@ export default function Sidebar({ currentPage, onNavigate, onCompose, unreadNoti
                 onClick={() => onNavigate(item.page)}
                 className={`flex items-center gap-4 px-3 py-3 rounded-full transition-all duration-200 group w-full ${
                   isActive
-                    ? `font-bold ${isDark ? 'text-white' : 'text-gray-900'}`
-                    : `${isDark ? 'text-gray-300 hover:text-white hover:bg-gray-800/40' : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'}`
+                    ? `font-bold ${tc.text}`
+                    : `text-gray-500 ${tc.bgHoverSecondary} ${tc.textSecondary}`
                 }`}
               >
                 <span>{item.icon}</span>
@@ -153,13 +150,13 @@ export default function Sidebar({ currentPage, onNavigate, onCompose, unreadNoti
 
       {/* User Profile at bottom */}
       <div className="mt-auto w-full">
-        <button className={`flex items-center gap-3 p-3 rounded-full transition-colors w-full ${isDark ? 'hover:bg-gray-800/50' : 'hover:bg-gray-100'}`}>
+        <button className={`flex items-center gap-3 p-3 rounded-full transition-colors w-full ${tc.bgHoverSecondary}`}>
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg flex-shrink-0">
             {currentUser.avatar}
           </div>
           <div className="hidden xl:block flex-1 text-left min-w-0">
             <div className="flex items-center gap-1">
-              <span className={`font-bold text-[15px] truncate ${isDark ? 'text-white' : 'text-gray-900'}`}>{currentUser.name}</span>
+              <span className={`font-bold text-[15px] truncate ${tc.text}`}>{currentUser.name}</span>
               {currentUser.verified && (
                 <svg className="w-4 h-4 text-blue-400 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81C14.67 2.63 13.43 1.75 12 1.75S9.33 2.63 8.66 3.94c-1.39-.46-2.9-.2-3.91.81s-1.27 2.52-.81 3.91C2.63 9.33 1.75 10.57 1.75 12s.88 2.67 2.19 3.34c-.46 1.39-.2 2.9.81 3.91s2.52 1.27 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.67-.88 3.34-2.19c1.39.46 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34zm-11.04 4.3l-3.7-3.7 1.42-1.41 2.28 2.27 5.16-5.16 1.42 1.42-6.58 6.58z"/>
@@ -168,7 +165,7 @@ export default function Sidebar({ currentPage, onNavigate, onCompose, unreadNoti
             </div>
             <span className="text-[13px] text-gray-500 truncate block">{currentUser.handle}</span>
           </div>
-          <span className={`hidden xl:block ${isDark ? 'text-gray-500' : 'text-gray-400'}`}><MoreHorizontal /></span>
+          <span className={`hidden xl:block ${tc.textMuted}`}><MoreHorizontal /></span>
         </button>
       </div>
     </aside>

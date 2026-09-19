@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { currentUser, emojiList } from '../data';
 import { Image, Gif, Emoji, Poll, Schedule, Location, Close, Verified, Premium } from './Icons';
-import { useTheme } from '../ThemeContext';
+import { useThemeClasses } from '../themeUtils';
 
 interface ComposeTweetProps {
   onClose?: () => void;
@@ -20,8 +20,7 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
   const maxChars = 280;
   const remaining = maxChars - content.length;
   const progress = (content.length / maxChars) * 100;
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const tc = useThemeClasses();
 
   const handleSubmit = () => {
     if (content.trim() && content.length <= maxChars) {
@@ -53,16 +52,15 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Simulate image upload with a placeholder
       setAttachedImage('https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=400&fit=crop');
     }
   };
 
   return (
-    <div className={`${isModal ? '' : `px-4 py-3 border-b ${isDark ? 'border-gray-800/50' : 'border-gray-200'}`}`}>
+    <div className={`${isModal ? '' : `px-4 py-3 border-b ${tc.border}`}`}>
       {isModal && (
-        <div className={`flex items-center justify-between p-3 border-b ${isDark ? 'border-gray-800/50' : 'border-gray-200'}`}>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-800/50 transition-colors">
+        <div className={`flex items-center justify-between p-3 border-b ${tc.border}`}>
+          <button onClick={onClose} className={`p-2 rounded-full transition-colors ${tc.bgHoverSecondary}`}>
             <Close />
           </button>
           <button className="text-blue-400 font-bold text-sm px-4 py-1.5 rounded-full border border-blue-400/30 hover:bg-blue-400/10 transition-colors">
@@ -82,7 +80,7 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
         <div className="flex-1">
           {isModal && (
             <div className="flex items-center gap-1 mb-2">
-              <span className="font-bold text-[15px] text-white">{currentUser.name}</span>
+              <span className={`font-bold text-[15px] ${tc.text}`}>{currentUser.name}</span>
               <Verified />
               <Premium />
               <span className="text-gray-500 text-[15px]">{currentUser.handle}</span>
@@ -94,13 +92,13 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
             onChange={handleTextareaChange}
             onFocus={() => setIsFocused(true)}
             placeholder="What is happening?!"
-            className={`w-full bg-transparent text-xl resize-none outline-none min-h-[52px] max-h-[300px] py-2 ${isDark ? 'text-white placeholder-gray-600' : 'text-gray-900 placeholder-gray-400'}`}
+            className={`w-full bg-transparent text-xl resize-none outline-none min-h-[52px] max-h-[300px] py-2 ${tc.text} placeholder-gray-500`}
             rows={isModal ? 5 : 2}
           />
 
           {/* Attached Image */}
           {attachedImage && (
-            <div className="relative mt-2 rounded-2xl overflow-hidden border border-gray-800/50">
+            <div className={`relative mt-2 rounded-2xl overflow-hidden border ${tc.border}`}>
               <img src={attachedImage} alt="Attached" className="w-full max-h-[300px] object-cover" />
               <button
                 onClick={() => setAttachedImage(null)}
@@ -112,7 +110,7 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
           )}
 
           {isFocused && (
-            <div className="border-b border-gray-800/50 mb-3 pb-3">
+            <div className={`border-b ${tc.borderSecondary} mb-3 pb-3`}>
               <button
                 onClick={() => setReplyToAudience(replyToAudience === 'everyone' ? 'followers' : replyToAudience === 'followers' ? 'mentioned' : 'everyone')}
                 className="text-blue-400 text-sm font-bold flex items-center gap-1 hover:bg-blue-400/10 px-3 py-1.5 rounded-full transition-colors"
@@ -129,13 +127,13 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
 
           {/* Emoji Picker */}
           {showEmojiPicker && (
-            <div className="mb-3 p-3 bg-gray-900 rounded-xl border border-gray-800/50">
+            <div className={`mb-3 p-3 ${tc.bgSecondary} rounded-xl border ${tc.border}`}>
               <div className="grid grid-cols-10 gap-1">
                 {emojiList.map((emoji, i) => (
                   <button
                     key={i}
                     onClick={() => handleEmojiSelect(emoji)}
-                    className="p-1.5 hover:bg-gray-800 rounded transition-colors text-xl"
+                    className={`p-1.5 ${tc.bgHoverSecondary} rounded transition-colors text-xl`}
                   >
                     {emoji}
                   </button>
@@ -196,7 +194,7 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
                       {remaining}
                     </span>
                   )}
-                  <div className="w-px h-6 bg-gray-700" />
+                  <div className={`w-px h-6 ${tc.borderLight}`} />
                 </div>
               )}
               <button

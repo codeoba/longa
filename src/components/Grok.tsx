@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { GrokMessage } from '../types';
 import { ArrowLeft } from './Icons';
-import { useTheme } from '../ThemeContext';
+import { useThemeClasses } from '../themeUtils';
 
 export default function Grok() {
   const [messages, setMessages] = useState<GrokMessage[]>([
@@ -15,8 +15,7 @@ export default function Grok() {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const tc = useThemeClasses();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -52,7 +51,6 @@ export default function Grok() {
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI response
     setTimeout(() => {
       const assistantMessage: GrokMessage = {
         id: (Date.now() + 1).toString(),
@@ -73,11 +71,11 @@ export default function Grok() {
   ];
 
   return (
-    <div className={`flex flex-col h-screen ${isDark ? 'bg-black' : 'bg-white'}`}>
+    <div className={`flex flex-col h-screen ${tc.bg}`}>
       {/* Header */}
-      <div className={`sticky top-0 z-30 backdrop-blur-xl border-b ${isDark ? 'bg-black/80 border-gray-800/50' : 'bg-white/80 border-gray-200'}`}>
+      <div className={`sticky top-0 z-30 ${tc.bgBackdrop} backdrop-blur-xl border-b ${tc.border}`}>
         <div className="flex items-center gap-4 px-4 py-3">
-          <button className={`p-2 rounded-full transition-colors ${isDark ? 'hover:bg-gray-800/50' : 'hover:bg-gray-100'}`}>
+          <button className={`p-2 rounded-full transition-colors ${tc.bgHoverSecondary}`}>
             <ArrowLeft />
           </button>
           <div className="flex items-center gap-3">
@@ -87,7 +85,7 @@ export default function Grok() {
               </svg>
             </div>
             <div>
-              <h1 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Grok</h1>
+              <h1 className={`text-xl font-bold ${tc.text}`}>Grok</h1>
               <p className="text-[13px] text-gray-500">AI Assistant by xAI</p>
             </div>
           </div>
@@ -101,7 +99,7 @@ export default function Grok() {
             <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
               msg.role === 'user'
                 ? 'bg-blue-500 text-white'
-                : isDark ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-900'
+                : `${tc.bgTertiary} ${tc.text}`
             }`}>
               <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{msg.content}</p>
               <p className={`text-[11px] mt-1 ${msg.role === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
@@ -112,11 +110,11 @@ export default function Grok() {
         ))}
         {isTyping && (
           <div className="flex justify-start">
-            <div className={`rounded-2xl px-4 py-3 ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
+            <div className={`rounded-2xl px-4 py-3 ${tc.bgTertiary}`}>
               <div className="flex gap-1">
-                <div className={`w-2 h-2 rounded-full ${isDark ? 'bg-gray-500' : 'bg-gray-400'} animate-bounce`} style={{ animationDelay: '0ms' }} />
-                <div className={`w-2 h-2 rounded-full ${isDark ? 'bg-gray-500' : 'bg-gray-400'} animate-bounce`} style={{ animationDelay: '150ms' }} />
-                <div className={`w-2 h-2 rounded-full ${isDark ? 'bg-gray-500' : 'bg-gray-400'} animate-bounce`} style={{ animationDelay: '300ms' }} />
+                <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           </div>
@@ -127,17 +125,13 @@ export default function Grok() {
       {/* Suggested Prompts */}
       {messages.length === 1 && (
         <div className="px-4 pb-2">
-          <p className={`text-sm mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Try asking:</p>
+          <p className={`text-sm mb-2 ${tc.textTertiary}`}>Try asking:</p>
           <div className="flex flex-wrap gap-2">
             {suggestedPrompts.map((prompt, i) => (
               <button
                 key={i}
                 onClick={() => setInput(prompt)}
-                className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
-                  isDark
-                    ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                className={`px-3 py-1.5 rounded-full text-sm transition-colors ${tc.bgTertiary} ${tc.textSecondary} ${tc.bgHoverSecondary}`}
               >
                 {prompt}
               </button>
@@ -147,7 +141,7 @@ export default function Grok() {
       )}
 
       {/* Input */}
-      <div className={`border-t ${isDark ? 'border-gray-800/50' : 'border-gray-200'} p-4`}>
+      <div className={`border-t ${tc.border} p-4`}>
         <div className="flex gap-3">
           <input
             type="text"
@@ -155,11 +149,7 @@ export default function Grok() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Ask Grok anything..."
-            className={`flex-1 px-4 py-2.5 rounded-full outline-none ${
-              isDark
-                ? 'bg-gray-800 text-white placeholder-gray-500'
-                : 'bg-gray-100 text-gray-900 placeholder-gray-400'
-            }`}
+            className={`flex-1 px-4 py-2.5 rounded-full outline-none ${tc.bgInput} ${tc.text} placeholder-gray-500`}
           />
           <button
             onClick={handleSend}

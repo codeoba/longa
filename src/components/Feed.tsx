@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Post } from '../types';
 import PostComponent from './Post';
 import ComposeTweet from './ComposeTweet';
-import { useTheme } from '../ThemeContext';
+import { useThemeClasses } from '../themeUtils';
 
 interface FeedProps {
   posts: Post[];
@@ -20,8 +20,7 @@ interface FeedProps {
 
 export default function Feed({ posts, onLike, onRetweet, onBookmark, onNewPost, onReply, onDelete, onPin, onViewThread, onUserClick, incrementViews }: FeedProps) {
   const [activeTab, setActiveTab] = useState<'for-you' | 'following'>('for-you');
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const tc = useThemeClasses();
 
   const filteredPosts = useMemo(() => {
     if (activeTab === 'following') {
@@ -37,11 +36,11 @@ export default function Feed({ posts, onLike, onRetweet, onBookmark, onNewPost, 
   return (
     <div>
       {/* Header */}
-      <div className={`sticky top-0 z-30 backdrop-blur-xl border-b ${isDark ? 'bg-black/80 border-gray-800/50' : 'bg-white/80 border-gray-200'}`}>
+      <div className={`sticky top-0 z-30 ${tc.bgBackdrop} backdrop-blur-xl border-b ${tc.border}`}>
         <div className="flex items-center justify-between px-4 py-3">
-          <h1 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Home</h1>
-          <button className={`p-2 rounded-full transition-colors ${isDark ? 'hover:bg-gray-800/50' : 'hover:bg-gray-100'}`}>
-            <svg viewBox="0 0 24 24" className={`w-5 h-5 ${isDark ? 'text-white' : 'text-gray-900'}`} fill="currentColor">
+          <h1 className={`text-xl font-bold ${tc.text}`}>Home</h1>
+          <button className={`p-2 rounded-full transition-colors ${tc.bgHoverSecondary}`}>
+            <svg viewBox="0 0 24 24" className={`w-5 h-5 ${tc.text}`} fill="currentColor">
               <path d="M22.772 10.506l-5.618-2.192-2.16-6.5c-.102-.307-.39-.514-.712-.514s-.61.207-.712.514l-2.16 6.5-5.62 2.192c-.282.11-.466.383-.466.692s.184.583.466.692l5.62 2.192 2.16 6.5c.102.306.39.514.712.514s.61-.208.712-.514l2.16-6.5 5.618-2.192c.282-.11.466-.383.466-.692s-.184-.583-.466-.692zm-6.49 3.042c-.102.307-.39.514-.712.514H8.43c-.322 0-.61-.207-.712-.514l-3.54-1.383 3.54-1.383c.102-.307.39-.514.712-.514h7.14c.322 0 .61.207.712.514l3.54 1.383-3.54 1.383z"/>
             </svg>
           </button>
@@ -52,8 +51,8 @@ export default function Feed({ posts, onLike, onRetweet, onBookmark, onNewPost, 
             onClick={() => setActiveTab('for-you')}
             className={`flex-1 py-3 text-[15px] font-medium transition-colors relative ${
               activeTab === 'for-you'
-                ? `${isDark ? 'text-white' : 'text-gray-900'} font-bold`
-                : `${isDark ? 'text-gray-500' : 'text-gray-500'} ${isDark ? 'hover:bg-gray-800/30' : 'hover:bg-gray-50'}`
+                ? `${tc.text} font-bold`
+                : `text-gray-500 ${tc.bgHover}`
             }`}
           >
             For you
@@ -65,8 +64,8 @@ export default function Feed({ posts, onLike, onRetweet, onBookmark, onNewPost, 
             onClick={() => setActiveTab('following')}
             className={`flex-1 py-3 text-[15px] font-medium transition-colors relative ${
               activeTab === 'following'
-                ? `${isDark ? 'text-white' : 'text-gray-900'} font-bold`
-                : `${isDark ? 'text-gray-500' : 'text-gray-500'} ${isDark ? 'hover:bg-gray-800/30' : 'hover:bg-gray-50'}`
+                ? `${tc.text} font-bold`
+                : `text-gray-500 ${tc.bgHover}`
             }`}
           >
             Following
@@ -100,8 +99,8 @@ export default function Feed({ posts, onLike, onRetweet, onBookmark, onNewPost, 
           ))
         ) : (
           <div className="flex flex-col items-center justify-center py-16 px-8">
-            <h3 className={`text-2xl font-extrabold ${isDark ? 'text-white' : 'text-gray-900'}`}>No posts to show</h3>
-            <p className={`${isDark ? 'text-gray-500' : 'text-gray-500'} text-[15px] mt-2 text-center`}>
+            <h3 className={`text-2xl font-extrabold ${tc.text}`}>No posts to show</h3>
+            <p className="text-gray-500 text-[15px] mt-2 text-center">
               {activeTab === 'following' ? 'Follow more accounts to see their posts here.' : 'Check back later for new posts.'}
             </p>
           </div>

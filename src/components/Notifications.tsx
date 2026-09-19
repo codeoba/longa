@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Notification } from '../types';
 import { Verified, Premium } from './Icons';
+import { useThemeClasses } from '../themeUtils';
 
 interface NotificationsProps {
   notifications: Notification[];
@@ -11,6 +12,7 @@ interface NotificationsProps {
 
 export default function Notifications({ notifications, onMarkAllRead, onFollowUser, followedUsers }: NotificationsProps) {
   const [activeTab, setActiveTab] = useState<'all' | 'verified' | 'mentions'>('all');
+  const tc = useThemeClasses();
 
   const filteredNotifications = useMemo(() => {
     switch (activeTab) {
@@ -69,11 +71,11 @@ export default function Notifications({ notifications, onMarkAllRead, onFollowUs
   return (
     <div>
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-black/80 backdrop-blur-xl border-b border-gray-800/50">
+      <div className={`sticky top-0 z-30 ${tc.bgBackdrop} backdrop-blur-xl border-b ${tc.border}`}>
         <div className="flex items-center justify-between px-4 py-3">
-          <h1 className="text-xl font-bold text-white">Notifications</h1>
-          <button onClick={onMarkAllRead} className="p-2 rounded-full hover:bg-gray-800/50 transition-colors">
-            <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="currentColor">
+          <h1 className={`text-xl font-bold ${tc.text}`}>Notifications</h1>
+          <button onClick={onMarkAllRead} className={`p-2 rounded-full transition-colors ${tc.bgHoverSecondary}`}>
+            <svg viewBox="0 0 24 24" className={`w-5 h-5 ${tc.text}`} fill="currentColor">
               <path d="M10.54 1.75h2.92l1.57 2.36c.11.17.32.25.53.21l2.53-.59 2.17 2.17-.58 2.54c-.05.2.04.41.21.53l2.36 1.57v2.92l-2.36 1.57c-.17.12-.26.33-.21.53l.58 2.54-2.17 2.17-2.53-.59c-.21-.04-.42.04-.53.21l-1.57 2.36h-2.92l-1.58-2.36c-.11-.17-.32-.25-.52-.21l-2.54.59-2.17-2.17.58-2.54c.05-.2-.03-.41-.21-.53l-2.36-1.57v-2.92L4.1 8.97c.18-.12.26-.33.21-.53L3.73 5.9 5.9 3.73l2.54.59c.2.04.41-.04.52-.21l1.58-2.36z"/>
             </svg>
           </button>
@@ -83,8 +85,8 @@ export default function Notifications({ notifications, onMarkAllRead, onFollowUs
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-3 text-[15px] font-medium capitalize hover:bg-gray-800/30 transition-colors relative ${
-                activeTab === tab ? 'text-white font-bold' : 'text-gray-500'
+              className={`flex-1 py-3 text-[15px] font-medium capitalize transition-colors relative ${
+                activeTab === tab ? `${tc.text} font-bold` : `text-gray-500 ${tc.bgHover}`
               }`}
             >
               {tab}
@@ -102,7 +104,7 @@ export default function Notifications({ notifications, onMarkAllRead, onFollowUs
           filteredNotifications.map((notif) => (
             <div
               key={notif.id}
-              className={`flex gap-3 px-4 py-3 border-b border-gray-800/30 hover:bg-gray-900/30 transition-colors cursor-pointer ${
+              className={`flex gap-3 px-4 py-3 border-b ${tc.borderSecondary} ${tc.bgHover} transition-colors cursor-pointer ${
                 !notif.read ? 'bg-blue-500/5' : ''
               }`}
             >
@@ -115,8 +117,8 @@ export default function Notifications({ notifications, onMarkAllRead, onFollowUs
                     {notif.user.avatar}
                   </div>
                 </div>
-                <p className="text-[15px] text-gray-300">
-                  <span className="font-bold text-white">{notif.user.name}</span>
+                <p className={`text-[15px] ${tc.textSecondary}`}>
+                  <span className={`font-bold ${tc.text}`}>{notif.user.name}</span>
                   {notif.user.verified && <span className="inline-block ml-1 align-middle"><Verified /></span>}
                   {' '}{notif.content}
                 </p>
@@ -143,7 +145,7 @@ export default function Notifications({ notifications, onMarkAllRead, onFollowUs
           ))
         ) : (
           <div className="flex flex-col items-center justify-center py-16 px-8">
-            <h3 className="text-2xl font-extrabold text-white">Nothing to see here</h3>
+            <h3 className={`text-2xl font-extrabold ${tc.text}`}>Nothing to see here</h3>
             <p className="text-gray-500 text-[15px] mt-2 text-center">
               {activeTab === 'verified' ? 'No notifications from verified accounts.' :
                activeTab === 'mentions' ? 'No mentions or replies yet.' :

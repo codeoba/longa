@@ -22,9 +22,11 @@ import Analytics from './components/Analytics';
 import Drafts from './components/Drafts';
 import { useKeyboardShortcuts } from './components/KeyboardShortcuts';
 import { useTheme } from './ThemeContext';
+import { useThemeClasses } from './themeUtils';
 
 export default function App() {
   const { theme } = useTheme();
+  const tc = useThemeClasses();
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [showComposeModal, setShowComposeModal] = useState(false);
@@ -377,7 +379,7 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-gray-900'}`}>
+    <div className={`min-h-screen ${tc.bg} ${tc.text} transition-colors duration-200`}>
       {/* Sidebar */}
       <Sidebar
         currentPage={currentPage}
@@ -388,7 +390,7 @@ export default function App() {
       />
 
       {/* Mobile Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-xl border-t border-gray-800/50 md:hidden">
+      <nav className={`fixed bottom-0 left-0 right-0 z-50 ${tc.bgBackdrop} backdrop-blur-xl border-t ${tc.border} md:hidden`}>
         <div className="flex items-center justify-around py-2">
           <button onClick={() => handleNavigate('home')} className={`p-3 ${currentPage === 'home' ? 'text-white' : 'text-gray-500'}`}>
             <svg viewBox="0 0 24 24" className="w-6 h-6" fill="currentColor">
@@ -425,7 +427,7 @@ export default function App() {
 
       {/* Main Content */}
       <main className="ml-[68px] xl:ml-[275px] flex justify-center">
-        <div className="w-full max-w-[600px] min-h-screen border-r border-gray-800/50 pb-16 md:pb-0">
+        <div className={`w-full max-w-[600px] min-h-screen border-r ${tc.border} pb-16 md:pb-0`}>
           {renderPage()}
         </div>
         <RightPanel onNavigate={handleNavigate} followedUsers={followedUsers} onFollowUser={handleFollowUser} />
@@ -435,7 +437,7 @@ export default function App() {
       {showComposeModal && (
         <div className="fixed inset-0 z-[100] flex items-start justify-center pt-16">
           <div className="absolute inset-0 bg-blue-300/20 backdrop-blur-sm" onClick={() => setShowComposeModal(false)} />
-          <div className="relative w-full max-w-[600px] mx-4 bg-black rounded-2xl border border-gray-800/50 shadow-2xl">
+          <div className={`relative w-full max-w-[600px] mx-4 ${tc.bgModal} rounded-2xl border ${tc.border} shadow-2xl`}>
             <ComposeTweet
               isModal
               onClose={() => setShowComposeModal(false)}
