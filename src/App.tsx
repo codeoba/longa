@@ -15,8 +15,10 @@ import RightPanel from './components/RightPanel';
 import ComposeTweet from './components/ComposeTweet';
 import ThreadView from './components/ThreadView';
 import UserProfile from './components/UserProfile';
+import { useTheme } from './ThemeContext';
 
 export default function App() {
+  const { theme } = useTheme();
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [showComposeModal, setShowComposeModal] = useState(false);
@@ -29,7 +31,7 @@ export default function App() {
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [settings, setSettings] = useState({
-    darkMode: true,
+    darkMode: theme === 'dark',
     notifications: true,
     soundEffects: false,
     autoplay: true,
@@ -342,7 +344,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-black text-white' : 'bg-white text-gray-900'}`}>
       {/* Sidebar */}
       <Sidebar
         currentPage={currentPage}

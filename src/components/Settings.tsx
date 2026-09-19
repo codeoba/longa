@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft } from './Icons';
+import { useTheme } from '../ThemeContext';
 
 interface SettingsProps {
   settings: {
@@ -16,9 +17,16 @@ interface SettingsProps {
 export default function Settings({ settings, onSettingsChange }: SettingsProps) {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showContentModal, setShowContentModal] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   const toggleSetting = (key: keyof typeof settings) => {
     onSettingsChange({ ...settings, [key]: !settings[key] });
+  };
+
+  const toggleDarkMode = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    onSettingsChange({ ...settings, darkMode: newTheme === 'dark' });
   };
 
   const languages = ['English', 'Kiswahili', 'Français', 'Español', 'العربية', '中文'];
@@ -48,10 +56,10 @@ export default function Settings({ settings, onSettingsChange }: SettingsProps) 
               <p className="text-[13px] text-gray-500">Use dark theme</p>
             </div>
             <button
-              onClick={() => toggleSetting('darkMode')}
-              className={`w-11 h-6 rounded-full transition-colors relative ${settings.darkMode ? 'bg-blue-500' : 'bg-gray-600'}`}
+              onClick={toggleDarkMode}
+              className={`w-11 h-6 rounded-full transition-colors relative ${theme === 'dark' ? 'bg-blue-500' : 'bg-gray-600'}`}
             >
-              <div className={`w-5 h-5 rounded-full bg-white absolute top-0.5 transition-all ${settings.darkMode ? 'left-[22px]' : 'left-0.5'}`} />
+              <div className={`w-5 h-5 rounded-full bg-white absolute top-0.5 transition-all ${theme === 'dark' ? 'left-[22px]' : 'left-0.5'}`} />
             </button>
           </div>
 
