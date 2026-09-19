@@ -20,13 +20,25 @@ import Spaces from './components/Spaces';
 import Communities from './components/Communities';
 import Analytics from './components/Analytics';
 import Drafts from './components/Drafts';
+import LoginPage from './components/auth/LoginPage';
+import RegisterPage from './components/auth/RegisterPage';
+import ForgotPasswordPage from './components/auth/ForgotPasswordPage';
+import ResetPasswordPage from './components/auth/ResetPasswordPage';
+import VerifyEmailPage from './components/auth/VerifyEmailPage';
+import AccountSettingsPage from './components/auth/AccountSettingsPage';
+import ProfileEditPage from './components/auth/ProfileEditPage';
 import { useKeyboardShortcuts } from './components/KeyboardShortcuts';
 import { useTheme } from './ThemeContext';
 import { useThemeClasses } from './themeUtils';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
-export default function App() {
+function AppContent() {
   const { theme } = useTheme();
   const tc = useThemeClasses();
+  const { isAuthenticated, user } = useAuth();
+  const [authPage, setAuthPage] = useState<'login' | 'register' | 'forgot' | 'reset' | 'verify'>('login');
+  const [resetToken, setResetToken] = useState('');
+  const [verifyToken, setVerifyToken] = useState('');
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [showComposeModal, setShowComposeModal] = useState(false);
@@ -378,6 +390,25 @@ export default function App() {
     }
   };
 
+  // Show auth pages if not authenticated
+  if (!isAuthenticated) {
+    if (authPage === 'login') {
+      return <LoginPage onSwitchToRegister={() => setAuthPage('register')} onForgotPassword={() => setAuthPage('forgot')} />;
+    }
+    if (authPage === 'register') {
+      return <RegisterPage onSwitchToLogin={() => setAuthPage('login')} />;
+    }
+    if (authPage === 'forgot') {
+      return <ForgotPasswordPage onBackToLogin={() => setAuthPage('login')} />;
+    }
+    if (authPage === 'reset') {
+      return <ResetPasswordPage token={resetToken} onBackToLogin={() => setAuthPage('login')} />;
+    }
+    if (authPage === 'verify') {
+      return <VerifyEmailPage token={verifyToken} onBackToLogin={() => setAuthPage('login')} />;
+    }
+  }
+
   return (
     <div className={`min-h-screen ${tc.bg} ${tc.text} transition-colors duration-200`}>
       {/* Sidebar */}
@@ -464,5 +495,13 @@ export default function App() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }

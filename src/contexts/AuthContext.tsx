@@ -7,6 +7,9 @@ interface User {
   handle: string;
   email: string;
   avatar: string;
+  bio?: string;
+  location?: string;
+  website?: string;
   verified: boolean;
   premium: boolean;
 }
