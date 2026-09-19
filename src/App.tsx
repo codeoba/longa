@@ -20,6 +20,24 @@ import Spaces from './components/Spaces';
 import Communities from './components/Communities';
 import Analytics from './components/Analytics';
 import Drafts from './components/Drafts';
+import Stories from './components/Stories';
+import VideoPosts from './components/VideoPosts';
+import LiveStreaming from './components/LiveStreaming';
+import CreatorMonetization from './components/CreatorMonetization';
+import AdvancedAnalytics from './components/AdvancedAnalytics';
+import AdvancedReactions from './components/AdvancedReactions';
+import BookmarkCollections from './components/BookmarkCollections';
+import ReadingList from './components/ReadingList';
+import FocusMode from './components/FocusMode';
+import LocationBasedFeatures from './components/LocationBasedFeatures';
+import CollaborativePosts from './components/CollaborativePosts';
+import AdvancedSearch from './components/AdvancedSearch';
+import ScheduledPosts from './components/ScheduledPosts';
+import AIImageGenerator from './components/AIImageGenerator';
+import CustomThemes from './components/CustomThemes';
+import OfflineMode from './components/OfflineMode';
+import ThreadBuilder from './components/ThreadBuilder';
+import MultiAccountSwitcher from './components/MultiAccountSwitcher';
 import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
 import ForgotPasswordPage from './components/auth/ForgotPasswordPage';
@@ -385,6 +403,40 @@ function AppContent() {
         return <Analytics />;
       case 'drafts':
         return <Drafts drafts={drafts} onDeleteDraft={handleDeleteDraft} onPostDraft={handlePostDraft} />;
+      case 'stories':
+        return <Stories />;
+      case 'videos':
+        return <VideoPosts />;
+      case 'live':
+        return <LiveStreaming />;
+      case 'monetization':
+        return <CreatorMonetization />;
+      case 'advanced-analytics':
+        return <AdvancedAnalytics />;
+      case 'bookmark-collections':
+        return <BookmarkCollections />;
+      case 'reading-list':
+        return <ReadingList />;
+      case 'location':
+        return <LocationBasedFeatures />;
+      case 'collaborative':
+        return <CollaborativePosts />;
+      case 'search':
+        return <AdvancedSearch />;
+      case 'scheduled':
+        return <ScheduledPosts />;
+      case 'ai-images':
+        return <AIImageGenerator />;
+      case 'themes':
+        return <CustomThemes />;
+      case 'offline':
+        return <OfflineMode />;
+      case 'thread-builder':
+        return <ThreadBuilder />;
+      case 'account-settings':
+        return <AccountSettingsPage onBack={() => setCurrentPage('home')} />;
+      case 'edit-profile':
+        return <ProfileEditPage onBack={() => setCurrentPage('profile')} />;
       default:
         return null;
     }

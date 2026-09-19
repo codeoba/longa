@@ -164,4 +164,4 @@ export interface GrokMessage {
   timestamp: Date;
 }
 
-export type Page = 'home' | 'explore' | 'notifications' | 'messages' | 'bookmarks' | 'profile' | 'settings' | 'lists' | 'premium' | 'user-profile' | 'thread' | 'grok' | 'spaces' | 'communities' | 'analytics' | 'drafts';
+export type Page = 'home' | 'explore' | 'notifications' | 'messages' | 'bookmarks' | 'profile' | 'settings' | 'lists' | 'premium' | 'user-profile' | 'thread' | 'grok' | 'spaces' | 'communities' | 'analytics' | 'drafts' | 'stories' | 'videos' | 'live' | 'monetization' | 'advanced-analytics' | 'bookmark-collections' | 'reading-list' | 'location' | 'collaborative' | 'search' | 'scheduled' | 'ai-images' | 'themes' | 'offline' | 'thread-builder' | 'account-settings' | 'edit-profile';
