@@ -131,8 +131,8 @@ fi
 echo ""
 echo "🔐 [7/7] Kurekebisha ruhusa za faili (Permissions)..."
 mkdir -p "$WEB_ROOT/api/uploads"
-chmod -R 755 "$WEB_ROOT"
-chmod -R 777 "$WEB_ROOT/api/uploads"
+chmod -R 755 "$WEB_ROOT" 2>/dev/null || true
+chmod -R 777 "$WEB_ROOT/api/uploads" 2>/dev/null || true
 chmod -R 777 "$WEB_ROOT/api/database" 2>/dev/null || true
 chown -R www:www "$WEB_ROOT" 2>/dev/null || chown -R nginx:nginx "$WEB_ROOT" 2>/dev/null || true
 
