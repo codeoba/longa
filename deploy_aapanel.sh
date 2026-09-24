@@ -84,27 +84,36 @@ echo "  ✅ Faili za Frontend na Backend zimesambazwa kikamilifu"
 # ── 5. Sanidi Hifadhidata (Database Setup) ─────────────────────────────
 echo ""
 echo "🗄️  [5/7] Kuweka Hifadhidata (MySQL)..."
-DB_NAME="twitter_mdandu"
-DB_USER="twitter_mdandu"
-DB_PASS="LongaPass2026!"
+DB_NAME="sql_twitt_9x4n90"
+DB_USER="sql_twitt_9x4n90"
+DB_PASS="6f87ef40fbce6"
 
 # Angalia kama MySQL CLI ipo
 if command -v mysql >/dev/null 2>&1; then
-    echo "  Inatengeneza Database '$DB_NAME'..."
-    mysql -u root -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null || true
-    mysql -u root -e "CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS';" 2>/dev/null || true
-    mysql -u root -e "GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USER'@'localhost'; FLUSH PRIVILEGES;" 2>/dev/null || true
-
-    # Ingiza Migrations
-    if [ -f "$WEB_ROOT/api/database/migrations.sql" ]; then
-        echo "  Inaingiza migrations.sql..."
+    echo "  Inajaribu kuunganisha na kuingiza migrations kwenye '$DB_NAME'..."
+    # Jaribu kutumia credentials moja kwa moja
+    if mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "SELECT 1;" >/dev/null 2>&1; then
+        echo "  ✅ Muunganisho wa database ya '$DB_NAME' umefanikiwa!"
+        if [ -f "$WEB_ROOT/api/database/migrations.sql" ]; then
+            echo "  Inaingiza migrations.sql..."
+            mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$WEB_ROOT/api/database/migrations.sql" 2>/dev/null || true
+        fi
+        if [ -f "$WEB_ROOT/api/database/payment_migrations.sql" ]; then
+            echo "  Inaingiza payment_migrations.sql..."
+            mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$WEB_ROOT/api/database/payment_migrations.sql" 2>/dev/null || true
+        fi
+        echo "  ✅ Migrations zote zimeingizwa kikamilifu!"
+    elif mysql -u root "$DB_NAME" -e "SELECT 1;" >/dev/null 2>&1; then
+        echo "  Inatumia root kuingiza migrations kwenye '$DB_NAME'..."
         mysql -u root "$DB_NAME" < "$WEB_ROOT/api/database/migrations.sql" 2>/dev/null || true
-    fi
-    if [ -f "$WEB_ROOT/api/database/payment_migrations.sql" ]; then
-        echo "  Inaingiza payment_migrations.sql..."
         mysql -u root "$DB_NAME" < "$WEB_ROOT/api/database/payment_migrations.sql" 2>/dev/null || true
+        echo "  ✅ Migrations zimeingizwa kikamilifu"
+    else
+        echo "  ℹ️ Kama unahitaji kuingiza schema mwenyewe, unaweza ku-import:"
+        echo "     $WEB_ROOT/api/database/migrations.sql"
+        echo "     $WEB_ROOT/api/database/payment_migrations.sql"
+        echo "     kupitia aaPanel -> Databases -> Import / phpMyAdmin."
     fi
-    echo "  ✅ Database imesanidiwa vizuri"
 fi
 
 # ── 6. Sanidi backend/config/database.php ──────────────────────────────
@@ -112,10 +121,10 @@ echo ""
 echo "⚙️  [6/7] Kusanidi config/database.php kwa ajili ya $DOMAIN..."
 CONFIG_FILE="$WEB_ROOT/api/config/database.php"
 if [ -f "$CONFIG_FILE" ]; then
-    sed -i "s/'database' => 'longa_db'/'database' => '$DB_NAME'/" "$CONFIG_FILE" 2>/dev/null || true
-    sed -i "s/'username' => 'longa_user'/'username' => '$DB_USER'/" "$CONFIG_FILE" 2>/dev/null || true
-    sed -i "s/'password' => 'your_password'/'password' => '$DB_PASS'/" "$CONFIG_FILE" 2>/dev/null || true
-    sed -i "s/'url' => 'https:\/\/yourdomain.com'/'url' => 'https:\/\/$DOMAIN'/" "$CONFIG_FILE" 2>/dev/null || true
+    sed -i "s/'database' => '.*'/'database' => '$DB_NAME'/" "$CONFIG_FILE" 2>/dev/null || true
+    sed -i "s/'username' => '.*'/'username' => '$DB_USER'/" "$CONFIG_FILE" 2>/dev/null || true
+    sed -i "s/'password' => '.*'/'password' => '$DB_PASS'/" "$CONFIG_FILE" 2>/dev/null || true
+    sed -i "s/'url' => '.*'/'url' => 'https:\/\/$DOMAIN'/" "$CONFIG_FILE" 2>/dev/null || true
 fi
 
 # ── 7. Ruhusa za Faili (Permissions) ──────────────────────────────────

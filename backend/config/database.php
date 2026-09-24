@@ -12,9 +12,9 @@ return [
     'mysql' => [
         'host' => getenv('DB_HOST') ?: 'localhost',
         'port' => (int)(getenv('DB_PORT') ?: 3306),
-        'database' => getenv('DB_NAME') ?: 'longa_db',
-        'username' => getenv('DB_USER') ?: 'root',
-        'password' => getenv('DB_PASS') !== false ? getenv('DB_PASS') : '',
+        'database' => getenv('DB_NAME') ?: 'sql_twitt_9x4n90',
+        'username' => getenv('DB_USER') ?: 'sql_twitt_9x4n90',
+        'password' => getenv('DB_PASS') !== false ? getenv('DB_PASS') : '6f87ef40fbce6',
         'charset' => 'utf8mb4',
         'collation' => 'utf8mb4_unicode_ci',
     ],
@@ -39,7 +39,7 @@ return [
     'app' => [
         'name' => 'Longa API',
         'debug' => getenv('APP_DEBUG') === 'true' || true,
-        'url' => getenv('APP_URL') ?: 'http://localhost:8000',
+        'url' => getenv('APP_URL') ?: 'https://twitter.mdandu.com',
         'timezone' => 'Africa/Dar_es_Salaam',
         'locale' => 'en',
         'require_email_verification' => getenv('REQUIRE_EMAIL_VERIFICATION') === 'true', // false by default so users can login immediately
