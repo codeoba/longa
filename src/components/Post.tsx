@@ -62,8 +62,9 @@ export default function PostComponent({ post, onLike, onRetweet, onBookmark, onR
     setCoPilotLoading(true);
     try {
       const { getActiveAiCredentials } = await import('../services/aiSettingsService');
+      const { getApiUrl } = await import('../api/phpAdapter');
       const { provider, apiKey, model } = getActiveAiCredentials();
-      const res = await fetch('http://localhost:8000/ai/co-pilot', {
+      const res = await fetch(`${getApiUrl()}/ai/co-pilot`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: post.content, provider, apiKey, model })

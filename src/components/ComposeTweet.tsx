@@ -31,8 +31,9 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
     setAiTransforming(true);
     try {
       const { getActiveAiCredentials } = await import('../services/aiSettingsService');
+      const { getApiUrl } = await import('../api/phpAdapter');
       const { provider, apiKey, model } = getActiveAiCredentials();
-      const res = await fetch('http://localhost:8000/ai/transform-text', {
+      const res = await fetch(`${getApiUrl()}/ai/transform-text`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

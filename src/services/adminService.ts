@@ -2,7 +2,9 @@
  * Admin Service - Longa Central Administration & Feature Control
  */
 
-const BASE_URL = 'http://localhost:8000';
+import { getApiUrl } from '../api/phpAdapter';
+
+const getBaseUrl = () => getApiUrl();
 
 export interface AdminKpis {
   total_users: number;
@@ -90,7 +92,7 @@ export interface AuditLog {
 
 export const fetchAdminStats = async (): Promise<{ kpis: AdminKpis; revenue_breakdown: any; growth_trends: any[] }> => {
   try {
-    const res = await fetch(`${BASE_URL}/admin/stats`);
+    const res = await fetch(`${getBaseUrl()}/admin/stats`);
     if (res.ok) {
       const data = await res.json();
       return data;
@@ -132,7 +134,7 @@ export const fetchAdminStats = async (): Promise<{ kpis: AdminKpis; revenue_brea
 
 export const fetchAdminFeatures = async (): Promise<{ features: FeatureFlags; moderation_settings: any }> => {
   try {
-    const res = await fetch(`${BASE_URL}/admin/features`);
+    const res = await fetch(`${getBaseUrl()}/admin/features`);
     if (res.ok) {
       const data = await res.json();
       return data;
@@ -194,7 +196,7 @@ export const updateAdminFeatures = async (
   }
 
   try {
-    const res = await fetch(`${BASE_URL}/admin/features`, {
+    const res = await fetch(`${getBaseUrl()}/admin/features`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -211,7 +213,7 @@ export const updateAdminFeatures = async (
 
 export const fetchAdminUsers = async (query?: string, role?: string): Promise<AdminUser[]> => {
   try {
-    const url = new URL(`${BASE_URL}/admin/users`);
+    const url = new URL(`${getBaseUrl()}/admin/users`);
     if (query) url.searchParams.set('q', query);
     if (role) url.searchParams.set('role', role);
 
@@ -307,7 +309,7 @@ export const performUserAction = async (
   reason?: string
 ): Promise<{ success: boolean; message?: string }> => {
   try {
-    const res = await fetch(`${BASE_URL}/admin/users/${userId}/action`, {
+    const res = await fetch(`${getBaseUrl()}/admin/users/${userId}/action`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action, value, reason }),
@@ -325,7 +327,7 @@ export const performUserAction = async (
 
 export const fetchModerationQueue = async (): Promise<FlaggedPost[]> => {
   try {
-    const res = await fetch(`${BASE_URL}/admin/moderation`);
+    const res = await fetch(`${getBaseUrl()}/admin/moderation`);
     if (res.ok) {
       const data = await res.json();
       return data.flagged_posts || [];
@@ -362,7 +364,7 @@ export const fetchModerationQueue = async (): Promise<FlaggedPost[]> => {
 
 export const deletePostAsAdmin = async (postId: string): Promise<boolean> => {
   try {
-    const res = await fetch(`${BASE_URL}/admin/posts/${postId}`, {
+    const res = await fetch(`${getBaseUrl()}/admin/posts/${postId}`, {
       method: 'DELETE',
     });
     return res.ok;
@@ -374,7 +376,7 @@ export const deletePostAsAdmin = async (postId: string): Promise<boolean> => {
 
 export const fetchPayouts = async (): Promise<CreatorPayout[]> => {
   try {
-    const res = await fetch(`${BASE_URL}/admin/payouts`);
+    const res = await fetch(`${getBaseUrl()}/admin/payouts`);
     if (res.ok) {
       const data = await res.json();
       return data.payouts || [];
@@ -415,7 +417,7 @@ export const processPayoutAction = async (
   transactionRef?: string
 ): Promise<boolean> => {
   try {
-    const res = await fetch(`${BASE_URL}/admin/payouts/${payoutId}/action`, {
+    const res = await fetch(`${getBaseUrl()}/admin/payouts/${payoutId}/action`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action, transaction_ref: transactionRef }),
@@ -429,7 +431,7 @@ export const processPayoutAction = async (
 
 export const fetchAuditLogs = async (): Promise<AuditLog[]> => {
   try {
-    const res = await fetch(`${BASE_URL}/admin/audit-logs`);
+    const res = await fetch(`${getBaseUrl()}/admin/audit-logs`);
     if (res.ok) {
       const data = await res.json();
       return data.logs || [];

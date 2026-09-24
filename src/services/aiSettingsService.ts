@@ -83,8 +83,10 @@ export const getActiveAiCredentials = () => {
   return { provider, apiKey, model };
 };
 
+import { getApiUrl } from '../api/phpAdapter';
+
 export const getApiBaseUrl = () => {
-  return 'http://localhost:8000';
+  return getApiUrl();
 };
 
 export const fetchAiProviders = async (): Promise<Record<string, AiProviderInfo>> => {
