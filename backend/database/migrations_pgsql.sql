@@ -7,6 +7,9 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(255) NOT NULL,
     handle VARCHAR(100) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL DEFAULT '',
+    email_verified BOOLEAN DEFAULT TRUE,
+    last_login TIMESTAMP,
     avatar VARCHAR(50) DEFAULT '👤',
     bio TEXT,
     verified BOOLEAN DEFAULT FALSE,
@@ -19,6 +22,7 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 CREATE INDEX IF NOT EXISTS idx_users_handle ON users(handle);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
@@ -151,6 +155,30 @@ CREATE TABLE IF NOT EXISTS settings (
     UNIQUE(user_id, setting_key)
 );
 
+-- Email verifications table
+CREATE TABLE IF NOT EXISTS email_verifications (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_email_verifications_token ON email_verifications(token);
+CREATE INDEX IF NOT EXISTS idx_email_verifications_expires_at ON email_verifications(expires_at);
+
+-- Password resets table
+CREATE TABLE IF NOT EXISTS password_resets (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_password_resets_token ON password_resets(token);
+CREATE INDEX IF NOT EXISTS idx_password_resets_expires_at ON password_resets(expires_at);
+
 -- Function to auto-update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -179,13 +207,55 @@ CREATE TRIGGER update_communities_updated_at BEFORE UPDATE ON communities
 CREATE TRIGGER update_settings_updated_at BEFORE UPDATE ON settings
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Insert sample data
-INSERT INTO users (name, handle, email, avatar, bio, verified, premium, followers, following, posts) VALUES
-('Amani Tech', '@amanitech', 'amani@example.com', '👨‍💻', 'Full Stack Developer | Building the future', TRUE, TRUE, 15420, 892, 3241),
-('Zawadi Innovation', '@zawadi_innov', 'zawadi@example.com', '👩‍🔬', 'Innovation Lead @TechAfrica | AI & ML Researcher', TRUE, TRUE, 89200, 432, 12500),
-('Baraka Digital', '@barakadigital', 'baraka@example.com', '🎨', 'UI/UX Designer | Creative Director', TRUE, FALSE, 45600, 1200, 8900);
+-- Insert sample data with default password: password123
+INSERT INTO users (name, handle, email, password_hash, avatar, bio, verified, premium, followers, following, posts, email_verified) VALUES
+('Amani Tech', '@longa_user', 'amani@example.com', '$2y$10$3w8BmYfVOvoKqUQrgA6cYO8FeL/qeLR0l6wxEeGBRBpnDLK3Fh1hS', '👨‍💻', 'Full Stack Developer | Building Longa | Open Source Contributor', TRUE, TRUE, 15420, 892, 3241, TRUE),
+('Zawadi Innovation', '@zawadi_innov', 'zawadi@example.com', '$2y$10$3w8BmYfVOvoKqUQrgA6cYO8FeL/qeLR0l6wxEeGBRBpnDLK3Fh1hS', '👩‍🔬', 'Innovation Lead @TechAfrica | AI & ML Researcher', TRUE, TRUE, 89200, 432, 12500, TRUE),
+('Baraka Digital', '@barakadigital', 'baraka@example.com', '$2y$10$3w8BmYfVOvoKqUQrgA6cYO8FeL/qeLR0l6wxEeGBRBpnDLK3Fh1hS', '🎨', 'UI/UX Designer | Creative Director', TRUE, FALSE, 45600, 1200, 8900, TRUE);
 
 INSERT INTO posts (user_id, content, likes, retweets, replies, views) VALUES
-(1, '🚀 Excited to announce our new project! Stay tuned for updates.', 234, 56, 12, 5600),
-(2, '🤖 AI is transforming the way we build software. The future is here!', 1567, 432, 89, 45000),
-(3, '🎨 Design is not just what it looks like. Design is how it works.', 892, 234, 45, 23000);
+(1, '🚀 Karibu kwenye Longa! Mtandao mpya wa kijamii unaoleta mapinduzi Afrika na ulimwenguni.', 234, 56, 12, 5600),
+(2, '🤖 AI na teknolojia ya kisasa ndio msingi wa Longa. Karibuni sana!', 1567, 432, 89, 45000),
+(3, '🎨 Design safi, wepesi, na usalama wa hali ya juu ndio vigezo vyetu.', 892, 234, 45, 23000);
+
+-- ==================== PAYMENT & MONETIZATION ====================
+CREATE TABLE IF NOT EXISTS subscriptions (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    plan VARCHAR(50) NOT NULL DEFAULT 'premium',
+    status VARCHAR(30) NOT NULL DEFAULT 'active',
+    payment_method VARCHAR(50) NOT NULL DEFAULT 'card',
+    amount DECIMAL(10,2) NOT NULL DEFAULT 8.00,
+    currency VARCHAR(10) NOT NULL DEFAULT 'USD',
+    starts_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_pg_user_subs ON subscriptions(user_id);
+CREATE INDEX IF NOT EXISTS idx_pg_sub_status ON subscriptions(status);
+
+CREATE TABLE IF NOT EXISTS transactions (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    reference VARCHAR(100) NOT NULL UNIQUE,
+    type VARCHAR(50) NOT NULL DEFAULT 'subscription',
+    amount DECIMAL(10,2) NOT NULL,
+    currency VARCHAR(10) NOT NULL DEFAULT 'USD',
+    payment_method VARCHAR(50) NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'completed',
+    recipient_id INTEGER NULL REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_pg_user_tx ON transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_pg_ref ON transactions(reference);
+
+CREATE TABLE IF NOT EXISTS creator_earnings (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+    balance DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    total_earned DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+

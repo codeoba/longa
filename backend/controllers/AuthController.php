@@ -61,6 +61,7 @@ class AuthController {
         $passwordHash = password_hash($input['password'], PASSWORD_BCRYPT);
         
         // Create user
+        $requireVerification = $this->config['app']['require_email_verification'] ?? false;
         $data = [
             'name' => $input['name'],
             'handle' => '@' . ltrim($input['handle'], '@'),
@@ -75,7 +76,7 @@ class AuthController {
             'posts' => 0,
             'location' => $input['location'] ?? null,
             'website' => $input['website'] ?? null,
-            'email_verified' => false,
+            'email_verified' => !$requireVerification, // Verified by default if email sending is disabled
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
         ];
@@ -89,8 +90,10 @@ class AuthController {
             'token' => $verificationToken,
             'expires_at' => date('Y-m-d H:i:s', strtotime('+24 hours'))
         ]);
-        
-        // TODO: Send verification email
+
+        // Send verification email via Mailer
+        require_once dirname(__DIR__) . '/core/Mailer.php';
+        Mailer::getInstance()->sendVerification($data['email'], $data['name'], $verificationToken);
         
         // Generate JWT token
         $token = $this->generateToken($userId);
@@ -98,14 +101,20 @@ class AuthController {
         jsonResponse([
             'message' => 'Registration successful',
             'user' => [
-                'id' => $userId,
+                'id' => (string)$userId,
                 'name' => $data['name'],
                 'handle' => $data['handle'],
                 'email' => $data['email'],
-                'avatar' => $data['avatar']
+                'avatar' => $data['avatar'],
+                'verified' => false,
+                'premium' => false,
+                'bio' => $data['bio'],
+                'followers' => 0,
+                'following' => 0,
+                'posts' => 0,
             ],
             'token' => $token,
-            'verification_required' => true
+            'verification_required' => $requireVerification
         ], 201);
     }
     
@@ -133,8 +142,9 @@ class AuthController {
             jsonResponse(['error' => 'Invalid credentials'], 401);
         }
         
-        // Check if email is verified
-        if (!$user['email_verified']) {
+        // Check if email is verified only if configured
+        $requireVerification = $this->config['app']['require_email_verification'] ?? false;
+        if ($requireVerification && !$user['email_verified']) {
             jsonResponse([
                 'error' => 'Please verify your email first',
                 'verification_required' => true
@@ -152,13 +162,17 @@ class AuthController {
         jsonResponse([
             'message' => 'Login successful',
             'user' => [
-                'id' => $user['id'],
+                'id' => (string)$user['id'],
                 'name' => $user['name'],
                 'handle' => $user['handle'],
                 'email' => $user['email'],
                 'avatar' => $user['avatar'],
+                'bio' => $user['bio'] ?? '',
                 'verified' => (bool)$user['verified'],
-                'premium' => (bool)$user['premium']
+                'premium' => (bool)$user['premium'],
+                'followers' => (int)($user['followers'] ?? 0),
+                'following' => (int)($user['following'] ?? 0),
+                'posts' => (int)($user['posts'] ?? 0),
             ],
             'token' => $token
         ]);
@@ -166,24 +180,12 @@ class AuthController {
     
     // POST /auth/logout - Logout user
     public function logout($params) {
-        // In a real app, you'd invalidate the token here
-        // For now, just return success
         jsonResponse(['message' => 'Logout successful']);
     }
     
     // GET /auth/me - Get current user
     public function me($params) {
-        $token = $this->getBearerToken();
-        
-        if (!$token) {
-            jsonResponse(['error' => 'Unauthorized'], 401);
-        }
-        
-        $userId = $this->validateToken($token);
-        
-        if (!$userId) {
-            jsonResponse(['error' => 'Invalid token'], 401);
-        }
+        $userId = requireAuth();
         
         $user = $this->db->fetchOne(
             "SELECT id, name, handle, email, avatar, bio, verified, premium, followers, following, posts, location, website, created_at 
@@ -194,6 +196,10 @@ class AuthController {
         if (!$user) {
             jsonResponse(['error' => 'User not found'], 404);
         }
+        
+        $user['id'] = (string)$user['id'];
+        $user['verified'] = (bool)$user['verified'];
+        $user['premium'] = (bool)$user['premium'];
         
         jsonResponse(['user' => $user]);
     }
@@ -236,7 +242,7 @@ class AuthController {
         }
         
         $user = $this->db->fetchOne(
-            "SELECT id FROM users WHERE email = ?",
+            "SELECT id, name, email FROM users WHERE email = ?",
             [$input['email']]
         );
         
@@ -257,8 +263,10 @@ class AuthController {
             'token' => $resetToken,
             'expires_at' => date('Y-m-d H:i:s', strtotime('+1 hour'))
         ]);
-        
-        // TODO: Send reset email with link: /reset-password?token={resetToken}
+
+        // Send reset email via Mailer
+        require_once dirname(__DIR__) . '/core/Mailer.php';
+        Mailer::getInstance()->sendPasswordReset($user['email'], $user['name'], $resetToken);
         
         jsonResponse(['message' => 'If the email exists, a reset link has been sent']);
     }
@@ -299,18 +307,7 @@ class AuthController {
     
     // PUT /auth/change-password - Change password (authenticated)
     public function changePassword($params) {
-        $token = $this->getBearerToken();
-        
-        if (!$token) {
-            jsonResponse(['error' => 'Unauthorized'], 401);
-        }
-        
-        $userId = $this->validateToken($token);
-        
-        if (!$userId) {
-            jsonResponse(['error' => 'Invalid token'], 401);
-        }
-        
+        $userId = requireAuth();
         $input = getJsonInput();
         
         if (!isset($input['current_password']) || !isset($input['new_password'])) {
@@ -319,6 +316,9 @@ class AuthController {
         
         // Get current user
         $user = $this->db->fetchOne("SELECT password_hash FROM users WHERE id = ?", [$userId]);
+        if (!$user) {
+            jsonResponse(['error' => 'User not found'], 404);
+        }
         
         // Verify current password
         if (!password_verify($input['current_password'], $user['password_hash'])) {
@@ -341,62 +341,21 @@ class AuthController {
     
     // Helper: Generate JWT token
     private function generateToken($userId) {
+        $secret = $this->config['jwt']['secret'] ?? 'longa_secret_key_change_in_production_2026';
+        $expiry = $this->config['jwt']['expiry'] ?? (86400 * 7);
+        
         $header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
         $payload = json_encode([
             'user_id' => $userId,
-            'exp' => time() + (24 * 60 * 60) // 24 hours
+            'exp' => time() + $expiry
         ]);
         
-        $base64Header = base64_encode($header);
-        $base64Payload = base64_encode($payload);
+        $base64Header = base64url_encode($header);
+        $base64Payload = base64url_encode($payload);
         
-        $signature = hash_hmac('sha256', $base64Header . "." . $base64Payload, 'your-secret-key-change-this');
-        $base64Signature = base64_encode($signature);
+        $signature = base64url_encode(hash_hmac('sha256', $base64Header . "." . $base64Payload, $secret, true));
         
-        return $base64Header . "." . $base64Payload . "." . $base64Signature;
-    }
-    
-    // Helper: Validate JWT token
-    private function validateToken($token) {
-        $parts = explode('.', $token);
-        
-        if (count($parts) !== 3) {
-            return false;
-        }
-        
-        list($base64Header, $base64Payload, $base64Signature) = $parts;
-        
-        // Verify signature
-        $signature = hash_hmac('sha256', $base64Header . "." . $base64Payload, 'your-secret-key-change-this');
-        $base64SignatureCheck = base64_encode($signature);
-        
-        if ($base64Signature !== $base64SignatureCheck) {
-            return false;
-        }
-        
-        // Decode payload
-        $payload = json_decode(base64_decode($base64Payload), true);
-        
-        // Check expiration
-        if ($payload['exp'] < time()) {
-            return false;
-        }
-        
-        return $payload['user_id'];
-    }
-    
-    // Helper: Get bearer token from headers
-    private function getBearerToken() {
-        $headers = getallheaders();
-        
-        if (!isset($headers['Authorization'])) {
-            return null;
-        }
-        
-        if (preg_match('/Bearer\s(\S+)/', $headers['Authorization'], $matches)) {
-            return $matches[1];
-        }
-        
-        return null;
+        return $base64Header . "." . $base64Payload . "." . $signature;
     }
 }
+

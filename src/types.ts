@@ -157,11 +157,113 @@ export interface AnalyticsData {
   mentions: number;
 }
 
-export interface GrokMessage {
+export interface AIMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
 }
 
-export type Page = 'home' | 'explore' | 'notifications' | 'messages' | 'bookmarks' | 'profile' | 'settings' | 'lists' | 'premium' | 'user-profile' | 'thread' | 'grok' | 'spaces' | 'communities' | 'analytics' | 'drafts' | 'stories' | 'videos' | 'live' | 'monetization' | 'advanced-analytics' | 'bookmark-collections' | 'reading-list' | 'location' | 'collaborative' | 'search' | 'scheduled' | 'ai-images' | 'themes' | 'offline' | 'thread-builder' | 'account-settings' | 'edit-profile';
+export interface StoreItem {
+  id: string;
+  creatorId: string;
+  creatorName: string;
+  creatorHandle: string;
+  creatorAvatar: string;
+  title: string;
+  description: string;
+  price: number;
+  currency: string;
+  category: 'ebook' | 'code' | 'design' | 'audio' | 'consultation';
+  coverImage: string;
+  salesCount: number;
+  rating: number;
+  fileUrl?: string;
+  tags: string[];
+}
+
+export interface BountySubmission {
+  id: string;
+  bountyId: string;
+  userId: string;
+  userName: string;
+  userHandle: string;
+  userAvatar: string;
+  content: string;
+  links?: string[];
+  isWinner?: boolean;
+  submittedAt: Date;
+}
+
+export interface Bounty {
+  id: string;
+  creatorId: string;
+  creatorName: string;
+  creatorHandle: string;
+  creatorAvatar: string;
+  title: string;
+  description: string;
+  rewardAmount: number;
+  currency: string;
+  category: string;
+  deadline: string;
+  status: 'open' | 'awarded' | 'closed';
+  submissionsCount: number;
+  tags: string[];
+  winnerSubmissionId?: string;
+}
+
+export interface ReelItem {
+  id: string;
+  creatorId: string;
+  creatorName: string;
+  creatorHandle: string;
+  creatorAvatar: string;
+  videoUrl: string;
+  caption: string;
+  likesCount: number;
+  commentsCount: number;
+  sharesCount: number;
+  audioTrack: string;
+  tags: string[];
+  isLiked?: boolean;
+}
+
+export interface PredictionItem {
+  id: string;
+  creatorName: string;
+  creatorHandle: string;
+  creatorAvatar: string;
+  question: string;
+  category: 'tech' | 'crypto' | 'sports' | 'world';
+  yesPercentage: number;
+  noPercentage: number;
+  totalVolumeUsd: number;
+  endsAt: string;
+  userVote?: 'yes' | 'no';
+}
+
+export interface LeaderboardUser {
+  rank: number;
+  id: string;
+  name: string;
+  handle: string;
+  avatar: string;
+  xp: number;
+  level: number;
+  tier: 'Grandmaster' | 'Master' | 'Elite' | 'Pro' | 'Rising';
+  streakDays: number;
+  weeklyTips: number;
+}
+
+export interface AICoPilotResult {
+  tldr: string[];
+  factCheck: {
+    score: number;
+    verdict: string;
+    analysis: string;
+  };
+  eli5: string;
+}
+
+export type Page = 'home' | 'explore' | 'notifications' | 'messages' | 'bookmarks' | 'profile' | 'settings' | 'lists' | 'premium' | 'user-profile' | 'thread' | 'longa-ai' | 'spaces' | 'communities' | 'analytics' | 'drafts' | 'stories' | 'videos' | 'live' | 'monetization' | 'advanced-analytics' | 'bookmark-collections' | 'reading-list' | 'location' | 'collaborative' | 'search' | 'scheduled' | 'ai-images' | 'themes' | 'offline' | 'thread-builder' | 'account-settings' | 'edit-profile' | 'store' | 'bounties' | 'reels' | 'predictions' | 'leaderboard' | 'admin';

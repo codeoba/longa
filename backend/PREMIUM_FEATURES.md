@@ -204,8 +204,8 @@ Hizi ni features za **premium level** ambazo zinafanya Longa kuwa social platfor
 - ✅ Rules & guidelines
 - ✅ Topic tags
 
-### 13. 🤖 **Grok AI Assistant**
-- ✅ AI chatbot
+### 13. 🤖 **Longa AI Native Assistant**
+- ✅ AI chatbot (Proprietary Longa Engine)
 - ✅ Context-aware responses
 - ✅ Suggested prompts
 - ✅ Conversation history

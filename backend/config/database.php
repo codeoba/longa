@@ -6,42 +6,50 @@
 
 return [
     // Database type: 'mysql' or 'pgsql'
-    'driver' => 'mysql',
+    'driver' => getenv('DB_DRIVER') ?: 'mysql',
     
     // MySQL Configuration
     'mysql' => [
-        'host' => 'localhost',
-        'port' => 3306,
-        'database' => 'longa_db',
-        'username' => 'root',
-        'password' => '',
+        'host' => getenv('DB_HOST') ?: 'localhost',
+        'port' => (int)(getenv('DB_PORT') ?: 3306),
+        'database' => getenv('DB_NAME') ?: 'longa_db',
+        'username' => getenv('DB_USER') ?: 'root',
+        'password' => getenv('DB_PASS') !== false ? getenv('DB_PASS') : '',
         'charset' => 'utf8mb4',
         'collation' => 'utf8mb4_unicode_ci',
     ],
     
     // PostgreSQL Configuration
     'pgsql' => [
-        'host' => 'localhost',
-        'port' => 5432,
-        'database' => 'longa_db',
-        'username' => 'postgres',
-        'password' => '',
+        'host' => getenv('DB_HOST') ?: 'localhost',
+        'port' => (int)(getenv('DB_PORT') ?: 5432),
+        'database' => getenv('DB_NAME') ?: 'longa_db',
+        'username' => getenv('DB_USER') ?: 'postgres',
+        'password' => getenv('DB_PASS') !== false ? getenv('DB_PASS') : '',
         'charset' => 'utf8',
     ],
     
+    // Security & Auth Settings
+    'jwt' => [
+        'secret' => getenv('JWT_SECRET') ?: 'longa_secret_key_change_in_production_2026',
+        'expiry' => 86400 * 7, // 7 days
+    ],
+
     // Application Settings
     'app' => [
         'name' => 'Longa API',
-        'debug' => true, // Badilisha kuwa false kwa production
-        'url' => 'http://localhost:8000',
+        'debug' => getenv('APP_DEBUG') === 'true' || true,
+        'url' => getenv('APP_URL') ?: 'http://localhost:8000',
         'timezone' => 'Africa/Dar_es_Salaam',
         'locale' => 'en',
+        'require_email_verification' => getenv('REQUIRE_EMAIL_VERIFICATION') === 'true', // false by default so users can login immediately
     ],
     
     // CORS Settings
     'cors' => [
-        'allowed_origins' => ['*'], // Badilisha kwa domain yako
+        'allowed_origins' => ['*'], // Badilisha kwa domain yako katika production
         'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        'allowed_headers' => ['Content-Type', 'Authorization'],
+        'allowed_headers' => ['Content-Type', 'Authorization', 'X-Requested-With'],
     ],
 ];
+

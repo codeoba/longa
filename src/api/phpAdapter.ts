@@ -2,10 +2,27 @@
  * PHP Backend Adapter for Frontend
  * 
  * Hii adapter inaruhusu frontend kuconnect na PHP backend
- * Badilisha API_URL na URL ya backend yako
  */
 
-const API_URL = 'https://api.longa.app'; // Badilisha na URL ya Longa backend yako
+export const getApiUrl = (): string => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/\/+$/, '');
+  }
+  
+  if (typeof window !== 'undefined') {
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocal) {
+      // Default local PHP dev server address (run: php -S localhost:8000 -t backend)
+      return 'http://localhost:8000';
+    }
+    // In production, fallback to relative /api or api subdomain
+    return window.location.origin + '/api';
+  }
+  
+  return 'https://api.longa.app';
+};
+
+export const API_URL = getApiUrl();
 
 interface ApiOptions extends RequestInit {
   headers?: Record<string, string>;
@@ -13,11 +30,16 @@ interface ApiOptions extends RequestInit {
 
 // Helper function kwa API calls
 async function apiCall(endpoint: string, options: ApiOptions = {}) {
-  const url = `${API_URL}${endpoint}`;
+  const baseUrl = getApiUrl();
+  const url = `${baseUrl}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+  
+  const token = typeof localStorage !== 'undefined' ? localStorage.getItem('auth_token') : null;
+  const authHeaders: Record<string, string> = token ? { 'Authorization': `Bearer ${token}` } : {};
   
   const config: ApiOptions = {
     headers: {
       'Content-Type': 'application/json',
+      ...authHeaders,
       ...options.headers,
     },
     ...options,
@@ -25,18 +47,19 @@ async function apiCall(endpoint: string, options: ApiOptions = {}) {
   
   try {
     const response = await fetch(url, config);
-    const data = await response.json();
+    const data = await response.json().catch(() => ({ error: 'Invalid JSON response from server' }));
     
     if (!response.ok) {
-      throw new Error(data.error || 'API request failed');
+      throw new Error(data.error || `Request failed with status ${response.status}`);
     }
     
     return data;
-  } catch (error) {
-    console.error('API Error:', error);
+  } catch (error: any) {
+    console.warn(`API Error [${endpoint}]:`, error.message);
     throw error;
   }
 }
+
 
 // ==================== AUTH API ====================
 export const AuthAPI = {
@@ -211,6 +234,45 @@ export const MessagesAPI = {
     }),
 };
 
+// ==================== UPLOAD API ====================
+export const UploadAPI = {
+  upload: async (file: File | Blob | string): Promise<{ url: string; filename: string }> => {
+    const baseUrl = getApiUrl();
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    const authHeaders: Record<string, string> = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+    if (typeof file === 'string' && file.startsWith('data:')) {
+      const res = await fetch(`${baseUrl}/upload`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeaders,
+        },
+        body: JSON.stringify({ data: file }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Upload failed');
+      return json;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file as Blob);
+
+    const res = await fetch(`${baseUrl}/upload`, {
+      method: 'POST',
+      headers: {
+        ...authHeaders,
+      },
+      body: formData,
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Upload failed');
+    return json;
+  }
+};
+
+export const uploadMedia = UploadAPI.upload;
+
 // Export all APIs
 export default {
   auth: AuthAPI,
@@ -218,4 +280,5 @@ export default {
   users: UsersAPI,
   notifications: NotificationsAPI,
   messages: MessagesAPI,
+  upload: UploadAPI,
 };

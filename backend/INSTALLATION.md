@@ -1,225 +1,121 @@
-# Longa - Installation Guide
+# 🚀 Longa Social Platform - Mwongozo wa Installation & Setup
 
-## 🚀 Installation kwenye aaPanel au cPanel
-
-### 1. Upload Backend Files
-
-**aaPanel:**
-```bash
-# Upload folder 'backend' kwenda:
-/home/yourdomain.com/public_html/api/
-```
-
-**cPanel:**
-```bash
-# Upload folder 'backend' kwenda:
-/public_html/api/
-```
-
-### 2. Setup Database
-
-#### MySQL:
-1. Fungua phpMyPanel au phpMyAdmin
-2. Tengeneza database mpya: `longa_db`
-3. Import file: `backend/database/migrations.sql`
-
-#### PostgreSQL:
-```bash
-# Kwenye terminal
-createdb longa_db
-psql longa_db < backend/database/migrations_pgsql.sql
-```
-
-### 3. Configure Database Connection
-
-Badilisha `backend/config/database.php`:
-
-```php
-return [
-    'driver' => 'mysql', // Au 'pgsql' kwa PostgreSQL
-    
-    'mysql' => [
-        'host' => 'localhost',
-        'port' => 3306,
-        'database' => 'longa_db',      // Database yako
-        'username' => 'your_username',  // Username yako
-        'password' => 'your_password',  // Password yako
-        'charset' => 'utf8mb4',
-        'collation' => 'utf8mb4_unicode_ci',
-    ],
-    
-    // Kwa PostgreSQL:
-    'pgsql' => [
-        'host' => 'localhost',
-        'port' => 5432,
-        'database' => 'longa_db',
-        'username' => 'postgres',
-        'password' => 'your_password',
-        'charset' => 'utf8',
-    ],
-];
-```
-
-### 4. Set Permissions
-
-```bash
-# Kwenye terminal
-chmod 755 /home/yourdomain.com/public_html/api/
-chmod 644 /home/yourdomain.com/public_html/api/.htaccess
-chmod 644 /home/yourdomain.com/public_html/api/index.php
-```
-
-### 5. Test API
-
-Fungua browser:
-```
-https://yourdomain.com/api/
-```
-
-Unapaswa kuona:
-```json
-{
-  "status": "ok",
-  "message": "Longa API is running",
-  "version": "1.0.0"
-}
-```
-
-### 6. Configure Frontend
-
-Badilisha `src/api/phpAdapter.ts`:
-
-```typescript
-const API_URL = 'https://yourdomain.com/api'; // URL ya API yako
-```
-
-### 7. Build Frontend
-
-```bash
-npm run build
-```
-
-Upload `dist/` folder kwenda:
-```
-/home/yourdomain.com/public_html/
-```
-
-## 📝 API Endpoints
-
-### Posts
-- `GET /posts` - Get all posts
-- `GET /posts/{id}` - Get single post
-- `POST /posts` - Create post
-- `PUT /posts/{id}` - Update post
-- `DELETE /posts/{id}` - Delete post
-- `POST /posts/{id}/like` - Like post
-- `POST /posts/{id}/unlike` - Unlike post
-- `POST /posts/{id}/retweet` - Retweet post
-
-### Users
-- `GET /users` - Get all users
-- `GET /users/{id}` - Get single user
-- `GET /users/search?q=query` - Search users
-- `POST /users` - Create user
-- `PUT /users/{id}` - Update user
-- `DELETE /users/{id}` - Delete user
-- `POST /users/{id}/follow` - Follow user
-- `POST /users/{id}/unfollow` - Unfollow user
-
-### Notifications
-- `GET /notifications?user_id={id}` - Get notifications
-- `GET /notifications/unread-count?user_id={id}` - Get unread count
-- `POST /notifications` - Create notification
-- `PUT /notifications/{id}/read` - Mark as read
-- `PUT /notifications/read-all` - Mark all as read
-
-### Messages
-- `GET /messages?user_id={id}` - Get conversations
-- `GET /messages/{conversation_id}` - Get messages
-- `GET /messages/unread-count?user_id={id}` - Get unread count
-- `POST /messages` - Send message
-- `PUT /messages/{id}/read` - Mark as read
-- `PUT /messages/read-all` - Mark all as read
-
-## 🔧 Troubleshooting
-
-### Error 500 - Internal Server Error
-- Check PHP error logs: `/home/yourdomain.com/logs/error.log`
-- Verify database credentials in `config/database.php`
-- Check file permissions
-
-### CORS Errors
-- Update `config/database.php` → `cors.allowed_origins`
-- Add your frontend domain
-
-### Database Connection Failed
-- Verify database exists
-- Check username/password
-- Ensure database user has permissions
-
-### .htaccess Not Working
-- Ensure `mod_rewrite` is enabled
-- Check Apache configuration
-- Try restarting Apache
-
-## 📊 Database Tables
-
-- `users` - User profiles
-- `posts` - User posts
-- `notifications` - Notifications
-- `messages` - Direct messages
-- `lists` - User lists
-- `bookmarks` - Bookmarked posts
-- `drafts` - Draft posts
-- `communities` - Communities
-- `spaces` - Audio spaces
-- `settings` - User settings
-
-## 🔐 Security Tips
-
-1. **Disable debug mode** kwa production:
-   ```php
-   'debug' => false
-   ```
-
-2. **Update CORS** kwa domain yako tu:
-   ```php
-   'allowed_origins' => ['https://yourdomain.com']
-   ```
-
-3. **Use HTTPS** kwa production
-
-4. **Implement authentication** (JWT au session-based)
-
-5. **Sanitize inputs** - tumia prepared statements (tayari zimefanywa)
-
-6. **Regular backups** ya database
-
-## 📞 Support
-
-Kwa msaada zaidi:
-- Check API logs
-- Review error messages
-- Verify database structure
-- Test endpoints individually
-
-## 🎯 Next Steps
-
-1. ✅ Upload backend files
-2. ✅ Setup database
-3. ✅ Configure database.php
-4. ✅ Test API endpoints
-5. ✅ Configure frontend API_URL
-6. ✅ Build and upload frontend
-7. ✅ Test full application
+Mwongozo huu utakusaidia kusanidi na kuendesha mradi wa **Longa** (Frontend ya React 18 / Vite na Backend ya PHP PDO REST API) kwenye mazingira ya kawaida ya kienyeji (Localhost) au kwenye Seva (aaPanel, cPanel, VPS).
 
 ---
 
-**Note:** Hii ni basic API. Kwa production, ongeza:
-- Authentication (JWT/OAuth)
-- Rate limiting
-- Input validation
-- Error handling
-- Logging
-- Caching
-- File upload handling
+## 🔑 Akaunti za Majaribio (Default Sample Accounts)
+Baada ya ku-run migrations za database, akaunti zifuatazo zinakuwa tayari kwa kuingia moja kwa moja:
+
+| Jina | Barua Pepe | Nenosiri (Password) | Handle |
+| :--- | :--- | :--- | :--- |
+| **Amani Joseph** (Default) | `amani@example.com` | `password123` | `@amani` |
+| **Zawadi Innovation** | `zawadi@example.com` | `password123` | `@zawadi` |
+| **Baraka Digital** | `baraka@example.com` | `password123` | `@baraka` |
+| **Neema Tech** | `neema@example.com` | `password123` | `@neema` |
+
+> 💡 **Kidokezo cha Haraka:** Ikiwa unataka kuutazama mradi bila kuunganisha database mara moja, bonyeza kitufe cha **"⚡ Explore Longa (Instant Demo Mode)"** kwenye ukurasa wa kuingia (Login screen).
+
+---
+
+## 💻 1. Kuendesha Localhost (Local Development)
+
+### Mahitaji (Prerequisites):
+- **PHP 7.4+** au **PHP 8.x** ikiwa na extension za `pdo`, `pdo_mysql` au `pdo_pgsql`, `openssl`, `mbstring`.
+- **Node.js 18+** na npm.
+- **MySQL 5.7+ / 8.0+** au **PostgreSQL 10+**.
+
+### Hatua ya A: Weka Database
+1. Fungua MySQL / phpMyAdmin yako kisha unda database:
+   ```sql
+   CREATE DATABASE longa_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+2. Ingiza muundo wa majedwali na data za majaribio:
+   ```bash
+   mysql -u root -p longa_db < backend/database/migrations.sql
+   ```
+   *(Kwa watumiaji wa PostgreSQL: tumia `psql -d longa_db -f backend/database/migrations_pgsql.sql`)*
+
+### Hatua ya B: Washa PHP Backend API
+Kwenye folda kuu ya mradi au ndani ya `backend`:
+```bash
+# Kutoka kwenye mzizi wa mradi (longa):
+php -S localhost:8000 -t backend
+```
+API itakuwa hewani kwenye: `http://localhost:8000/`  
+Unaweza kuifungua browser na utaona:
+```json
+{"status":"ok","message":"Longa API is running","version":"1.0.0"}
+```
+
+### Hatua ya C: Washa Frontend (React/Vite)
+Kwenye dirisha jipya la terminal:
+```bash
+npm install
+npm run dev
+```
+Mfumo utakupa kiungo (kwa mfano `http://localhost:5173`). Ukifungua kiungo hicho, utaweza kuingia kwa `amani@example.com` na nenosiri `password123`.
+
+---
+
+## 🌐 2. Deployment kwenye aaPanel au cPanel (Production)
+
+### A. Mpangilio wa Mafaili (Directory Layout)
+Kwenye server (mfano `public_html`), unaweza kuweka mafaili kwa mtindo huu:
+
+```text
+public_html/
+├── index.html              <-- Kutoka kwenye 'dist/' ya frontend
+├── assets/                 <-- Kutoka kwenye 'dist/assets/'
+├── vite.svg
+├── .htaccess               <-- Kwa ajili ya React SPA routing
+└── api/                    <-- Weka maudhui yote ya folda ya 'backend' hapa
+    ├── index.php
+    ├── .htaccess           <-- Tayari imesanidiwa kwa ajili ya routing na CORS
+    ├── config/
+    │   └── database.php
+    ├── core/
+    ├── controllers/
+    └── database/
+```
+
+### B. Usanidi wa Database (Environment Variables au config)
+Unaweza kusanidi database kwa njia mbili:
+1. **Njia ya Mazingira (Environment Variables - Inapendekezwa):**
+   Weka vigezo kwenye `.htaccess` au server environment:
+   ```apache
+   SetEnv DB_HOST "localhost"
+   SetEnv DB_NAME "longa_db"
+   SetEnv DB_USER "jina_la_user_wa_db"
+   SetEnv DB_PASS "nenosiri_imara_la_db"
+   SetEnv JWT_SECRET "tengeneza_neno_siri_refu_la_siri_zaidi_hapa_12345"
+   ```
+2. **Njia ya faili `backend/config/database.php`:**
+   Fungua `backend/config/database.php` na ujaze maelezo yako ya `mysql` au `pgsql`.
+
+### C. Ku-build Frontend kwa ajili ya Production
+Kwenye kompyuta yako kabla ya ku-upload:
+```bash
+# Ikiwa unataka kubadilisha API URL maalum:
+# Unda faili ya .env.production yenye:
+# VITE_API_URL=https://domain-yako.com/api
+
+npm run build
+```
+Folda itakayozalishwa inaitwa `dist/`. Nakili maudhui yote ya ndani ya `dist/` na uyaweke kwenye `public_html/`.
+
+### D. Usalama wa Apache na Ruhusa (Permissions)
+Hakikisha moduli ya `mod_rewrite` imewashwa kwenye Apache.
+Ruhusa za mafaili zinazopendekezwa:
+- Folda: `755`
+- Mafaili ya kawaida: `644`
+- Faili ya `.htaccess` ndani ya `api/` inahakikisha tokeni za `Authorization: Bearer <token>` hazikatwi na Apache.
+
+---
+
+## 🔒 3. Vipengele vya Usalama Vilivyoboreshwa (Security & Fixes)
+- ✅ **Kuzuia kuvuja kwa Passwords:** Endpoints za `/users` na `/users/{id}` hazitoi tena `password_hash`.
+- ✅ **Uthibitishaji wa Umiliki wa Machapisho (IDOR Protection):** Mtumiaji hawezi kufuta au kubadilisha chapisho la mtu mwingine; mfumo unathibitisha `user_id` kutoka kwenye JWT iliyosainiwa.
+- ✅ **Saini Salama ya JWT:** Tokeni hutumia HMAC-SHA256 yenye `hash_equals` (timing-attack resistant) na secret inayobadilika.
+- ✅ **CORS & Preflight Handling:** Maombi ya `OPTIONS` yanajibiwa kwa msimbo sahihi wa `200 OK` na headers zote stahiki.
+- ✅ **Database Migration Parity:** Migrations zote za MySQL na PostgreSQL zinalingana kwa ukamilifu zikiwa na meza za `users`, `posts`, `comments`, `likes`, `retweets`, `bookmarks`, `follows`, `messages`, `notifications`, `email_verifications`, na `password_resets`.

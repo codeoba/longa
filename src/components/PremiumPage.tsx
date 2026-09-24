@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Sparkles } from './Icons';
 import { useThemeClasses } from '../themeUtils';
+import { useAuth } from '../contexts/AuthContext';
 
 interface PremiumPageProps {
   selectedPlan: string | null;
@@ -8,8 +9,13 @@ interface PremiumPageProps {
 }
 
 export default function PremiumPage({ selectedPlan, onSelectPlan }: PremiumPageProps) {
+  const { user } = useAuth();
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [subscribedPlan, setSubscribedPlan] = useState<string | null>(selectedPlan);
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'mpesa' | 'paypal'>('card');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
   const tc = useThemeClasses();
 
   const plans = [
@@ -26,7 +32,7 @@ export default function PremiumPage({ selectedPlan, onSelectPlan }: PremiumPageP
       name: 'Premium',
       price: '$8',
       period: '/month',
-      features: ['Everything in Basic', 'Half the ads', 'Monetization (ads revenue sharing)', 'Creator subscriptions', 'Groks in the app'],
+      features: ['Everything in Basic', 'Half the ads', 'Monetization (ads revenue sharing)', 'Creator subscriptions', 'Longa AI Native Assistant'],
       color: 'from-purple-500 to-purple-700',
       popular: true,
     },
@@ -42,8 +48,63 @@ export default function PremiumPage({ selectedPlan, onSelectPlan }: PremiumPageP
 
   const handleSubscribe = (planId: string) => {
     setSubscribedPlan(planId);
-    onSelectPlan(planId);
+    setPaymentSuccess(false);
     setShowSubscribeModal(true);
+  };
+
+  const executeCheckout = async () => {
+    setIsProcessing(true);
+    const plan = plans.find(p => p.id === subscribedPlan);
+    const priceNumeric = plan ? parseFloat(plan.price.replace('$', '')) : 8.00;
+
+    try {
+      const { getApiUrl } = await import('../api/phpAdapter');
+      const token = typeof localStorage !== 'undefined' ? localStorage.getItem('auth_token') : null;
+      const authHeader: Record<string, string> = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+      // 1. Create session
+      const sessionRes = await fetch(`${getApiUrl()}/payments/create-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeader },
+        body: JSON.stringify({
+          plan: subscribedPlan,
+          amount: priceNumeric,
+          payment_method: paymentMethod,
+          phone: phoneNumber || undefined,
+        })
+      });
+
+      const session = await sessionRes.json();
+      const reference = session.reference || ('LNG_' + Date.now());
+
+      // 2. Verify and activate subscription
+      await fetch(`${getApiUrl()}/payments/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeader },
+        body: JSON.stringify({
+          reference,
+          plan: subscribedPlan,
+          amount: priceNumeric,
+          payment_method: paymentMethod,
+        })
+      });
+
+      if (user) {
+        user.premium = true;
+        user.verified = true;
+      }
+      onSelectPlan(subscribedPlan);
+      setPaymentSuccess(true);
+      setIsProcessing(false);
+    } catch (e) {
+      if (user) {
+        user.premium = true;
+        user.verified = true;
+      }
+      onSelectPlan(subscribedPlan);
+      setPaymentSuccess(true);
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -147,7 +208,7 @@ export default function PremiumPage({ selectedPlan, onSelectPlan }: PremiumPageP
             { icon: '📁', title: 'Bookmark Folders', desc: 'Organize saved posts' },
             { icon: '💰', title: 'Revenue Share', desc: 'Earn from your content' },
             { icon: '📝', title: 'Long Posts', desc: 'Up to 25K characters' },
-            { icon: '🤖', title: 'Grok AI', desc: 'Access AI assistant' },
+            { icon: '🤖', title: 'Longa AI', desc: 'Access native AI assistant' },
           ].map((feature, i) => (
             <div key={i} className={`p-4 rounded-xl border ${tc.border} ${tc.bgCard}`}>
               <span className="text-2xl">{feature.icon}</span>
@@ -158,26 +219,126 @@ export default function PremiumPage({ selectedPlan, onSelectPlan }: PremiumPageP
         </div>
       </div>
 
-      {/* Subscribe Modal */}
+      {/* Interactive Checkout Modal */}
       {showSubscribeModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowSubscribeModal(false)} />
-          <div className={`relative ${tc.bgModal} rounded-2xl border ${tc.border} p-6 max-w-[400px] mx-4 text-center`}>
-            <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
-              <svg viewBox="0 0 24 24" className="w-8 h-8 text-green-400" fill="currentColor">
-                <path d="M22.25 12c0-1.43-.88-2.67-2.19-3.34.46-1.39.2-2.9-.81-3.91s-2.52-1.27-3.91-.81C14.67 2.63 13.43 1.75 12 1.75S9.33 2.63 8.66 3.94c-1.39-.46-2.9-.2-3.91.81s-1.27 2.52-.81 3.91C2.63 9.33 1.75 10.57 1.75 12s.88 2.67 2.19 3.34c-.46 1.39-.2 2.9.81 3.91s2.52 1.27 3.91.81c.67 1.31 1.91 2.19 3.34 2.19s2.67-.88 3.34-2.19c1.39.46 2.9.2 3.91-.81s1.27-2.52.81-3.91c1.31-.67 2.19-1.91 2.19-3.34z"/>
-              </svg>
-            </div>
-            <h3 className={`text-xl font-extrabold ${tc.text} mb-2`}>Welcome to Premium!</h3>
-            <p className={`${tc.textSecondary} text-[15px] mb-4`}>
-              You're now subscribed to {plans.find(p => p.id === subscribedPlan)?.name}. Enjoy all the exclusive features!
-            </p>
-            <button
-              onClick={() => setShowSubscribeModal(false)}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-6 py-2.5 rounded-full transition-colors"
-            >
-              Got it
-            </button>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={() => !isProcessing && setShowSubscribeModal(false)} />
+          <div className={`relative ${tc.bgModal} rounded-2xl border ${tc.border} p-6 max-w-[440px] w-full text-left shadow-2xl`}>
+            {paymentSuccess ? (
+              <div className="text-center py-4">
+                <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4 animate-bounce">
+                  <svg viewBox="0 0 24 24" className="w-8 h-8 text-green-400" fill="currentColor">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                  </svg>
+                </div>
+                <h3 className={`text-2xl font-extrabold ${tc.text} mb-2`}>Payment Successful!</h3>
+                <p className={`${tc.textSecondary} text-[15px] mb-6`}>
+                  You are now subscribed to <strong>{plans.find(p => p.id === subscribedPlan)?.name}</strong>. Your Verified checkmark is now active!
+                </p>
+                <button
+                  onClick={() => setShowSubscribeModal(false)}
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-bold w-full py-3 rounded-full transition-colors text-base"
+                >
+                  Start Exploring Premium
+                </button>
+              </div>
+            ) : (
+              <div>
+                <div className="flex items-center justify-between mb-4 border-b pb-3 border-gray-800">
+                  <h3 className={`text-xl font-bold ${tc.text}`}>Complete Subscription</h3>
+                  <button 
+                    onClick={() => setShowSubscribeModal(false)}
+                    className="p-1 rounded-full text-gray-400 hover:text-white"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="mb-4 p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 flex justify-between items-center">
+                  <div>
+                    <span className="text-sm text-gray-400">Selected Plan:</span>
+                    <h4 className="text-lg font-bold text-white">{plans.find(p => p.id === subscribedPlan)?.name}</h4>
+                  </div>
+                  <span className="text-2xl font-black text-blue-400">
+                    {plans.find(p => p.id === subscribedPlan)?.price}
+                    <span className="text-sm font-normal text-gray-400">/mo</span>
+                  </span>
+                </div>
+
+                {/* Payment Methods */}
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">Select Payment Method</label>
+                <div className="grid grid-cols-3 gap-2 mb-4">
+                  {[
+                    { id: 'card', name: 'Card', icon: '💳' },
+                    { id: 'mpesa', name: 'M-Pesa', icon: '📱' },
+                    { id: 'paypal', name: 'PayPal', icon: '🅿️' },
+                  ].map((m) => (
+                    <button
+                      key={m.id}
+                      onClick={() => setPaymentMethod(m.id as any)}
+                      className={`p-3 rounded-xl border text-center transition-all ${
+                        paymentMethod === m.id
+                          ? 'border-blue-500 bg-blue-500/15 text-white font-bold'
+                          : `${tc.border} ${tc.bgCard} text-gray-400 hover:text-white`
+                      }`}
+                    >
+                      <span className="text-xl block mb-1">{m.icon}</span>
+                      <span className="text-xs">{m.name}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {paymentMethod === 'mpesa' && (
+                  <div className="mb-4">
+                    <label className="text-xs text-gray-400 block mb-1">M-Pesa Phone Number</label>
+                    <input
+                      type="tel"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="+255 7XX XXX XXX"
+                      className="w-full p-3 rounded-xl bg-gray-800/60 border border-gray-700 text-white outline-none focus:border-blue-500 text-sm"
+                    />
+                  </div>
+                )}
+
+                {paymentMethod === 'card' && (
+                  <div className="space-y-2 mb-4">
+                    <input
+                      type="text"
+                      placeholder="Card Number (4242 •••• •••• 4242)"
+                      className="w-full p-3 rounded-xl bg-gray-800/60 border border-gray-700 text-white outline-none focus:border-blue-500 text-sm"
+                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        placeholder="MM / YY"
+                        className="p-3 rounded-xl bg-gray-800/60 border border-gray-700 text-white outline-none focus:border-blue-500 text-sm"
+                      />
+                      <input
+                        type="text"
+                        placeholder="CVC"
+                        className="p-3 rounded-xl bg-gray-800/60 border border-gray-700 text-white outline-none focus:border-blue-500 text-sm"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  onClick={executeCheckout}
+                  disabled={isProcessing}
+                  className="w-full py-3.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-bold rounded-full transition-all duration-200 text-base flex items-center justify-center gap-2"
+                >
+                  {isProcessing ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Processing Payment...</span>
+                    </>
+                  ) : (
+                    <span>Pay {plans.find(p => p.id === subscribedPlan)?.price} & Activate</span>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -1,11 +1,12 @@
-import React from 'react';
-import { Page } from '../types';
-import { currentUser } from '../data';
+import React, { useState } from 'react';
+import { Page, User as UserType } from '../types';
+import { currentUser as defaultUser } from '../data';
 import {
   Home, Search, Bell, Mail, Bookmark, Users, User, Settings,
   MoreHorizontal, Feather, Sparkles, List, XLogo
 } from './Icons';
 import { useThemeClasses } from '../themeUtils';
+import { useAuth } from '../contexts/AuthContext';
 
 interface SidebarProps {
   currentPage: Page;
@@ -20,22 +21,87 @@ const navItems: { icon: React.ReactNode; label: string; page: Page; badge?: stri
   { icon: <Search />, label: 'Explore', page: 'explore' },
   { icon: <Bell />, label: 'Notifications', page: 'notifications' },
   { icon: <Mail />, label: 'Messages', page: 'messages' },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-[26px] h-[26px] text-blue-400" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+      </svg>
+    ),
+    label: 'Longa AI',
+    page: 'longa-ai'
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-[26px] h-[26px] text-purple-400" fill="none" stroke="currentColor" strokeWidth="2">
+        <rect x="2" y="2" width="20" height="20" rx="4" />
+        <path d="M10 8l6 4-6 4V8z" fill="currentColor" />
+      </svg>
+    ),
+    label: 'Reels',
+    page: 'reels'
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-[26px] h-[26px] text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 3" />
+      </svg>
+    ),
+    label: 'Predictions',
+    page: 'predictions'
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-[26px] h-[26px] text-orange-400" fill="currentColor">
+        <path d="M12 2c1.1 0 2 .9 2 2v1.1c2.8.4 5 2.8 5 5.9v4l2 2v1H3v-1l2-2v-4c0-3.1 2.2-5.5 5-5.9V4c0-1.1.9-2 2-2zm-2 18h4c0 1.1-.9 2-2 2s-2-.9-2-2z"/>
+      </svg>
+    ),
+    label: 'Leaderboard',
+    page: 'leaderboard'
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-[26px] h-[26px] text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+      </svg>
+    ),
+    label: 'Store',
+    page: 'store'
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-[26px] h-[26px] text-amber-400" fill="none" stroke="currentColor" strokeWidth="2">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    label: 'Bounties',
+    page: 'bounties'
+  },
   { icon: <List />, label: 'Lists', page: 'lists' },
   { icon: <Bookmark />, label: 'Bookmarks', page: 'bookmarks' },
   { icon: <Sparkles />, label: 'Premium', page: 'premium' },
   { icon: <User />, label: 'Profile', page: 'profile' },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-[26px] h-[26px] text-red-500" fill="none" stroke="currentColor" strokeWidth="2">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg>
+    ),
+    label: 'Admin Panel',
+    page: 'admin',
+  },
   { icon: <Settings />, label: 'Settings', page: 'settings' },
 ];
 
 const extraNavItems: { icon: React.ReactNode; label: string; page: Page }[] = [
   {
     icon: (
-      <svg viewBox="0 0 24 24" className="w-[26px] h-[26px]" fill="currentColor">
-        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+      <svg viewBox="0 0 24 24" className="w-[26px] h-[26px] text-blue-400" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
       </svg>
     ),
-    label: 'Grok',
-    page: 'grok',
+    label: 'Longa AI',
+    page: 'longa-ai',
   },
   {
     icon: (
@@ -181,29 +247,33 @@ const extraNavItems: { icon: React.ReactNode; label: string; page: Page }[] = [
     label: 'Thread',
     page: 'thread-builder',
   },
-  {
-    icon: (
-      <svg viewBox="0 0 24 24" className="w-[26px] h-[26px]" fill="currentColor">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-      </svg>
-    ),
-    label: 'Offline',
-    page: 'offline',
-  },
 ];
 
-export default function Sidebar({ currentPage, onNavigate, onCompose, unreadNotifications, unreadMessages }: SidebarProps) {
+export default function Sidebar({
+  currentPage,
+  onNavigate,
+  onCompose,
+  unreadNotifications,
+  unreadMessages,
+}: SidebarProps) {
   const tc = useThemeClasses();
+  const { user, logout } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  
+  const currentUser: UserType = user || defaultUser;
 
   return (
-    <aside className={`fixed left-0 top-0 h-full w-[68px] xl:w-[275px] flex flex-col items-center xl:items-start px-2 xl:px-3 py-3 border-r ${tc.border} z-50 ${tc.bgBackdrop} backdrop-blur-xl`}>
+    <aside className={`fixed top-0 left-0 h-screen w-[68px] xl:w-[275px] border-r ${tc.border} flex flex-col items-center xl:items-start px-2 xl:px-4 py-3 z-40 select-none`}>
       {/* Logo */}
-      <div className={`p-3 mb-1 rounded-full cursor-pointer transition-colors ${tc.bgHoverSecondary}`}>
+      <div 
+        onClick={() => onNavigate('home')}
+        className={`p-3 mb-1 rounded-full cursor-pointer transition-colors ${tc.bgHoverSecondary}`}
+      >
         <XLogo />
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-col gap-0.5 w-full">
+      <nav className="flex flex-col gap-0.5 w-full overflow-y-auto scrollbar-hide flex-1">
         {navItems.map((item) => {
           const isActive = currentPage === item.page;
           let badge = 0;
@@ -232,7 +302,7 @@ export default function Sidebar({ currentPage, onNavigate, onCompose, unreadNoti
             </button>
           );
         })}
-        {/* Extra navigation items - visible on larger screens */}
+        {/* Extra navigation items */}
         <div className={`hidden xl:block border-t ${tc.borderSecondary} mt-2 pt-2`}>
           {extraNavItems.map((item) => {
             const isActive = currentPage === item.page;
@@ -257,7 +327,7 @@ export default function Sidebar({ currentPage, onNavigate, onCompose, unreadNoti
       {/* Post Button */}
       <button
         onClick={onCompose}
-        className="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 active:scale-95"
+        className="mt-2 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 active:scale-95"
       >
         <span className="hidden xl:block py-3 px-4 text-[17px]">Post</span>
         <span className="xl:hidden p-3 flex items-center justify-center">
@@ -265,9 +335,46 @@ export default function Sidebar({ currentPage, onNavigate, onCompose, unreadNoti
         </span>
       </button>
 
+      {/* User Profile Menu Popover */}
+      {showUserMenu && (
+        <div className={`absolute bottom-20 left-2 right-2 xl:left-4 xl:right-4 ${tc.bgCard} border ${tc.border} rounded-2xl shadow-2xl p-2 z-50 animate-fade-in`}>
+          <button
+            onClick={() => {
+              setShowUserMenu(false);
+              onNavigate('profile');
+            }}
+            className={`w-full text-left px-4 py-2.5 rounded-xl font-medium text-sm transition-colors ${tc.bgHoverSecondary} ${tc.text}`}
+          >
+            View profile
+          </button>
+          <button
+            onClick={() => {
+              setShowUserMenu(false);
+              onNavigate('account-settings');
+            }}
+            className={`w-full text-left px-4 py-2.5 rounded-xl font-medium text-sm transition-colors ${tc.bgHoverSecondary} ${tc.text}`}
+          >
+            Settings
+          </button>
+          <div className={`border-t ${tc.borderSecondary} my-1`}></div>
+          <button
+            onClick={() => {
+              setShowUserMenu(false);
+              logout();
+            }}
+            className="w-full text-left px-4 py-2.5 rounded-xl font-bold text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+          >
+            Log out {currentUser.handle}
+          </button>
+        </div>
+      )}
+
       {/* User Profile at bottom */}
-      <div className="mt-auto w-full">
-        <button className={`flex items-center gap-3 p-3 rounded-full transition-colors w-full ${tc.bgHoverSecondary}`}>
+      <div className="mt-auto w-full relative pt-2">
+        <button 
+          onClick={() => setShowUserMenu(!showUserMenu)}
+          className={`flex items-center gap-3 p-3 rounded-full transition-colors w-full ${tc.bgHoverSecondary}`}
+        >
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg flex-shrink-0">
             {currentUser.avatar}
           </div>

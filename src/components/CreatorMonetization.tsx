@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useThemeClasses } from '../themeUtils';
 
@@ -85,7 +85,24 @@ export default function CreatorMonetization() {
     },
   ]);
 
-  const totalRevenue = subscriptions.reduce((sum, sub) => sum + sub.revenue, 0) + 
+  const [liveBalance, setLiveBalance] = useState<number | null>(null);
+
+  useEffect(() => {
+    import('../api/phpAdapter').then(({ getApiUrl }) => {
+      const token = typeof localStorage !== 'undefined' ? localStorage.getItem('auth_token') : null;
+      const authHeader: Record<string, string> = token ? { 'Authorization': `Bearer ${token}` } : {};
+      fetch(`${getApiUrl()}/payments/earnings`, { headers: authHeader })
+        .then(r => r.json())
+        .then(data => {
+          if (data && typeof data.balance === 'number') {
+            setLiveBalance(data.balance);
+          }
+        })
+        .catch(() => {});
+    });
+  }, []);
+
+  const totalRevenue = (liveBalance !== null ? liveBalance : subscriptions.reduce((sum, sub) => sum + sub.revenue, 0)) + 
                        tips.reduce((sum, tip) => sum + tip.amount, 0);
   const totalSubscribers = subscriptions.reduce((sum, sub) => sum + sub.subscribers, 0);
 

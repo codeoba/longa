@@ -11,7 +11,6 @@ class Database {
     
     private function __construct() {
         $this->config = require __DIR__ . '/../config/database.php';
-        $this->connect();
     }
     
     public static function getInstance() {
@@ -19,6 +18,25 @@ class Database {
             self::$instance = new self();
         }
         return self::$instance;
+    }
+
+    public static function isConnected() {
+        try {
+            $config = require __DIR__ . '/../config/database.php';
+            $driver = $config['driver'];
+            $dbConfig = $config[$driver];
+            if ($driver === 'mysql') {
+                $dsn = "mysql:host={$dbConfig['host']};port={$dbConfig['port']};dbname={$dbConfig['database']};charset={$dbConfig['charset']}";
+                $pdo = new PDO($dsn, $dbConfig['username'], $dbConfig['password'], [
+                    PDO::ATTR_TIMEOUT => 1,
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT
+                ]);
+                return $pdo !== null;
+            }
+            return false;
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
     
     private function connect() {
@@ -40,16 +58,25 @@ class Database {
             $this->connection->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
             
         } catch (PDOException $e) {
-            die("Connection failed: " . $e->getMessage());
+            http_response_code(500);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'error' => 'Database connection failed. Please check config/database.php or database status.',
+                'details' => $this->config['app']['debug'] ? $e->getMessage() : null
+            ]);
+            exit;
         }
     }
     
     public function getConnection() {
+        if ($this->connection === null) {
+            $this->connect();
+        }
         return $this->connection;
     }
     
     public function query($sql, $params = []) {
-        $stmt = $this->connection->prepare($sql);
+        $stmt = $this->getConnection()->prepare($sql);
         $stmt->execute($params);
         return $stmt;
     }
@@ -69,7 +96,7 @@ class Database {
         $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
         $this->query($sql, array_values($data));
         
-        return $this->connection->lastInsertId();
+        return $this->getConnection()->lastInsertId();
     }
     
     public function update($table, $data, $where, $whereParams = []) {

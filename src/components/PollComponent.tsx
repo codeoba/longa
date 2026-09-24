@@ -12,7 +12,8 @@ export default function PollComponent({ poll, onVote }: PollProps) {
   const tc = useThemeClasses();
 
   const timeLeft = () => {
-    const diff = poll.endsAt.getTime() - Date.now();
+    const endsAtTime = poll.endsAt instanceof Date ? poll.endsAt.getTime() : new Date(poll.endsAt).getTime();
+    const diff = endsAtTime - Date.now();
     if (diff <= 0) return 'Ended';
     const hours = Math.floor(diff / 3600000);
     const minutes = Math.floor((diff % 3600000) / 60000);

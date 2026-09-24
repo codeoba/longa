@@ -2,19 +2,23 @@ import React, { useState, useRef } from 'react';
 import { currentUser, emojiList } from '../data';
 import { Image, Gif, Emoji, Poll, Schedule, Location, Close, Verified, Premium } from './Icons';
 import { useThemeClasses } from '../themeUtils';
+import { useAuth } from '../contexts/AuthContext';
 
 interface ComposeTweetProps {
   onClose?: () => void;
-  onSubmit: (content: string) => void;
+  onSubmit: (content: string, image?: string) => void;
   isModal?: boolean;
 }
 
 export default function ComposeTweet({ onClose, onSubmit, isModal = false }: ComposeTweetProps) {
+  const { user } = useAuth();
+  const activeUser = user || currentUser;
   const [content, setContent] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const [replyToAudience, setReplyToAudience] = useState<'everyone' | 'followers' | 'mentioned'>('everyone');
+  const [aiTransforming, setAiTransforming] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const maxChars = 280;
@@ -22,9 +26,49 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
   const progress = (content.length / maxChars) * 100;
   const tc = useThemeClasses();
 
+  const handleAiTransform = async (action: 'hook' | 'thread' | 'translate' | 'tone', target?: string) => {
+    if (!content.trim()) return;
+    setAiTransforming(true);
+    try {
+      const { getActiveAiCredentials } = await import('../services/aiSettingsService');
+      const { provider, apiKey, model } = getActiveAiCredentials();
+      const res = await fetch('http://localhost:8000/ai/transform-text', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: content,
+          action,
+          target,
+          provider,
+          apiKey,
+          model
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.result) {
+          setContent(data.result);
+          if (textareaRef.current) {
+            textareaRef.current.style.height = 'auto';
+            textareaRef.current.style.height = (textareaRef.current.scrollHeight + 40) + 'px';
+          }
+        }
+      }
+    } catch {
+      // Local fallback if offline
+      if (action === 'hook') {
+        setContent(`🔥 Unpopular opinion: Most people get this backwards:\n\n"${content}"\n\nHere is what top builders do 👇`);
+      } else if (action === 'thread') {
+        setContent(`🧵 [1/2]\n${content}\n\n---\n\n🧵 [2/2]\nFollow for more daily breakthroughs.`);
+      }
+    } finally {
+      setAiTransforming(false);
+    }
+  };
+
   const handleSubmit = () => {
     if (content.trim() && content.length <= maxChars) {
-      onSubmit(content);
+      onSubmit(content, attachedImage || undefined);
       setContent('');
       setAttachedImage(null);
       if (onClose) onClose();
@@ -49,10 +93,28 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setAttachedImage('https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=400&fit=crop');
+      // 1. Instant local preview
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          setAttachedImage(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+
+      // 2. Real server upload via API
+      try {
+        const { uploadMedia } = await import('../api/phpAdapter');
+        const res = await uploadMedia(file);
+        if (res && res.url) {
+          setAttachedImage(res.url);
+        }
+      } catch (err) {
+        console.warn('Server upload fallback to local preview:', err);
+      }
     }
   };
 
@@ -72,7 +134,7 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
         {/* Avatar */}
         <div className="flex-shrink-0 mt-1">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg">
-            {currentUser.avatar}
+            {activeUser.avatar || '👤'}
           </div>
         </div>
 
@@ -80,10 +142,10 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
         <div className="flex-1">
           {isModal && (
             <div className="flex items-center gap-1 mb-2">
-              <span className={`font-bold text-[15px] ${tc.text}`}>{currentUser.name}</span>
+              <span className={`font-bold text-[15px] ${tc.text}`}>{activeUser.name}</span>
               <Verified />
               <Premium />
-              <span className="text-gray-500 text-[15px]">{currentUser.handle}</span>
+              <span className="text-gray-500 text-[15px]">{activeUser.handle}</span>
             </div>
           )}
           <textarea
@@ -108,6 +170,110 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
               </button>
             </div>
           )}
+
+          {/* Longa AI Smart Composer Suite */}
+          <div className="flex flex-wrap items-center gap-1.5 my-2.5 p-1.5 rounded-xl bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-indigo-500/10 border border-blue-500/20">
+            <span className="text-[11px] font-bold text-blue-400 px-2 flex items-center gap-1">
+              <span>✨ Longa AI:</span>
+            </span>
+
+            <button
+              type="button"
+              disabled={aiTransforming || !content.trim()}
+              onClick={() => handleAiTransform('hook')}
+              className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 hover:text-white disabled:opacity-40 transition flex items-center gap-1"
+            >
+              <span>🪄</span> Viral Hook
+            </button>
+
+            <button
+              type="button"
+              disabled={aiTransforming || !content.trim()}
+              onClick={() => handleAiTransform('thread')}
+              className="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 hover:text-white disabled:opacity-40 transition flex items-center gap-1"
+            >
+              <span>🧵</span> Threadify
+            </button>
+
+            <div className="relative group">
+              <button
+                type="button"
+                disabled={aiTransforming || !content.trim()}
+                className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 hover:text-white disabled:opacity-40 transition flex items-center gap-1"
+              >
+                <span>🌍</span> Translate ▾
+              </button>
+              <div className="hidden group-hover:flex flex-col absolute left-0 bottom-full mb-1 z-30 py-1 rounded-xl bg-gray-900 border border-gray-700 shadow-xl min-w-[130px]">
+                <button
+                  type="button"
+                  onClick={() => handleAiTransform('translate', 'sw')}
+                  className="px-3 py-1.5 text-xs text-left text-gray-200 hover:bg-blue-600 hover:text-white"
+                >
+                  ✨ Kiswahili
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAiTransform('translate', 'fr')}
+                  className="px-3 py-1.5 text-xs text-left text-gray-200 hover:bg-blue-600 hover:text-white"
+                >
+                  🇫🇷 Français
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAiTransform('translate', 'ar')}
+                  className="px-3 py-1.5 text-xs text-left text-gray-200 hover:bg-blue-600 hover:text-white"
+                >
+                  🌍 العربية
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAiTransform('translate', 'en')}
+                  className="px-3 py-1.5 text-xs text-left text-gray-200 hover:bg-blue-600 hover:text-white"
+                >
+                  🇬🇧 English
+                </button>
+              </div>
+            </div>
+
+            <div className="relative group">
+              <button
+                type="button"
+                disabled={aiTransforming || !content.trim()}
+                className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 hover:text-white disabled:opacity-40 transition flex items-center gap-1"
+              >
+                <span>🎭</span> Tone ▾
+              </button>
+              <div className="hidden group-hover:flex flex-col absolute left-0 bottom-full mb-1 z-30 py-1 rounded-xl bg-gray-900 border border-gray-700 shadow-xl min-w-[140px]">
+                <button
+                  type="button"
+                  onClick={() => handleAiTransform('tone', 'spicy')}
+                  className="px-3 py-1.5 text-xs text-left text-gray-200 hover:bg-amber-600 hover:text-white"
+                >
+                  🚨 Hot Take / Viral
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAiTransform('tone', 'professional')}
+                  className="px-3 py-1.5 text-xs text-left text-gray-200 hover:bg-amber-600 hover:text-white"
+                >
+                  💼 Executive / Pro
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleAiTransform('tone', 'poetic')}
+                  className="px-3 py-1.5 text-xs text-left text-gray-200 hover:bg-amber-600 hover:text-white"
+                >
+                  ✨ Poetic / Inspiring
+                </button>
+              </div>
+            </div>
+
+            {aiTransforming && (
+              <span className="text-[11px] text-blue-400 animate-pulse ml-auto pr-1">
+                Refining with AI...
+              </span>
+            )}
+          </div>
 
           {isFocused && (
             <div className={`border-b ${tc.borderSecondary} mb-3 pb-3`}>

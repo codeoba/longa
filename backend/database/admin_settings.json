@@ -1,0 +1,104 @@
+{
+    "features": {
+        "ai_suite_enabled": true,
+        "ai_copilot_enabled": true,
+        "webrtc_calling_enabled": true,
+        "reels_enabled": true,
+        "spaces_audio_enabled": true,
+        "store_marketplace_enabled": true,
+        "prediction_markets_enabled": true,
+        "monetization_enabled": true,
+        "whisper_messages_enabled": true,
+        "user_registration_enabled": true,
+        "require_email_verification": false,
+        "maintenance_mode": false,
+        "maintenance_message": "Longa iko kwenye uboreshaji wa kiufundi. Tutarudi hewani baada ya muda mfupi.",
+        "platform_commission_pct": 12,
+        "free_ai_daily_limit": 50,
+        "default_ai_provider": "gemini"
+    },
+    "moderation_settings": {
+        "auto_flag_keywords": [
+            "scam",
+            "fraud",
+            "hacked",
+            "ponzi",
+            "abuse"
+        ],
+        "require_approval_for_store_products": true,
+        "max_file_upload_mb": 25
+    },
+    "audit_logs": [
+        {
+            "id": "log_init_01",
+            "admin_name": "Amani Joseph",
+            "admin_handle": "@amanitech",
+            "action": "SYSTEM_INITIALIZED",
+            "details": "Mfumo wa Longa Admin Panel umewashwa na kusanidiwa.",
+            "timestamp": "2026-09-24T06:00:00Z"
+        },
+        {
+            "id": "log_41a9bbe2977a",
+            "admin_name": "Amani Joseph",
+            "admin_handle": "@amanitech",
+            "action": "UPDATE_FEATURE_SWITCHES",
+            "details": "Features zilibadilishwa: whisper_messages_enabled, platform_commission_pct",
+            "timestamp": "2026-09-24T14:24:48Z",
+            "ip": "127.0.0.1"
+        },
+        {
+            "id": "log_78cd9b52c5d7",
+            "admin_name": "Amani Joseph",
+            "admin_handle": "@amanitech",
+            "action": "UPDATE_FEATURE_SWITCHES",
+            "details": "Features zilibadilishwa: whisper_messages_enabled",
+            "timestamp": "2026-09-24T14:38:33Z",
+            "ip": "127.0.0.1"
+        },
+        {
+            "id": "log_080c13acc43a",
+            "admin_name": "Amani Joseph",
+            "admin_handle": "@amanitech",
+            "action": "USER_GOVERNANCE",
+            "details": "User #Array - Action: toggle_verified",
+            "timestamp": "2026-09-24T14:49:14Z",
+            "ip": "127.0.0.1"
+        },
+        {
+            "id": "log_adef3e78b434",
+            "admin_name": "Amani Joseph",
+            "admin_handle": "@amanitech",
+            "action": "USER_GOVERNANCE",
+            "details": "User #Array - Action: toggle_premium",
+            "timestamp": "2026-09-24T14:58:36Z",
+            "ip": "127.0.0.1"
+        },
+        {
+            "id": "log_7ea8d377efee",
+            "admin_name": "Amani Joseph",
+            "admin_handle": "@amanitech",
+            "action": "USER_GOVERNANCE",
+            "details": "User #Array - Action: toggle_premium",
+            "timestamp": "2026-09-24T15:13:00Z",
+            "ip": "127.0.0.1"
+        },
+        {
+            "id": "log_a01b1e345d85",
+            "admin_name": "Amani Joseph",
+            "admin_handle": "@amanitech",
+            "action": "UPDATE_FEATURE_SWITCHES",
+            "details": "Features zilibadilishwa: whisper_messages_enabled",
+            "timestamp": "2026-09-24T16:40:51Z",
+            "ip": "127.0.0.1"
+        },
+        {
+            "id": "log_08ee8923df66",
+            "admin_name": "Amani Joseph",
+            "admin_handle": "@amanitech",
+            "action": "USER_GOVERNANCE",
+            "details": "User #Array - Action: toggle_verified",
+            "timestamp": "2026-09-24T16:52:31Z",
+            "ip": "127.0.0.1"
+        }
+    ]
+}

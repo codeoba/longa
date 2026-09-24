@@ -14,7 +14,7 @@ Longa ni premium social platform kamili yenye backend ya PHP inayofanya kazi kwe
 - ✅ Lists
 - ✅ Communities
 - ✅ Spaces (audio rooms)
-- ✅ Grok AI assistant
+- ✅ Longa AI native assistant
 - ✅ Analytics dashboard
 - ✅ Drafts
 - ✅ Polls

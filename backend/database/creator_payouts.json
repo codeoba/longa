@@ -1,0 +1,24 @@
+[
+    {
+        "id": "pay_001",
+        "creator_id": "2",
+        "creator_name": "Zawadi Innovation",
+        "creator_handle": "@zawadi_innovates",
+        "amount_usd": 450,
+        "payment_method": "M-Pesa Tanzania (+255 754 112 233)",
+        "status": "pending",
+        "created_at": "2026-09-24 03:54:01"
+    },
+    {
+        "id": "pay_002",
+        "creator_id": "3",
+        "creator_name": "Baraka Digital",
+        "creator_handle": "@baraka_ui",
+        "amount_usd": 180,
+        "payment_method": "Bank Transfer (CRDB Bank)",
+        "status": "approved",
+        "created_at": "2026-09-23 05:54:01",
+        "processed_at": "2026-09-23 17:54:01",
+        "transaction_ref": "TXN-CRDB-994821"
+    }
+]

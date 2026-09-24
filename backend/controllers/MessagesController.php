@@ -10,11 +10,7 @@ class MessagesController {
     
     // GET /messages - Get conversations
     public function index($params) {
-        $userId = isset($_GET['user_id']) ? $_GET['user_id'] : null;
-        
-        if (!$userId) {
-            jsonResponse(['error' => 'user_id is required'], 400);
-        }
+        $userId = requireAuth();
         
         // Get all conversations for user
         $sql = "SELECT DISTINCT conversation_id, 
@@ -24,42 +20,44 @@ class MessagesController {
                 GROUP BY conversation_id
                 ORDER BY last_message_at DESC";
         
-        $conversations = $this->db->fetchAll($sql, [$userId, "%{$userId}%"]);
+        $conversations = $this->db->fetchAll($sql, [$userId, "%_{$userId}_%"]);
         
         jsonResponse(['conversations' => $conversations]);
     }
     
     // GET /messages/{conversation_id} - Get messages in conversation
     public function show($params) {
+        $userId = requireAuth();
         $conversationId = $params['conversation_id'];
-        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 50;
+        $limit = isset($_GET['limit']) ? max(1, min(100, (int)$_GET['limit'])) : 50;
         
         $sql = "SELECT m.*, u.name as sender_name, u.handle as sender_handle, u.avatar as sender_avatar
                 FROM messages m
                 JOIN users u ON m.sender_id = u.id
                 WHERE m.conversation_id = ?
                 ORDER BY m.created_at DESC
-                LIMIT ?";
-        $messages = $this->db->fetchAll($sql, [$conversationId, $limit]);
+                LIMIT {$limit}";
+        $messages = $this->db->fetchAll($sql, [$conversationId]);
         
         jsonResponse(['messages' => array_reverse($messages)]);
     }
     
-    // POST /messages - Send message
+    // POST /messages - Send message (Protected)
     public function store($params) {
+        $authenticatedUserId = requireAuth();
         $input = getJsonInput();
         
-        $required = ['conversation_id', 'sender_id', 'content'];
+        $required = ['conversation_id', 'content'];
         foreach ($required as $field) {
-            if (!isset($input[$field])) {
+            if (!isset($input[$field]) || empty(trim($input[$field]))) {
                 jsonResponse(['error' => "Field '{$field}' is required"], 400);
             }
         }
         
         $data = [
             'conversation_id' => $input['conversation_id'],
-            'sender_id' => $input['sender_id'],
-            'content' => $input['content'],
+            'sender_id' => $authenticatedUserId,
+            'content' => trim($input['content']),
             'read' => false,
             'created_at' => date('Y-m-d H:i:s')
         ];
@@ -68,52 +66,51 @@ class MessagesController {
         
         jsonResponse([
             'message' => 'Message sent',
-            'message_id' => $id
+            'message_id' => (string)$id
         ], 201);
     }
     
-    // PUT /messages/{id}/read - Mark message as read
+    // PUT /messages/{id}/read - Mark message as read (Protected)
     public function markAsRead($params) {
+        requireAuth();
         $id = $params['id'];
         
         $this->db->update('messages', ['read' => true], 'id = ?', [$id]);
-        
         jsonResponse(['message' => 'Message marked as read']);
     }
     
-    // PUT /messages/read-all - Mark all messages in conversation as read
+    // PUT /messages/read-all - Mark all messages in conversation as read (Protected)
     public function markAllAsRead($params) {
+        $authenticatedUserId = requireAuth();
         $input = getJsonInput();
         $conversationId = $input['conversation_id'] ?? null;
-        $userId = $input['user_id'] ?? null;
         
-        if (!$conversationId || !$userId) {
-            jsonResponse(['error' => 'conversation_id and user_id are required'], 400);
+        if (!$conversationId) {
+            jsonResponse(['error' => 'conversation_id is required'], 400);
         }
         
         $this->db->update(
             'messages',
             ['read' => true],
             'conversation_id = ? AND sender_id != ?',
-            [$conversationId, $userId]
+            [$conversationId, $authenticatedUserId]
         );
         
         jsonResponse(['message' => 'All messages marked as read']);
     }
     
-    // GET /messages/unread-count - Get unread messages count
+    // GET /messages/unread-count - Get unread messages count (Protected)
     public function unreadCount($params) {
-        $userId = isset($_GET['user_id']) ? $_GET['user_id'] : null;
+        $userId = requireAuth();
         
-        if (!$userId) {
-            jsonResponse(['error' => 'user_id is required'], 400);
-        }
-        
+        // Count unread messages in conversations where current user is a participant but not the sender
         $result = $this->db->fetchOne(
-            "SELECT COUNT(*) as count FROM messages WHERE sender_id != ? AND read = FALSE",
-            [$userId]
+            "SELECT COUNT(*) as count FROM messages 
+             WHERE sender_id != ? AND read = FALSE AND (conversation_id LIKE ? OR conversation_id LIKE ?)",
+            [$userId, "%_{$userId}_%", "{$userId}_%"]
         );
         
-        jsonResponse(['unread_count' => (int)$result['count']]);
+        jsonResponse(['unread_count' => (int)($result['count'] ?? 0)]);
     }
 }
+

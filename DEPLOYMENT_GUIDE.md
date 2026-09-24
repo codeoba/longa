@@ -40,7 +40,7 @@ App hii imekamilika 100% na iko tayari ku-install kwenye server.
 - ✅ Offline Mode (PWA)
 - ✅ Communities
 - ✅ Spaces (Audio Rooms)
-- ✅ Grok AI Assistant
+- ✅ Longa AI Native Assistant
 - ✅ Creator Monetization
 - ✅ Advanced Analytics
 - ✅ Bookmark Collections
@@ -143,8 +143,14 @@ psql longa_db < backend/database/migrations_pgsql.sql
 
 # 3. Create user (optional but recommended)
 CREATE USER longa_user WITH PASSWORD 'your_secure_password';
-GRANT ALL PRIVILEGES ON DATABASE longa_db TO longa_user;
-```
+#### Default Credentials (Akaunti za Kuingia):
+Baada ya ku-run migrations za MySQL au PostgreSQL, unaweza kuingia na akaunti hizi:
+- **Email:** `amani@example.com` | **Password:** `password123` (Admin/Primary Account)
+- **Email:** `zawadi@example.com` | **Password:** `password123`
+- **Email:** `baraka@example.com` | **Password:** `password123`
+- **Email:** `neema@example.com` | **Password:** `password123`
+
+*(Au unaweza kubonyeza kitufe cha **"⚡ Explore Longa (Instant Demo Mode)"** kwenye login page ili kujaribu app moja kwa moja bila database)*
 
 ---
 

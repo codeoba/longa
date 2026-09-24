@@ -1,18 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { AuthAPI } from '../api/phpAdapter';
-
-interface User {
-  id: number;
-  name: string;
-  handle: string;
-  email: string;
-  avatar: string;
-  bio?: string;
-  location?: string;
-  website?: string;
-  verified: boolean;
-  premium: boolean;
-}
+import { currentUser as defaultUser } from '../data';
+import { User } from '../types';
 
 interface AuthContextType {
   user: User | null;
@@ -20,6 +9,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, handle: string, email: string, password: string) => Promise<void>;
+  loginAsDemo: () => void;
   logout: () => void;
   updateUser: (user: User) => void;
 }
@@ -32,41 +22,85 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Load user from localStorage on mount
   useEffect(() => {
-    const savedToken = localStorage.getItem('auth_token');
-    const savedUser = localStorage.getItem('auth_user');
-    
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
+    try {
+      const savedToken = localStorage.getItem('auth_token');
+      const savedUser = localStorage.getItem('auth_user');
+      
+      if (savedToken && savedUser) {
+        setToken(savedToken);
+        const parsed = JSON.parse(savedUser);
+        setUser({
+          ...parsed,
+          id: String(parsed.id),
+        });
+      }
+    } catch (e) {
+      console.error('Failed to restore auth session:', e);
     }
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
       const response = await AuthAPI.login(email, password);
+      const authenticatedUser: User = {
+        id: String(response.user.id),
+        name: response.user.name,
+        handle: response.user.handle,
+        email: response.user.email,
+        avatar: response.user.avatar || '👤',
+        bio: response.user.bio || '',
+        verified: !!response.user.verified,
+        premium: !!response.user.premium,
+        followers: response.user.followers || 0,
+        following: response.user.following || 0,
+        posts: response.user.posts || 0,
+        joinedDate: response.user.joinedDate || 'September 2026',
+      };
       
       setToken(response.token);
-      setUser(response.user);
+      setUser(authenticatedUser);
       
       localStorage.setItem('auth_token', response.token);
-      localStorage.setItem('auth_user', JSON.stringify(response.user));
+      localStorage.setItem('auth_user', JSON.stringify(authenticatedUser));
     } catch (error: any) {
-      throw new Error(error.message || 'Login failed');
+      throw new Error(error.message || 'Login failed. Please check backend connection.');
     }
   };
 
   const register = async (name: string, handle: string, email: string, password: string) => {
     try {
       const response = await AuthAPI.register(name, handle, email, password);
+      const registeredUser: User = {
+        id: String(response.user.id),
+        name: response.user.name,
+        handle: response.user.handle,
+        email: response.user.email,
+        avatar: response.user.avatar || '👤',
+        bio: response.user.bio || '',
+        verified: false,
+        premium: false,
+        followers: 0,
+        following: 0,
+        posts: 0,
+        joinedDate: 'September 2026',
+      };
       
       setToken(response.token);
-      setUser(response.user);
+      setUser(registeredUser);
       
       localStorage.setItem('auth_token', response.token);
-      localStorage.setItem('auth_user', JSON.stringify(response.user));
+      localStorage.setItem('auth_user', JSON.stringify(registeredUser));
     } catch (error: any) {
-      throw new Error(error.message || 'Registration failed');
+      throw new Error(error.message || 'Registration failed. Please check backend connection.');
     }
+  };
+
+  const loginAsDemo = () => {
+    const demoToken = 'demo-token-' + Date.now();
+    setToken(demoToken);
+    setUser(defaultUser);
+    localStorage.setItem('auth_token', demoToken);
+    localStorage.setItem('auth_user', JSON.stringify(defaultUser));
   };
 
   const logout = () => {
@@ -89,6 +123,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isAuthenticated: !!user,
         login,
         register,
+        loginAsDemo,
         logout,
         updateUser,
       }}
@@ -105,3 +140,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

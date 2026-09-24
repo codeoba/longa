@@ -36,21 +36,47 @@ export default function AIImageGenerator() {
     if (!prompt.trim()) return;
 
     setIsGenerating(true);
+    const activePrompt = prompt;
 
-    // Simulate AI generation (in real app, this would call an API)
-    setTimeout(() => {
-      const newImage: GeneratedImage = {
-        id: Date.now().toString(),
-        prompt,
-        // Using placeholder images for demo
-        url: `https://picsum.photos/512/512?random=${Date.now()}`,
-        createdAt: new Date(),
-      };
+    try {
+      const { getApiUrl } = await import('../api/phpAdapter');
+      const res = await fetch(`${getApiUrl()}/ai/generate-image`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: activePrompt, style: selectedStyle }),
+      });
 
-      setGeneratedImages([newImage, ...generatedImages]);
-      setPrompt('');
-      setIsGenerating(false);
-    }, 3000);
+      if (res.ok) {
+        const json = await res.json();
+        const newImage: GeneratedImage = {
+          id: json.id || Date.now().toString(),
+          prompt: json.prompt || activePrompt,
+          url: json.url,
+          createdAt: new Date(),
+        };
+
+        setGeneratedImages(prev => [newImage, ...prev]);
+        setPrompt('');
+        setIsGenerating(false);
+        return;
+      }
+    } catch (e) {
+      console.warn('Real AI generation fallback to dynamic engine:', e);
+    }
+
+    // Dynamic fallback
+    const seed = Date.now();
+    const encoded = encodeURIComponent(activePrompt + ', ' + selectedStyle);
+    const fallbackImage: GeneratedImage = {
+      id: Date.now().toString(),
+      prompt: activePrompt,
+      url: `https://image.pollinations.ai/prompt/${encoded}?width=800&height=800&seed=${seed}&nologo=true`,
+      createdAt: new Date(),
+    };
+
+    setGeneratedImages(prev => [fallbackImage, ...prev]);
+    setPrompt('');
+    setIsGenerating(false);
   };
 
   const handleDownload = (image: GeneratedImage) => {

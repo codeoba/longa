@@ -7,6 +7,9 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(255) NOT NULL,
     handle VARCHAR(100) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL DEFAULT '',
+    email_verified BOOLEAN DEFAULT TRUE,
+    last_login TIMESTAMP NULL,
     avatar VARCHAR(50) DEFAULT '👤',
     bio TEXT,
     verified BOOLEAN DEFAULT FALSE,
@@ -21,6 +24,7 @@ CREATE TABLE IF NOT EXISTS users (
     INDEX idx_handle (handle),
     INDEX idx_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Posts table
 CREATE TABLE IF NOT EXISTS posts (
@@ -178,18 +182,54 @@ CREATE TABLE IF NOT EXISTS password_resets (
     INDEX idx_expires_at (expires_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Add password_hash and email_verified to users table
-ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255) NOT NULL DEFAULT '';
-ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP NULL;
-
--- Insert sample data
-INSERT INTO users (name, handle, email, avatar, bio, verified, premium, followers, following, posts) VALUES
-('Amani Tech', '@amanitech', 'amani@example.com', '👨‍💻', 'Full Stack Developer | Building the future', TRUE, TRUE, 15420, 892, 3241),
-('Zawadi Innovation', '@zawadi_innov', 'zawadi@example.com', '👩‍🔬', 'Innovation Lead @TechAfrica | AI & ML Researcher', TRUE, TRUE, 89200, 432, 12500),
-('Baraka Digital', '@barakadigital', 'baraka@example.com', '🎨', 'UI/UX Designer | Creative Director', TRUE, FALSE, 45600, 1200, 8900);
+-- Insert sample data with default password: password123
+INSERT INTO users (name, handle, email, password_hash, avatar, bio, verified, premium, followers, following, posts, email_verified) VALUES
+('Amani Tech', '@longa_user', 'amani@example.com', '$2y$10$3w8BmYfVOvoKqUQrgA6cYO8FeL/qeLR0l6wxEeGBRBpnDLK3Fh1hS', '👨‍💻', 'Full Stack Developer | Building Longa | Open Source Contributor', TRUE, TRUE, 15420, 892, 3241, TRUE),
+('Zawadi Innovation', '@zawadi_innov', 'zawadi@example.com', '$2y$10$3w8BmYfVOvoKqUQrgA6cYO8FeL/qeLR0l6wxEeGBRBpnDLK3Fh1hS', '👩‍🔬', 'Innovation Lead @TechAfrica | AI & ML Researcher', TRUE, TRUE, 89200, 432, 12500, TRUE),
+('Baraka Digital', '@barakadigital', 'baraka@example.com', '$2y$10$3w8BmYfVOvoKqUQrgA6cYO8FeL/qeLR0l6wxEeGBRBpnDLK3Fh1hS', '🎨', 'UI/UX Designer | Creative Director', TRUE, FALSE, 45600, 1200, 8900, TRUE);
 
 INSERT INTO posts (user_id, content, likes, retweets, replies, views) VALUES
-(1, '🚀 Excited to announce our new project! Stay tuned for updates.', 234, 56, 12, 5600),
-(2, '🤖 AI is transforming the way we build software. The future is here!', 1567, 432, 89, 45000),
-(3, '🎨 Design is not just what it looks like. Design is how it works.', 892, 234, 45, 23000);
+(1, '🚀 Karibu kwenye Longa! Mtandao mpya wa kijamii unaoleta mapinduzi Afrika na ulimwenguni.', 234, 56, 12, 5600),
+(2, '🤖 AI na teknolojia ya kisasa ndio msingi wa Longa. Karibuni sana!', 1567, 432, 89, 45000),
+(3, '🎨 Design safi, wepesi, na usalama wa hali ya juu ndio vigezo vyetu.', 892, 234, 45, 23000);
+
+-- ==================== PAYMENT & MONETIZATION ====================
+CREATE TABLE IF NOT EXISTS subscriptions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    plan VARCHAR(50) NOT NULL DEFAULT 'premium',
+    status VARCHAR(30) NOT NULL DEFAULT 'active',
+    payment_method VARCHAR(50) NOT NULL DEFAULT 'card',
+    amount DECIMAL(10,2) NOT NULL DEFAULT 8.00,
+    currency VARCHAR(10) NOT NULL DEFAULT 'USD',
+    starts_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_user_subs (user_id),
+    INDEX idx_sub_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    reference VARCHAR(100) NOT NULL UNIQUE,
+    type VARCHAR(50) NOT NULL DEFAULT 'subscription',
+    amount DECIMAL(10,2) NOT NULL,
+    currency VARCHAR(10) NOT NULL DEFAULT 'USD',
+    payment_method VARCHAR(50) NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'completed',
+    recipient_id INT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_user_tx (user_id),
+    INDEX idx_ref (reference)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS creator_earnings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    balance DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    total_earned DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_creator_user (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+

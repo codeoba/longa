@@ -3,6 +3,7 @@ import { Post } from '../types';
 import PostComponent from './Post';
 import { ArrowLeft } from './Icons';
 import { useThemeClasses } from '../themeUtils';
+import { useAuth } from '../contexts/AuthContext';
 
 interface BookmarksProps {
   posts: Post[];
@@ -16,6 +17,7 @@ interface BookmarksProps {
 }
 
 export default function Bookmarks({ posts, onLike, onRetweet, onBookmark, onReply, onViewThread, onUserClick, incrementViews }: BookmarksProps) {
+  const { user } = useAuth();
   const bookmarkedPosts = posts.filter(p => p.bookmarked);
   const tc = useThemeClasses();
 
@@ -29,7 +31,7 @@ export default function Bookmarks({ posts, onLike, onRetweet, onBookmark, onRepl
           </button>
           <div>
             <h1 className={`text-xl font-bold ${tc.text}`}>Bookmarks</h1>
-            <p className="text-[13px] text-gray-500">@longa_user</p>
+            <p className="text-[13px] text-gray-500">{user?.handle || '@longa_user'}</p>
           </div>
         </div>
       </div>

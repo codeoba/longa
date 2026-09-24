@@ -9,7 +9,7 @@ interface FeedProps {
   onLike: (id: string) => void;
   onRetweet: (id: string) => void;
   onBookmark: (id: string) => void;
-  onNewPost: (content: string) => void;
+  onNewPost: (content: string, image?: string) => void;
   onReply: (postId: string, content: string) => void;
   onDelete: (id: string) => void;
   onPin: (id: string) => void;

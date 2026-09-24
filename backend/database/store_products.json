@@ -1,0 +1,62 @@
+[
+    {
+        "id": "prod_1",
+        "creatorId": "1",
+        "creatorName": "Amani Tech",
+        "creatorHandle": "@longa_user",
+        "creatorAvatar": "\ud83d\udc68\u200d\ud83d\udcbb",
+        "title": "\ud83d\ude80 Full-Stack React & PHP SaaS Starter Kit",
+        "description": "Complete clean architecture boilerplate with JWT auth, Tailwind v4, and database migrations.",
+        "price": 29,
+        "currency": "USD",
+        "category": "code",
+        "coverImage": "https:\/\/images.unsplash.com\/photo-1555066931-4365d14bab8c?w=600&h=400&fit=crop",
+        "salesCount": 144,
+        "rating": 4.9,
+        "tags": [
+            "React",
+            "PHP",
+            "Boilerplate"
+        ]
+    },
+    {
+        "id": "prod_2",
+        "creatorId": "2",
+        "creatorName": "Zawadi Innovation",
+        "creatorHandle": "@zawadi_innov",
+        "creatorAvatar": "\ud83d\udc69\u200d\ud83d\udd2c",
+        "title": "\ud83e\udd16 AI Prompt Engineering Master Guide 2026",
+        "description": "150+ battle-tested prompts for coding, content generation, and audience growth.",
+        "price": 15,
+        "currency": "USD",
+        "category": "ebook",
+        "coverImage": "https:\/\/images.unsplash.com\/photo-1618005182384-a83a8bd57fbe?w=600&h=400&fit=crop",
+        "salesCount": 381,
+        "rating": 5,
+        "tags": [
+            "AI",
+            "Guide",
+            "Prompts"
+        ]
+    },
+    {
+        "id": "prod_3",
+        "creatorId": "3",
+        "creatorName": "Baraka Digital",
+        "creatorHandle": "@barakadigital",
+        "creatorAvatar": "\ud83c\udfa8",
+        "title": "\ud83c\udfa8 Modern Minimalist Mobile UI Kit (Figma)",
+        "description": "Over 200+ clean responsive mobile components, dark and light modes, ready for production.",
+        "price": 35,
+        "currency": "USD",
+        "category": "design",
+        "coverImage": "https:\/\/images.unsplash.com\/photo-1581291518857-4e27b48ff24e?w=600&h=400&fit=crop",
+        "salesCount": 89,
+        "rating": 4.8,
+        "tags": [
+            "Figma",
+            "UI\/UX",
+            "Design"
+        ]
+    }
+]

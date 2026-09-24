@@ -3,3 +3,7 @@ node_modules/
 dist/
 build/
 *.log
+backend/uploads/*
+!backend/uploads/.gitkeep
+.env
+.DS_Store

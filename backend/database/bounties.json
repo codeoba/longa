@@ -1,0 +1,55 @@
+[
+    {
+        "id": "bounty_1",
+        "creatorId": "1",
+        "creatorName": "Amani Tech",
+        "creatorHandle": "@longa_user",
+        "creatorAvatar": "\ud83d\udc68\u200d\ud83d\udcbb",
+        "title": "\ud83c\udfa8 Redesign our Audio Space Visualizer Waveform",
+        "description": "We are seeking the cleanest CSS\/Canvas waveform animation for Longa Spaces. Post your GitHub or CodePen link!",
+        "rewardAmount": 50,
+        "currency": "USD",
+        "category": "Design & Code",
+        "deadline": "2026-09-30",
+        "status": "open",
+        "submissionsCount": 12,
+        "tags": [
+            "UI\/UX",
+            "CSS",
+            "Canvas"
+        ],
+        "submissions": [
+            {
+                "id": "sub_1",
+                "bountyId": "bounty_1",
+                "userId": "2",
+                "userName": "Zawadi Innovation",
+                "userHandle": "@zawadi_innov",
+                "userAvatar": "\ud83d\udc69\u200d\ud83d\udd2c",
+                "content": "Here is an interactive 60fps dynamic audio reactive shader demo: https:\/\/codepen.io\/demo\/audio-wave",
+                "submittedAt": "2026-09-22 17:35:40"
+            }
+        ]
+    },
+    {
+        "id": "bounty_2",
+        "creatorId": "3",
+        "creatorName": "Baraka Digital",
+        "creatorHandle": "@barakadigital",
+        "creatorAvatar": "\ud83c\udfa8",
+        "title": "\ud83d\ude80 Best Explainer Thread on Decentralized Social Networks",
+        "description": "Write a compelling 5-post thread on Longa explaining why user-owned data is the future. Top thread wins $30!",
+        "rewardAmount": 30,
+        "currency": "USD",
+        "category": "Content & Writing",
+        "deadline": "2026-09-26",
+        "status": "open",
+        "submissionsCount": 28,
+        "tags": [
+            "Writing",
+            "Thread",
+            "Web3"
+        ],
+        "submissions": []
+    }
+]

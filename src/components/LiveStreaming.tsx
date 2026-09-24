@@ -36,6 +36,8 @@ export default function LiveStreaming() {
   const [isStreaming, setIsStreaming] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+  const currentRoomIdRef = useRef<string | null>(null);
 
   // Sample live streams
   const sampleStreams: LiveStream[] = [
@@ -68,7 +70,32 @@ export default function LiveStreaming() {
   ];
 
   useEffect(() => {
-    setStreams(sampleStreams);
+    // Load live rooms from signaling API
+    import('../api/phpAdapter').then(({ getApiUrl }) => {
+      fetch(`${getApiUrl()}/signaling/rooms`)
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.rooms && data.rooms.length > 0) {
+            const liveRooms = data.rooms.map((r: any) => ({
+              id: r.id,
+              hostId: r.host_id,
+              hostName: r.host_name,
+              hostAvatar: r.host_avatar,
+              title: r.title,
+              description: 'Live broadcast in progress',
+              viewers: r.viewers || 1,
+              isLive: true,
+              startedAt: new Date(r.created_at || Date.now()),
+              thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=400&fit=crop',
+              tags: ['Live', 'WebRTC', 'Broadcasting'],
+            }));
+            setStreams([...liveRooms, ...sampleStreams]);
+          } else {
+            setStreams(sampleStreams);
+          }
+        })
+        .catch(() => setStreams(sampleStreams));
+    });
   }, []);
 
   const startStreaming = async () => {
@@ -86,29 +113,93 @@ export default function LiveStreaming() {
       setIsStreaming(true);
       setShowGoLiveModal(false);
 
-      // Simulate viewer count increasing
-      const interval = setInterval(() => {
-        setStreams(prev => prev.map(s => 
-          s.id === 'new' ? { ...s, viewers: s.viewers + Math.floor(Math.random() * 3) } : s
-        ));
-      }, 5000);
+      // WebRTC RTCPeerConnection initialization
+      const pc = new RTCPeerConnection({
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+      });
+      peerConnectionRef.current = pc;
+
+      stream.getTracks().forEach(track => pc.addTrack(track, stream));
+
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+
+      const roomId = 'stream_' + Date.now();
+      currentRoomIdRef.current = roomId;
+
+      const { getApiUrl } = await import('../api/phpAdapter');
+      await fetch(`${getApiUrl()}/signaling/offer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          room_id: roomId,
+          title: '🔥 Live from ' + (user?.name || 'Longa Creator'),
+          host_id: user?.id || 'host',
+          host_name: user?.name || 'Creator',
+          host_avatar: user?.avatar || '👤',
+          sdp: offer
+        })
+      });
+
+      pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          fetch(`${getApiUrl()}/signaling/candidate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ room_id: roomId, candidate: event.candidate, role: 'host' })
+          }).catch(() => {});
+        }
+      };
+
+      // Add newly created stream to live list
+      const newLiveStream: LiveStream = {
+        id: roomId,
+        hostId: user?.id ? user.id.toString() : 'host',
+        hostName: user?.name || 'You (Host)',
+        hostAvatar: user?.avatar || '👤',
+        title: '🔥 Live from ' + (user?.name || 'Longa Creator'),
+        description: 'Broadcasting live to Longa via WebRTC',
+        viewers: 1,
+        isLive: true,
+        startedAt: new Date(),
+        thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=400&fit=crop',
+        tags: ['Live', 'WebRTC'],
+      };
+      setStreams(prev => [newLiveStream, ...prev]);
 
       return () => {
-        clearInterval(interval);
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(track => track.stop());
         }
+        if (peerConnectionRef.current) {
+          peerConnectionRef.current.close();
+        }
       };
     } catch (err) {
-      console.error('Error accessing camera:', err);
-      alert('Could not access camera. Please check permissions.');
+      console.error('Error accessing camera or WebRTC:', err);
+      alert('Could not access camera/microphone. Please check permissions.');
     }
   };
 
-  const stopStreaming = () => {
+  const stopStreaming = async () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
+    }
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+      peerConnectionRef.current = null;
+    }
+    if (currentRoomIdRef.current) {
+      try {
+        const { getApiUrl } = await import('../api/phpAdapter');
+        fetch(`${getApiUrl()}/signaling/close`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ room_id: currentRoomIdRef.current })
+        });
+      } catch (e) {}
+      currentRoomIdRef.current = null;
     }
     setIsStreaming(false);
     setActiveStream(null);
@@ -119,9 +210,9 @@ export default function LiveStreaming() {
 
     const message: ChatMessage = {
       id: Date.now().toString(),
-      userId: user!.id.toString(),
-      userName: user!.name,
-      userAvatar: user!.avatar,
+      userId: user?.id ? user.id.toString() : 'guest',
+      userName: user?.name || 'Guest User',
+      userAvatar: user?.avatar || '👤',
       message: newMessage,
       timestamp: new Date(),
     };

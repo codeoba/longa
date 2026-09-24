@@ -14,7 +14,7 @@ export default function LoginPage({ onSwitchToRegister, onForgotPassword }: Logi
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, loginAsDemo } = useAuth();
   const tc = useThemeClasses();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -119,9 +119,9 @@ export default function LoginPage({ onSwitchToRegister, onForgotPassword }: Logi
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400 text-white font-bold py-2.5 rounded-full transition-colors"
+            className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400 text-white font-bold py-2.5 rounded-full transition-colors shadow-md shadow-blue-500/20 active:scale-98"
           >
-            {loading ? 'Signing in...' : 'Sign in'}
+            {loading ? 'Signing in...' : 'Sign in with Backend'}
           </button>
         </form>
 
@@ -134,6 +134,16 @@ export default function LoginPage({ onSwitchToRegister, onForgotPassword }: Logi
             <span className={`px-2 ${tc.bgCard} ${tc.textMuted}`}>or</span>
           </div>
         </div>
+
+        {/* Demo Mode Button */}
+        <button
+          type="button"
+          onClick={loginAsDemo}
+          className={`w-full py-2.5 px-4 rounded-full border border-blue-400/40 text-blue-400 hover:bg-blue-500/10 font-bold transition-all text-sm flex items-center justify-center gap-2 mb-4`}
+        >
+          <span>🚀</span>
+          <span>Explore Longa (Instant Demo Mode)</span>
+        </button>
 
         {/* Sign up link */}
         <p className={`text-center text-sm ${tc.textSecondary}`}>
@@ -149,3 +159,4 @@ export default function LoginPage({ onSwitchToRegister, onForgotPassword }: Logi
     </div>
   );
 }
+

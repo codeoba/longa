@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Page, Post, Reply, User, Draft } from './types';
 import { posts as initialPosts, currentUser, notifications as initialNotifications, messages as initialMessages, users, userLists as initialLists, suggestedLists, initialDrafts } from './data';
 import Sidebar from './components/Sidebar';
@@ -15,7 +15,7 @@ import RightPanel from './components/RightPanel';
 import ComposeTweet from './components/ComposeTweet';
 import ThreadView from './components/ThreadView';
 import UserProfile from './components/UserProfile';
-import Grok from './components/Grok';
+import LongaAI from './components/LongaAI';
 import Spaces from './components/Spaces';
 import Communities from './components/Communities';
 import Analytics from './components/Analytics';
@@ -45,20 +45,56 @@ import ResetPasswordPage from './components/auth/ResetPasswordPage';
 import VerifyEmailPage from './components/auth/VerifyEmailPage';
 import AccountSettingsPage from './components/auth/AccountSettingsPage';
 import ProfileEditPage from './components/auth/ProfileEditPage';
+import { CreatorStore } from './components/CreatorStore';
+import { BountiesHub } from './components/BountiesHub';
+import { LongaReels } from './components/LongaReels';
+import { PredictionMarket } from './components/PredictionMarket';
+import { Leaderboard } from './components/Leaderboard';
+import AdminPanel from './components/admin/AdminPanel';
 import { useKeyboardShortcuts } from './components/KeyboardShortcuts';
 import { useTheme } from './ThemeContext';
 import { useThemeClasses } from './themeUtils';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { realtime } from './api/realtime';
 
 function AppContent() {
   const { theme } = useTheme();
   const tc = useThemeClasses();
   const { isAuthenticated, user } = useAuth();
+  const activeUser: User = user || currentUser;
+
   const [authPage, setAuthPage] = useState<'login' | 'register' | 'forgot' | 'reset' | 'verify'>('login');
   const [resetToken, setResetToken] = useState('');
   const [verifyToken, setVerifyToken] = useState('');
   const [currentPage, setCurrentPage] = useState<Page>('home');
-  const [posts, setPosts] = useState<Post[]>(initialPosts);
+
+  // Load posts from localStorage or fallback to initialPosts
+  const [posts, setPosts] = useState<Post[]>(() => {
+    try {
+      const saved = localStorage.getItem('longa_posts');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.map((p: any) => ({
+          ...p,
+          timestamp: new Date(p.timestamp),
+          poll: p.poll ? { ...p.poll, endsAt: new Date(p.poll.endsAt) } : undefined,
+        }));
+      }
+    } catch (e) {
+      console.error('Failed to parse saved posts:', e);
+    }
+    return initialPosts;
+  });
+
+  // Persist posts to localStorage on change
+  useEffect(() => {
+    try {
+      localStorage.setItem('longa_posts', JSON.stringify(posts));
+    } catch (e) {
+      console.error('Failed to persist posts:', e);
+    }
+  }, [posts]);
+
   const [showComposeModal, setShowComposeModal] = useState(false);
   const [notifications, setNotifications] = useState(initialNotifications);
   const [followedUsers, setFollowedUsers] = useState<string[]>(users.filter(u => u.isFollowing).map(u => u.id));
@@ -88,6 +124,35 @@ function AppContent() {
     setTimeout(() => setToast(null), 3000);
   };
 
+  useEffect(() => {
+    if (!activeUser?.id) return;
+    const unsubscribe = realtime.subscribe(activeUser.id.toString(), {
+      onNotification: (notif) => {
+        setNotifications(prev => [
+          {
+            id: notif.id || 'notif_' + Date.now(),
+            type: (notif.type as any) || 'like',
+            user: {
+              id: 'actor_' + Date.now(),
+              name: notif.actor_name,
+              handle: '@' + notif.actor_name.toLowerCase().replace(/\s+/g, ''),
+              avatar: notif.actor_avatar,
+              verified: false,
+              premium: false,
+              isFollowing: false,
+            },
+            content: notif.message,
+            time: 'Just now',
+            read: false,
+          },
+          ...prev,
+        ]);
+        showToast('🔔 ' + notif.message);
+      },
+    });
+    return () => unsubscribe();
+  }, [activeUser?.id]);
+
   const handleLike = useCallback((id: string) => {
     setPosts(prev => prev.map(post =>
       post.id === id
@@ -115,11 +180,12 @@ function AppContent() {
     }));
   }, []);
 
-  const handleNewPost = useCallback((content: string) => {
+  const handleNewPost = useCallback((content: string, image?: string) => {
     const newPost: Post = {
       id: Date.now().toString(),
-      user: currentUser,
+      user: activeUser,
       content,
+      image,
       timestamp: new Date(),
       likes: 0,
       retweets: 0,
@@ -129,13 +195,13 @@ function AppContent() {
       liked: false,
       retweeted: false,
       bookmarked: false,
-      isPremium: true,
+      isPremium: !!activeUser.premium,
       isOwn: true,
       replyList: [],
     };
     setPosts(prev => [newPost, ...prev]);
     showToast('Your post was sent');
-  }, []);
+  }, [activeUser]);
 
   // Keyboard shortcuts
   useKeyboardShortcuts({
@@ -149,14 +215,14 @@ function AppContent() {
   }, []);
 
   const handlePostDraft = useCallback((draft: Draft) => {
-    handleNewPost(draft.content);
+    handleNewPost(draft.content, draft.image);
     setDrafts(prev => prev.filter(d => d.id !== draft.id));
   }, [handleNewPost]);
 
   const handleReply = useCallback((postId: string, content: string) => {
     const newReply: Reply = {
       id: 'r' + Date.now(),
-      user: currentUser,
+      user: activeUser,
       content,
       timestamp: new Date(),
       likes: 0,
@@ -169,7 +235,7 @@ function AppContent() {
         : post
     ));
     showToast('Your reply was sent');
-  }, []);
+  }, [activeUser]);
 
   const handleDeletePost = useCallback((id: string) => {
     setPosts(prev => prev.filter(post => post.id !== id));
@@ -184,12 +250,13 @@ function AppContent() {
         return { ...post, pinned: newPinned };
       }
       // Unpin other posts when pinning a new one
-      if (post.isOwn || post.user.id === currentUser.id) {
+      if (post.isOwn || post.user.id === activeUser.id) {
         return { ...post, pinned: false };
       }
       return post;
     }));
-  }, []);
+  }, [activeUser.id]);
+
 
   const handleViewThread = useCallback((id: string) => {
     setSelectedThreadId(id);
@@ -248,11 +315,11 @@ function AppContent() {
       description,
       isPrivate,
       followers: 0,
-      memberUsers: [currentUser],
+      memberUsers: [activeUser],
     };
     setLists(prev => [...prev, newList]);
     showToast('List created successfully');
-  }, []);
+  }, [activeUser]);
 
   const handleFollowList = useCallback((listId: string) => {
     setFollowedLists(prev => {
@@ -305,8 +372,8 @@ function AppContent() {
       case 'profile':
         return (
           <Profile
-            user={currentUser}
-            posts={posts.filter(p => p.user.id === currentUser.id || p.isOwn)}
+            user={activeUser}
+            posts={posts.filter(p => p.user.id === activeUser.id || p.isOwn)}
             onLike={handleLike}
             onRetweet={handleRetweet}
             onBookmark={handleBookmark}
@@ -393,8 +460,8 @@ function AppContent() {
           );
         }
         return null;
-      case 'grok':
-        return <Grok />;
+      case 'longa-ai':
+        return <LongaAI />;
       case 'spaces':
         return <Spaces />;
       case 'communities':
@@ -437,6 +504,18 @@ function AppContent() {
         return <AccountSettingsPage onBack={() => setCurrentPage('home')} />;
       case 'edit-profile':
         return <ProfileEditPage onBack={() => setCurrentPage('profile')} />;
+      case 'store':
+        return <CreatorStore />;
+      case 'bounties':
+        return <BountiesHub />;
+      case 'reels':
+        return <LongaReels />;
+      case 'predictions':
+        return <PredictionMarket />;
+      case 'leaderboard':
+        return <Leaderboard />;
+      case 'admin':
+        return <AdminPanel />;
       default:
         return null;
     }
@@ -510,10 +589,12 @@ function AppContent() {
 
       {/* Main Content */}
       <main className="ml-[68px] xl:ml-[275px] flex justify-center">
-        <div className={`w-full max-w-[600px] min-h-screen border-r ${tc.border} pb-16 md:pb-0`}>
+        <div className={`w-full ${currentPage === 'admin' ? 'max-w-[1250px]' : 'max-w-[600px] border-r'} min-h-screen ${tc.border} pb-16 md:pb-0`}>
           {renderPage()}
         </div>
-        <RightPanel onNavigate={handleNavigate} followedUsers={followedUsers} onFollowUser={handleFollowUser} />
+        {currentPage !== 'admin' && (
+          <RightPanel onNavigate={handleNavigate} followedUsers={followedUsers} onFollowUser={handleFollowUser} />
+        )}
       </main>
 
       {/* Compose Modal */}
