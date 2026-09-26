@@ -1,6 +1,9 @@
 -- Database Migration for Longa
 -- Run this SQL file to create all necessary tables
 
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -10,7 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL DEFAULT '',
     email_verified BOOLEAN DEFAULT TRUE,
     last_login TIMESTAMP NULL,
-    avatar VARCHAR(50) DEFAULT '👤',
+    avatar VARCHAR(255) DEFAULT '',
     bio TEXT,
     verified BOOLEAN DEFAULT FALSE,
     premium BOOLEAN DEFAULT FALSE,
@@ -122,7 +125,7 @@ CREATE TABLE IF NOT EXISTS communities (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    avatar VARCHAR(50) DEFAULT '🌍',
+    avatar VARCHAR(255) DEFAULT '',
     admin_id INT NOT NULL,
     members INT DEFAULT 0,
     is_private BOOLEAN DEFAULT FALSE,
@@ -232,4 +235,6 @@ CREATE TABLE IF NOT EXISTS creator_earnings (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_creator_user (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+SET FOREIGN_KEY_CHECKS = 1;
 
