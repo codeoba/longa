@@ -53,49 +53,53 @@ class RealtimeController {
         $maxLoops = 15; // stream for ~15 seconds then finish, browser EventSource reconnects automatically
 
         for ($i = 0; $i < $maxLoops; $i++) {
-            // 1. Check for new messages
-            $newMessages = $this->db->fetchAll(
-                "SELECT m.*, u.name as sender_name, u.handle as sender_handle, u.avatar as sender_avatar
-                 FROM messages m
-                 JOIN users u ON m.sender_id = u.id
-                 WHERE m.receiver_id = ? AND m.created_at >= ?
-                 ORDER BY m.created_at ASC",
-                [$userId, date('Y-m-d H:i:s', $lastCheck)]
-            );
+            try {
+                // 1. Check for new messages
+                $newMessages = $this->db->fetchAll(
+                    "SELECT m.*, u.name as sender_name, u.handle as sender_handle, u.avatar as sender_avatar
+                     FROM messages m
+                     JOIN users u ON m.sender_id = u.id
+                     WHERE m.receiver_id = ? AND m.created_at >= ?
+                     ORDER BY m.created_at ASC",
+                    [$userId, date('Y-m-d H:i:s', $lastCheck)]
+                );
 
-            foreach ($newMessages as $msg) {
-                $this->sendEvent('new_message', [
-                    'id' => (string)$msg['id'],
-                    'conversation_id' => (string)$msg['conversation_id'],
-                    'sender_id' => (string)$msg['sender_id'],
-                    'sender_name' => $msg['sender_name'],
-                    'sender_handle' => $msg['sender_handle'],
-                    'sender_avatar' => $msg['sender_avatar'],
-                    'content' => $msg['content'],
-                    'created_at' => $msg['created_at']
-                ]);
-            }
+                foreach ($newMessages as $msg) {
+                    $this->sendEvent('new_message', [
+                        'id' => (string)$msg['id'],
+                        'conversation_id' => (string)$msg['conversation_id'],
+                        'sender_id' => (string)$msg['sender_id'],
+                        'sender_name' => $msg['sender_name'],
+                        'sender_handle' => $msg['sender_handle'],
+                        'sender_avatar' => $msg['sender_avatar'],
+                        'content' => $msg['content'],
+                        'created_at' => $msg['created_at']
+                    ]);
+                }
 
-            // 2. Check for new notifications
-            $newNotifications = $this->db->fetchAll(
-                "SELECT n.*, u.name as actor_name, u.handle as actor_handle, u.avatar as actor_avatar
-                 FROM notifications n
-                 LEFT JOIN users u ON n.actor_id = u.id
-                 WHERE n.user_id = ? AND n.created_at >= ?
-                 ORDER BY n.created_at ASC",
-                [$userId, date('Y-m-d H:i:s', $lastCheck)]
-            );
+                // 2. Check for new notifications
+                $newNotifications = $this->db->fetchAll(
+                    "SELECT n.*, u.name as actor_name, u.handle as actor_handle, u.avatar as actor_avatar
+                     FROM notifications n
+                     LEFT JOIN users u ON n.actor_id = u.id
+                     WHERE n.user_id = ? AND n.created_at >= ?
+                     ORDER BY n.created_at ASC",
+                    [$userId, date('Y-m-d H:i:s', $lastCheck)]
+                );
 
-            foreach ($newNotifications as $notif) {
-                $this->sendEvent('new_notification', [
-                    'id' => (string)$notif['id'],
-                    'user_id' => (string)$notif['user_id'],
-                    'type' => $notif['type'],
-                    'message' => $notif['message'],
-                    'actor_name' => $notif['actor_name'] ?? 'Someone',
-                    'actor_avatar' => $notif['actor_avatar'] ?? '👤',
-                    'created_at' => $notif['created_at']
-                ]);
+                foreach ($newNotifications as $notif) {
+                    $this->sendEvent('new_notification', [
+                        'id' => (string)$notif['id'],
+                        'user_id' => (string)$notif['user_id'],
+                        'type' => $notif['type'],
+                        'message' => $notif['message'],
+                        'actor_name' => $notif['actor_name'] ?? 'Someone',
+                        'actor_avatar' => $notif['actor_avatar'] ?? '👤',
+                        'created_at' => $notif['created_at']
+                    ]);
+                }
+            } catch (\Throwable $err) {
+                // Silent catch so SSE stream stays open
             }
 
             $lastCheck = time();
