@@ -56,6 +56,7 @@ import { useTheme } from './ThemeContext';
 import { useThemeClasses } from './themeUtils';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { realtime } from './api/realtime';
+import { PostsAPI } from './api/phpAdapter';
 
 function AppContent() {
   const { theme } = useTheme();
@@ -153,20 +154,87 @@ function AppContent() {
     return () => unsubscribe();
   }, [activeUser?.id]);
 
+  // Load real posts from backend API via AJAX, merging with cached/mock
+  useEffect(() => {
+    const fetchBackendPosts = async () => {
+      try {
+        const res: any = await PostsAPI.getAll();
+        if (res && res.posts && Array.isArray(res.posts) && res.posts.length > 0) {
+          const backendPosts: Post[] = res.posts.map((p: any) => ({
+            id: p.id.toString(),
+            user: {
+              id: p.user_id.toString(),
+              name: p.user_name || 'Longa User',
+              handle: p.user_handle || '@user',
+              avatar: p.user_avatar || '👤',
+              verified: !!p.user_verified,
+              premium: !!p.user_premium,
+              isFollowing: false,
+            },
+            content: p.content,
+            image: p.image || undefined,
+            timestamp: new Date(p.created_at || Date.now()),
+            likes: Number(p.likes) || 0,
+            retweets: Number(p.retweets) || 0,
+            replies: Number(p.replies) || 0,
+            views: Number(p.views) || 0,
+            bookmarks: Number(p.bookmarks) || 0,
+            liked: false,
+            retweeted: false,
+            bookmarked: false,
+            isPremium: !!p.user_premium,
+            isOwn: activeUser?.id ? p.user_id.toString() === activeUser.id.toString() : false,
+            replyList: [],
+          }));
+          setPosts(prev => {
+            const existingIds = new Set(backendPosts.map(bp => bp.id));
+            const remaining = prev.filter(p => !existingIds.has(p.id));
+            return [...backendPosts, ...remaining];
+          });
+        }
+      } catch (e) {
+        console.warn('Could not fetch posts from backend, using local/cached posts:', e);
+      }
+    };
+    fetchBackendPosts();
+  }, [activeUser?.id]);
+
   const handleLike = useCallback((id: string) => {
-    setPosts(prev => prev.map(post =>
-      post.id === id
-        ? { ...post, liked: !post.liked, likes: post.liked ? post.likes - 1 : post.likes + 1 }
-        : post
-    ));
+    let wasLiked = false;
+    // 1. Instant Optimistic AJAX UI Update (0ms delay!)
+    setPosts(prev => prev.map(post => {
+      if (post.id === id) {
+        wasLiked = !!post.liked;
+        const newLiked = !post.liked;
+        const newLikes = newLiked ? post.likes + 1 : Math.max(0, post.likes - 1);
+        return { ...post, liked: newLiked, likes: newLikes };
+      }
+      return post;
+    }));
+
+    // 2. Asynchronous AJAX call to backend
+    if (wasLiked) {
+      PostsAPI.unlike(id).catch(err => console.warn('AJAX unlike notice:', err));
+    } else {
+      PostsAPI.like(id).catch(err => console.warn('AJAX like notice:', err));
+    }
   }, []);
 
   const handleRetweet = useCallback((id: string) => {
-    setPosts(prev => prev.map(post =>
-      post.id === id
-        ? { ...post, retweeted: !post.retweeted, retweets: post.retweeted ? post.retweets - 1 : post.retweets + 1 }
-        : post
-    ));
+    let wasRetweeted = false;
+    setPosts(prev => prev.map(post => {
+      if (post.id === id) {
+        wasRetweeted = !!post.retweeted;
+        const newRetweeted = !post.retweeted;
+        const newRetweets = newRetweeted ? post.retweets + 1 : Math.max(0, post.retweets - 1);
+        return { ...post, retweeted: newRetweeted, retweets: newRetweets };
+      }
+      return post;
+    }));
+
+    if (!wasRetweeted) {
+      PostsAPI.retweet(id).catch(err => console.warn('AJAX retweet notice:', err));
+    }
   }, []);
 
   const handleBookmark = useCallback((id: string) => {
@@ -180,9 +248,10 @@ function AppContent() {
     }));
   }, []);
 
-  const handleNewPost = useCallback((content: string, image?: string) => {
+  const handleNewPost = useCallback(async (content: string, image?: string) => {
+    const tempId = Date.now().toString();
     const newPost: Post = {
-      id: Date.now().toString(),
+      id: tempId,
       user: activeUser,
       content,
       image,
@@ -199,8 +268,23 @@ function AppContent() {
       isOwn: true,
       replyList: [],
     };
+    // Instant optimistic UI update
     setPosts(prev => [newPost, ...prev]);
     showToast('Your post was sent');
+
+    // AJAX creation in background
+    try {
+      const res: any = await PostsAPI.create({
+        content,
+        image,
+        user_id: activeUser.id,
+      });
+      if (res && res.post_id) {
+        setPosts(prev => prev.map(p => p.id === tempId ? { ...p, id: res.post_id.toString() } : p));
+      }
+    } catch (e) {
+      console.warn('Backend post creation notice:', e);
+    }
   }, [activeUser]);
 
   // Keyboard shortcuts
@@ -237,9 +321,14 @@ function AppContent() {
     showToast('Your reply was sent');
   }, [activeUser]);
 
-  const handleDeletePost = useCallback((id: string) => {
+  const handleDeletePost = useCallback(async (id: string) => {
     setPosts(prev => prev.filter(post => post.id !== id));
     showToast('Your post was deleted');
+    try {
+      await PostsAPI.delete(id);
+    } catch (e) {
+      console.warn('Backend post deletion notice:', e);
+    }
   }, []);
 
   const handlePinPost = useCallback((id: string) => {
