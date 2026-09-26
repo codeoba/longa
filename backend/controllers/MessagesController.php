@@ -106,7 +106,7 @@ class MessagesController {
         // Count unread messages in conversations where current user is a participant but not the sender
         $result = $this->db->fetchOne(
             "SELECT COUNT(*) as count FROM messages 
-             WHERE sender_id != ? AND read = FALSE AND (conversation_id LIKE ? OR conversation_id LIKE ?)",
+             WHERE sender_id != ? AND `read` = FALSE AND (conversation_id LIKE ? OR conversation_id LIKE ?)",
             [$userId, "%_{$userId}_%", "{$userId}_%"]
         );
         

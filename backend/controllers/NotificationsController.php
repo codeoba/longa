@@ -89,7 +89,7 @@ class NotificationsController {
         }
         
         $result = $this->db->fetchOne(
-            "SELECT COUNT(*) as count FROM notifications WHERE user_id = ? AND read = FALSE",
+            "SELECT COUNT(*) as count FROM notifications WHERE user_id = ? AND `read` = FALSE",
             [$userId]
         );
         

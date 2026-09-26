@@ -57,13 +57,13 @@ CREATE TABLE IF NOT EXISTS notifications (
     from_user_id INT NOT NULL,
     post_id INT,
     content TEXT,
-    read BOOLEAN DEFAULT FALSE,
+    `read` BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (from_user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
     INDEX idx_user_id (user_id),
-    INDEX idx_read (read),
+    INDEX idx_read (`read`),
     INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS messages (
     conversation_id VARCHAR(100) NOT NULL,
     sender_id INT NOT NULL,
     content TEXT NOT NULL,
-    read BOOLEAN DEFAULT FALSE,
+    `read` BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_conversation_id (conversation_id),

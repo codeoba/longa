@@ -90,7 +90,10 @@ class Database {
     }
     
     public function insert($table, $data) {
-        $columns = implode(', ', array_keys($data));
+        $escapedColumns = array_map(function($col) {
+            return "`" . str_replace("`", "``", $col) . "`";
+        }, array_keys($data));
+        $columns = implode(', ', $escapedColumns);
         $placeholders = implode(', ', array_fill(0, count($data), '?'));
         
         $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
@@ -101,7 +104,8 @@ class Database {
     
     public function update($table, $data, $where, $whereParams = []) {
         $set = implode(', ', array_map(function($key) {
-            return "{$key} = ?";
+            $escapedKey = "`" . str_replace("`", "``", $key) . "`";
+            return "{$escapedKey} = ?";
         }, array_keys($data)));
         
         $sql = "UPDATE {$table} SET {$set} WHERE {$where}";
