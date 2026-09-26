@@ -5,7 +5,7 @@ class UsersController {
     private $db;
     
     // Whitelisted public fields that NEVER leak sensitive columns like password_hash
-    private const SAFE_COLUMNS = "id, name, handle, email, avatar, bio, verified, premium, followers, following, posts, location, website, created_at";
+    private const SAFE_COLUMNS = "id, name, handle, email, avatar, banner, bio, verified, premium, followers, following, posts, location, website, created_at";
     
     public function __construct() {
         $this->db = Database::getInstance();
@@ -117,7 +117,7 @@ class UsersController {
         $data = [];
         
         // Safe profile fields user can update
-        $allowedFields = ['name', 'bio', 'avatar', 'location', 'website'];
+        $allowedFields = ['name', 'bio', 'avatar', 'banner', 'location', 'website'];
         foreach ($allowedFields as $field) {
             if (isset($input[$field])) {
                 $data[$field] = $input[$field];

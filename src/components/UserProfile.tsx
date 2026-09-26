@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { User, Post } from '../types';
 import PostComponent from './Post';
 import { ArrowLeft, Verified, Premium, Calendar, MapPin, LinkIcon, ThreeDots } from './Icons';
+import Avatar, { isImageUrl } from './Avatar';
 
 interface UserProfileProps {
   user: User;
@@ -70,13 +71,23 @@ export default function UserProfile({ user, posts, isFollowing, onFollow, onLike
       </div>
 
       {/* Banner */}
-      <div className="h-[200px] bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600" />
+      <div className="h-[200px] w-full relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
+        {user.banner ? (
+          <img src={user.banner} alt={user.name} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600" />
+        )}
+      </div>
 
       {/* Profile Info */}
       <div className="px-4 pb-4 border-b border-gray-800/50">
         <div className="flex items-end justify-between -mt-16 mb-3">
-          <div className="w-[120px] h-[120px] rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-5xl border-4 border-black">
-            {user.avatar}
+          <div className="w-[120px] h-[120px] rounded-full overflow-hidden flex items-center justify-center text-5xl border-4 border-black bg-gradient-to-br from-blue-500 to-purple-600 shadow-xl select-none">
+            {isImageUrl(user.avatar) ? (
+              <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+            ) : (
+              <span>{user.avatar || '👤'}</span>
+            )}
           </div>
           <div className="flex gap-2 mt-12">
             <button className="px-4 py-1.5 rounded-full border border-gray-600 text-white font-bold text-[15px] hover:bg-gray-800/50 transition-colors">

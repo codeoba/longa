@@ -7,6 +7,7 @@ import {
 } from './Icons';
 import { useThemeClasses } from '../themeUtils';
 import { useAuth } from '../contexts/AuthContext';
+import Avatar from './Avatar';
 
 interface SidebarProps {
   currentPage: Page;
@@ -375,9 +376,7 @@ export default function Sidebar({
           onClick={() => setShowUserMenu(!showUserMenu)}
           className={`flex items-center gap-3 p-3 rounded-full transition-colors w-full ${tc.bgHoverSecondary}`}
         >
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg flex-shrink-0">
-            {currentUser.avatar}
-          </div>
+          <Avatar src={currentUser.avatar} size="md" />
           <div className="hidden xl:block flex-1 text-left min-w-0">
             <div className="flex items-center gap-1">
               <span className={`font-bold text-[15px] truncate ${tc.text}`}>{currentUser.name}</span>

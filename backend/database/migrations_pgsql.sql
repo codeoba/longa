@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
     email_verified BOOLEAN DEFAULT TRUE,
     last_login TIMESTAMP,
     avatar VARCHAR(50) DEFAULT '👤',
+    banner VARCHAR(255) DEFAULT '',
     bio TEXT,
     verified BOOLEAN DEFAULT FALSE,
     premium BOOLEAN DEFAULT FALSE,

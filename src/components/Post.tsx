@@ -4,6 +4,7 @@ import { Heart, Retweet, Reply as ReplyIcon, Views, Share, ThreeDots, Verified, 
 import { currentUser } from '../data';
 import { useThemeClasses } from '../themeUtils';
 import PollComponent from './PollComponent';
+import Avatar from './Avatar';
 
 interface PostProps {
   post: PostType;
@@ -164,12 +165,12 @@ export default function PostComponent({ post, onLike, onRetweet, onBookmark, onR
       <div className="flex gap-3">
         {/* Avatar */}
         <div className="flex-shrink-0">
-          <div
+          <Avatar
+            src={post.user.avatar}
+            size="md"
+            className="cursor-pointer hover:opacity-80 transition-opacity"
             onClick={(e) => { e.stopPropagation(); onUserClick?.(post.user.id); }}
-            className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg hover:opacity-80 transition-opacity cursor-pointer"
-          >
-            {post.user.avatar}
-          </div>
+          />
         </div>
 
         {/* Content */}
@@ -295,9 +296,7 @@ export default function PostComponent({ post, onLike, onRetweet, onBookmark, onR
           {post.quotePost && (
             <div className={`mt-3 rounded-2xl border p-3 ${tc.border} ${tc.bgHover} transition-colors cursor-pointer`}>
               <div className="flex items-center gap-2 mb-1">
-                <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-[10px]">
-                  {post.quotePost.user.avatar}
-                </div>
+                <Avatar src={post.quotePost.user.avatar} size="xs" />
                 <span className={`font-bold text-[13px] ${tc.text}`}>{post.quotePost.user.name}</span>
                 {post.quotePost.user.verified && <Verified />}
                 <span className="text-gray-500 text-[13px]">{post.quotePost.user.handle}</span>
@@ -537,9 +536,7 @@ export default function PostComponent({ post, onLike, onRetweet, onBookmark, onR
           {/* Reply Box */}
           {showReplyBox && (
             <div className="mt-3 flex gap-3" onClick={(e) => e.stopPropagation()}>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm flex-shrink-0">
-                {currentUser.avatar}
-              </div>
+              <Avatar src={currentUser.avatar} size="sm" />
               <div className="flex-1">
                 <textarea
                   value={replyText}

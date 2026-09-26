@@ -3,6 +3,7 @@ export interface User {
   name: string;
   handle: string;
   avatar: string;
+  banner?: string;
   bio: string;
   verified: boolean;
   premium: boolean;

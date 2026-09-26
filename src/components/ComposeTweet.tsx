@@ -4,6 +4,7 @@ import { Image, Gif, Emoji, Poll as PollIcon, Schedule, Location, Close, Verifie
 import { useThemeClasses } from '../themeUtils';
 import { useAuth } from '../contexts/AuthContext';
 import { Poll } from '../types';
+import Avatar from './Avatar';
 
 interface ComposeTweetProps {
   onClose?: () => void;
@@ -323,9 +324,7 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
       <div className="flex gap-3">
         {/* Avatar */}
         <div className="flex-shrink-0 mt-1">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg shadow-md">
-            {activeUser.avatar || '👤'}
-          </div>
+          <Avatar src={activeUser.avatar} size="md" className="shadow-md" />
         </div>
 
         {/* Input area */}
