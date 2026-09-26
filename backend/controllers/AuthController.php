@@ -67,16 +67,16 @@ class AuthController {
             'handle' => '@' . ltrim($input['handle'], '@'),
             'email' => $input['email'],
             'password_hash' => $passwordHash,
-            'avatar' => $input['avatar'] ?? '👤',
+            'avatar' => $input['avatar'] ?? '',
             'bio' => $input['bio'] ?? '',
-            'verified' => false,
-            'premium' => false,
+            'verified' => 0,
+            'premium' => 0,
             'followers' => 0,
             'following' => 0,
             'posts' => 0,
             'location' => $input['location'] ?? null,
             'website' => $input['website'] ?? null,
-            'email_verified' => !$requireVerification, // Verified by default if email sending is disabled
+            'email_verified' => $requireVerification ? 0 : 1, // Verified by default if email sending is disabled
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
         ];

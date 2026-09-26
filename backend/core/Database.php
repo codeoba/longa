@@ -77,7 +77,13 @@ class Database {
     
     public function query($sql, $params = []) {
         $stmt = $this->getConnection()->prepare($sql);
-        $stmt->execute($params);
+        $normalizedParams = array_map(function($val) {
+            if (is_bool($val)) {
+                return $val ? 1 : 0;
+            }
+            return $val;
+        }, $params);
+        $stmt->execute($normalizedParams);
         return $stmt;
     }
     
