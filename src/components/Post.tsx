@@ -16,6 +16,7 @@ interface PostProps {
   onViewThread?: (id: string) => void;
   onUserClick?: (userId: string) => void;
   incrementViews?: (id: string) => void;
+  onVote?: (pollId: string, optionId: string) => void;
 }
 
 function formatNumber(num: number): string {
@@ -38,7 +39,7 @@ function timeAgo(date: Date): string {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-export default function PostComponent({ post, onLike, onRetweet, onBookmark, onReply, onDelete, onPin, onViewThread, onUserClick, incrementViews }: PostProps) {
+export default function PostComponent({ post, onLike, onRetweet, onBookmark, onReply, onDelete, onPin, onViewThread, onUserClick, incrementViews, onVote }: PostProps) {
   const [showActions, setShowActions] = useState(false);
   const [showReplyBox, setShowReplyBox] = useState(false);
   const [replyText, setReplyText] = useState('');
@@ -264,16 +265,30 @@ export default function PostComponent({ post, onLike, onRetweet, onBookmark, onR
             })}
           </div>
 
-          {/* Image */}
+          {/* Location */}
+          {post.location && (
+            <div className="mt-1 flex items-center gap-1 text-[13px] text-blue-400/90 font-medium">
+              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              <span>{post.location}</span>
+            </div>
+          )}
+
+          {/* Media (Image / Video) */}
           {post.image && (
             <div className={`mt-3 rounded-2xl overflow-hidden border ${tc.border}`}>
-              <img src={post.image} alt="" className="w-full max-h-[500px] object-cover" />
+              {post.image.includes('.mp4') || post.image.includes('.webm') || post.image.startsWith('data:video/') ? (
+                <video src={post.image} controls className="w-full max-h-[500px] object-cover bg-black" />
+              ) : (
+                <img src={post.image} alt="" className="w-full max-h-[500px] object-cover" />
+              )}
             </div>
           )}
 
           {/* Poll */}
           {post.poll && (
-            <PollComponent poll={post.poll} onVote={() => {}} />
+            <PollComponent poll={post.poll} onVote={(pollId, optionId) => onVote?.(pollId, optionId)} />
           )}
 
           {/* Quote Post */}

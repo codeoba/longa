@@ -1,5 +1,4 @@
-import React, { useState, useMemo } from 'react';
-import { Post } from '../types';
+import { Post, Poll } from '../types';
 import PostComponent from './Post';
 import ComposeTweet from './ComposeTweet';
 import { useThemeClasses } from '../themeUtils';
@@ -9,16 +8,17 @@ interface FeedProps {
   onLike: (id: string) => void;
   onRetweet: (id: string) => void;
   onBookmark: (id: string) => void;
-  onNewPost: (content: string, image?: string) => void;
+  onNewPost: (content: string, image?: string, poll?: Poll, location?: string) => void;
   onReply: (postId: string, content: string) => void;
   onDelete: (id: string) => void;
   onPin: (id: string) => void;
   onViewThread: (id: string) => void;
   onUserClick: (userId: string) => void;
   incrementViews: (id: string) => void;
+  onVote?: (pollId: string, optionId: string) => void;
 }
 
-export default function Feed({ posts, onLike, onRetweet, onBookmark, onNewPost, onReply, onDelete, onPin, onViewThread, onUserClick, incrementViews }: FeedProps) {
+export default function Feed({ posts, onLike, onRetweet, onBookmark, onNewPost, onReply, onDelete, onPin, onViewThread, onUserClick, incrementViews, onVote }: FeedProps) {
   const [activeTab, setActiveTab] = useState<'for-you' | 'following'>('for-you');
   const tc = useThemeClasses();
 
@@ -95,6 +95,7 @@ export default function Feed({ posts, onLike, onRetweet, onBookmark, onNewPost, 
               onViewThread={onViewThread}
               onUserClick={onUserClick}
               incrementViews={incrementViews}
+              onVote={onVote}
             />
           ))
         ) : (

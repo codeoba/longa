@@ -64,6 +64,7 @@ export interface Post {
   isOwn?: boolean;
   poll?: Poll;
   quotePost?: Post;
+  location?: string;
 }
 
 export interface Notification {

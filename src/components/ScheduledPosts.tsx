@@ -19,27 +19,29 @@ export default function ScheduledPosts() {
   const [scheduledDate, setScheduledDate] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
 
-  // Sample scheduled posts
-  const samplePosts: ScheduledPost[] = [
-    {
-      id: '1',
-      content: '🚀 Excited to announce our new product launch tomorrow! Stay tuned for something amazing.',
-      scheduledFor: new Date(Date.now() + 1000 * 60 * 60 * 24),
-      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
-      status: 'scheduled',
-    },
-    {
-      id: '2',
-      content: '💡 Tip: Always test your code before deploying. It saves hours of debugging!',
-      scheduledFor: new Date(Date.now() + 1000 * 60 * 60 * 48),
-      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5),
-      status: 'scheduled',
-    },
-  ];
+  React.useEffect(() => {
+    try {
+      const saved = localStorage.getItem('longa_scheduled_posts');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setPosts(parsed.map((p: any) => ({
+          ...p,
+          scheduledFor: new Date(p.scheduledFor),
+          createdAt: new Date(p.createdAt),
+        })));
+      }
+    } catch (e) {
+      console.error('Failed to load scheduled posts:', e);
+    }
+  }, []);
 
   React.useEffect(() => {
-    setPosts(samplePosts);
-  }, []);
+    try {
+      localStorage.setItem('longa_scheduled_posts', JSON.stringify(posts));
+    } catch (e) {
+      console.error('Failed to persist scheduled posts:', e);
+    }
+  }, [posts]);
 
   const handleSchedule = () => {
     if (!content.trim() || !scheduledDate || !scheduledTime) return;

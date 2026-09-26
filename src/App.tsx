@@ -246,13 +246,15 @@ function AppContent() {
     }));
   }, []);
 
-  const handleNewPost = useCallback(async (content: string, image?: string) => {
+  const handleNewPost = useCallback(async (content: string, image?: string, poll?: Poll, location?: string) => {
     const tempId = Date.now().toString();
     const newPost: Post = {
       id: tempId,
       user: activeUser,
       content,
       image,
+      poll,
+      location,
       timestamp: new Date(),
       likes: 0,
       retweets: 0,
@@ -284,6 +286,35 @@ function AppContent() {
       console.warn('Backend post creation notice:', e);
     }
   }, [activeUser]);
+
+  const handleVote = useCallback((pollId: string, optionId: string) => {
+    setPosts(prev => prev.map(p => {
+      if (p.poll && p.poll.id === pollId && !p.poll.hasVoted) {
+        const totalVotes = (p.poll.totalVotes || 0) + 1;
+        const options = p.poll.options.map(opt => {
+          const isSelected = opt.id === optionId;
+          const votes = isSelected ? opt.votes + 1 : opt.votes;
+          return {
+            ...opt,
+            votes,
+            percentage: Math.round((votes / totalVotes) * 100),
+            voted: isSelected,
+          };
+        });
+        return {
+          ...p,
+          poll: {
+            ...p.poll,
+            totalVotes,
+            hasVoted: true,
+            options,
+          }
+        };
+      }
+      return p;
+    }));
+    showToast('Vote recorded!');
+  }, []);
 
   // Keyboard shortcuts
   useKeyboardShortcuts({
@@ -441,6 +472,7 @@ function AppContent() {
             onViewThread={handleViewThread}
             onUserClick={handleUserClick}
             incrementViews={incrementViews}
+            onVote={handleVote}
           />
         );
       case 'explore':
