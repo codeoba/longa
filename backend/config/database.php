@@ -39,7 +39,7 @@ return [
     'app' => [
         'name' => 'Longa API',
         'debug' => getenv('APP_DEBUG') === 'true' || true,
-        'url' => getenv('APP_URL') ?: 'https://twitter.mdandu.com',
+        'url' => getenv('APP_URL') ?: 'https://longa.mdandu.com',
         'timezone' => 'Africa/Dar_es_Salaam',
         'locale' => 'en',
         'require_email_verification' => getenv('REQUIRE_EMAIL_VERIFICATION') === 'true', // false by default so users can login immediately

@@ -1,12 +1,12 @@
 #!/bin/bash
 # =====================================================================
 # Longa Social Platform — Automated aaPanel Deploy Script
-# Domain: twitter.mdandu.com
+# Domain: longa.mdandu.com
 # =====================================================================
 
 set -e
 
-DOMAIN="twitter.mdandu.com"
+DOMAIN="longa.mdandu.com"
 WEB_ROOT="/www/wwwroot/$DOMAIN"
 BACKUP_DIR="/www/backup/longa_backup_$(date +%Y%m%d_%H%M%S)"
 REPO="https://github.com/codeoba/longa.git"

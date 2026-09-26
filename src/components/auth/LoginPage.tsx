@@ -121,7 +121,7 @@ export default function LoginPage({ onSwitchToRegister, onForgotPassword }: Logi
             disabled={loading}
             className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400 text-white font-bold py-2.5 rounded-full transition-colors shadow-md shadow-blue-500/20 active:scale-98"
           >
-            {loading ? 'Signing in...' : 'Sign in with Backend'}
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
