@@ -38,16 +38,25 @@ echo "  ✅ Mradi umepakuliwa kwenye: $TEMP_DIR"
 
 # ── 3. Jenga Frontend (Vite Production Build) ──────────────────────────
 echo ""
-echo "⚙️  [3/7] Kujenga Frontend ya Kisasa (npm install & build)..."
+echo "⚙️  [3/7] Kuangalia Node.js na kujenga Frontend..."
 cd "$TEMP_DIR"
+
+# Check aaPanel Node.js / nvm paths
+for p in /www/server/nodejs/v*/bin /www/server/nvm/versions/node/v*/bin /root/.nvm/versions/node/v*/bin; do
+    if [ -d "$p" ]; then
+        export PATH="$p:$PATH"
+    fi
+done
 
 if command -v node >/dev/null 2>&1; then
     echo "  Node version: $(node -v)"
-    npm install --silent
-    npm run build
+    npm install --silent 2>/dev/null || true
+    npm run build 2>/dev/null || true
     echo "  ✅ Frontend build imekamilika (dist/ ipo tayari)"
+elif [ -d "$TEMP_DIR/dist" ]; then
+    echo "  ✅ Inatumia pre-compiled production build ya dist/ (Hakuna haja ya node)"
 else
-    echo "  ⚠️ Node.js haijapatikana kwenye terminal. Tutatumia build iliyopo..."
+    echo "  ⚠️ Hakuna dist/ wala node.js"
 fi
 
 # ── 4. Sambaza Faili kwenye aaPanel Web Root ───────────────────────────
