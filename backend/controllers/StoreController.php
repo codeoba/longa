@@ -103,31 +103,71 @@ class StoreController {
         $title = trim($input['title'] ?? '');
         $description = trim($input['description'] ?? '');
         $price = (float)($input['price'] ?? 0);
-        $category = $input['category'] ?? 'ebook';
-        $coverImage = $input['cover_image'] ?? 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=400&fit=crop';
+        $originalPrice = isset($input['originalPrice']) ? (float)$input['originalPrice'] : (isset($input['original_price']) ? (float)$input['original_price'] : null);
+        $currency = $input['currency'] ?? 'USD';
+        $category = $input['category'] ?? 'code';
+        $coverImage = $input['coverImage'] ?? ($input['cover_image'] ?? 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=400&fit=crop');
+        $galleryImages = $input['galleryImages'] ?? ($input['gallery_images'] ?? []);
         $tags = $input['tags'] ?? ['Digital'];
+        $features = $input['features'] ?? [];
+        $fileUrl = $input['fileUrl'] ?? ($input['file_url'] ?? null);
+        $fileName = $input['fileName'] ?? ($input['file_name'] ?? null);
+        $fileSize = $input['fileSize'] ?? ($input['file_size'] ?? null);
+        $license = $input['license'] ?? 'commercial';
+        $deliveryType = $input['deliveryType'] ?? ($input['delivery_type'] ?? 'instant_download');
 
         if (empty($title) || $price <= 0) {
             jsonResponse(['error' => 'Title and a valid price (> 0) are required'], 400);
+        }
+
+        // Resolve creator info
+        $creatorName = $input['creatorName'] ?? ($input['creator_name'] ?? 'Creator');
+        $creatorHandle = $input['creatorHandle'] ?? ($input['creator_handle'] ?? '@creator');
+        $creatorAvatar = $input['creatorAvatar'] ?? ($input['creator_avatar'] ?? '👤');
+        $creatorId = $userId ? (string)$userId : ($input['creatorId'] ?? ($input['creator_id'] ?? 'user_' . bin2hex(random_bytes(3))));
+
+        if ($userId) {
+            try {
+                $db = Database::getInstance();
+                $stmt = $db->prepare("SELECT id, name, handle, avatar FROM users WHERE id = :id LIMIT 1");
+                $stmt->execute([':id' => $userId]);
+                $userDb = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($userDb) {
+                    $creatorName = $userDb['name'];
+                    $creatorHandle = $userDb['handle'];
+                    $creatorAvatar = $userDb['avatar'] ?: '👤';
+                    $creatorId = (string)$userDb['id'];
+                }
+            } catch (Exception $e) {
+                // Ignore DB error, use fallback
+            }
         }
 
         $products = json_decode(file_get_contents($this->storageFile), true) ?? [];
 
         $newProduct = [
             'id' => 'prod_' . bin2hex(random_bytes(6)),
-            'creatorId' => (string)$user['id'],
-            'creatorName' => $user['name'] ?? 'Creator',
-            'creatorHandle' => $user['handle'] ?? '@creator',
-            'creatorAvatar' => $user['avatar'] ?? '👤',
+            'creatorId' => $creatorId,
+            'creatorName' => $creatorName,
+            'creatorHandle' => $creatorHandle,
+            'creatorAvatar' => $creatorAvatar,
             'title' => $title,
             'description' => $description,
             'price' => $price,
-            'currency' => 'USD',
+            'originalPrice' => $originalPrice,
+            'currency' => $currency,
             'category' => $category,
             'coverImage' => $coverImage,
+            'galleryImages' => is_array($galleryImages) ? $galleryImages : [],
+            'features' => is_array($features) ? $features : [],
+            'fileUrl' => $fileUrl,
+            'fileName' => $fileName,
+            'fileSize' => $fileSize,
+            'license' => $license,
+            'deliveryType' => $deliveryType,
             'salesCount' => 0,
             'rating' => 5.0,
-            'tags' => $tags
+            'tags' => is_array($tags) ? $tags : []
         ];
 
         array_unshift($products, $newProduct);

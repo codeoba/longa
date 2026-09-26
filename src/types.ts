@@ -175,13 +175,20 @@ export interface StoreItem {
   title: string;
   description: string;
   price: number;
+  originalPrice?: number;
   currency: string;
-  category: 'ebook' | 'code' | 'design' | 'audio' | 'consultation';
+  category: 'ebook' | 'code' | 'design' | 'audio' | 'consultation' | 'course' | 'service';
   coverImage: string;
+  galleryImages?: string[];
   salesCount: number;
   rating: number;
   fileUrl?: string;
+  fileName?: string;
+  fileSize?: string;
   tags: string[];
+  features?: string[];
+  license?: 'personal' | 'commercial' | 'extended';
+  deliveryType?: 'instant_download' | 'link' | 'consultation_call';
 }
 
 export interface BountySubmission {
