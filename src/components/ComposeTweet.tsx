@@ -750,14 +750,20 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
           <div className="flex items-center justify-between pt-1">
             <div className="flex items-center gap-1 -ml-1.5">
               {/* 1. Image / Video */}
-              <button
-                type="button"
-                onClick={handleImageUpload}
-                title="Add photo or video"
-                className={`p-2 rounded-full hover:bg-blue-500/10 transition-colors ${attachedImage ? 'text-blue-400' : 'text-blue-400'}`}
-              >
-                <Image />
-              </button>
+              <div className="relative group">
+                <button
+                  type="button"
+                  onClick={handleImageUpload}
+                  title="Media (Photo / Video)"
+                  aria-label="Media"
+                  className={`p-2 rounded-full hover:bg-blue-500/10 transition-colors ${attachedImage ? 'text-blue-400' : 'text-blue-400'}`}
+                >
+                  <Image />
+                </button>
+                <div className="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-gray-900/95 border border-gray-700/60 text-[11px] text-gray-200 whitespace-nowrap shadow-lg z-30">
+                  Media
+                </div>
+              </div>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -767,84 +773,114 @@ export default function ComposeTweet({ onClose, onSubmit, isModal = false }: Com
               />
 
               {/* 2. GIF */}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowGifPicker(!showGifPicker);
-                  setShowEmojiPicker(false);
-                  setShowPollBuilder(false);
-                  setShowScheduleModal(false);
-                  setShowLocationPicker(false);
-                }}
-                title="Add a GIF"
-                className={`p-2 rounded-full hover:bg-blue-500/10 transition-colors ${showGifPicker ? 'text-blue-500 bg-blue-500/20' : 'text-blue-400'}`}
-              >
-                <Gif />
-              </button>
+              <div className="relative group">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowGifPicker(!showGifPicker);
+                    setShowEmojiPicker(false);
+                    setShowPollBuilder(false);
+                    setShowScheduleModal(false);
+                    setShowLocationPicker(false);
+                  }}
+                  title="GIF"
+                  aria-label="GIF"
+                  className={`p-2 rounded-full hover:bg-blue-500/10 transition-colors ${showGifPicker ? 'text-blue-500 bg-blue-500/20' : 'text-blue-400'}`}
+                >
+                  <Gif />
+                </button>
+                <div className="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-gray-900/95 border border-gray-700/60 text-[11px] text-gray-200 whitespace-nowrap shadow-lg z-30">
+                  GIF
+                </div>
+              </div>
 
               {/* 3. Poll */}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowPollBuilder(!showPollBuilder);
-                  setShowGifPicker(false);
-                  setShowEmojiPicker(false);
-                  setShowScheduleModal(false);
-                  setShowLocationPicker(false);
-                }}
-                title="Create a poll"
-                className={`p-2 rounded-full hover:bg-blue-500/10 transition-colors ${showPollBuilder ? 'text-blue-500 bg-blue-500/20' : 'text-blue-400'}`}
-              >
-                <PollIcon />
-              </button>
+              <div className="relative group">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPollBuilder(!showPollBuilder);
+                    setShowGifPicker(false);
+                    setShowEmojiPicker(false);
+                    setShowScheduleModal(false);
+                    setShowLocationPicker(false);
+                  }}
+                  title="Poll"
+                  aria-label="Poll"
+                  className={`p-2 rounded-full hover:bg-blue-500/10 transition-colors ${showPollBuilder ? 'text-blue-500 bg-blue-500/20' : 'text-blue-400'}`}
+                >
+                  <PollIcon />
+                </button>
+                <div className="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-gray-900/95 border border-gray-700/60 text-[11px] text-gray-200 whitespace-nowrap shadow-lg z-30">
+                  Poll
+                </div>
+              </div>
 
               {/* 4. Emoji */}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowEmojiPicker(!showEmojiPicker);
-                  setShowGifPicker(false);
-                  setShowPollBuilder(false);
-                  setShowScheduleModal(false);
-                  setShowLocationPicker(false);
-                }}
-                title="Add emoji"
-                className={`p-2 rounded-full hover:bg-blue-500/10 transition-colors ${showEmojiPicker ? 'text-blue-500 bg-blue-500/20' : 'text-blue-400'}`}
-              >
-                <Emoji />
-              </button>
+              <div className="relative group">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEmojiPicker(!showEmojiPicker);
+                    setShowGifPicker(false);
+                    setShowPollBuilder(false);
+                    setShowScheduleModal(false);
+                    setShowLocationPicker(false);
+                  }}
+                  title="Emoji"
+                  aria-label="Emoji"
+                  className={`p-2 rounded-full hover:bg-blue-500/10 transition-colors ${showEmojiPicker ? 'text-blue-500 bg-blue-500/20' : 'text-blue-400'}`}
+                >
+                  <Emoji />
+                </button>
+                <div className="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-gray-900/95 border border-gray-700/60 text-[11px] text-gray-200 whitespace-nowrap shadow-lg z-30">
+                  Emoji
+                </div>
+              </div>
 
               {/* 5. Schedule */}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowScheduleModal(!showScheduleModal);
-                  setShowGifPicker(false);
-                  setShowEmojiPicker(false);
-                  setShowPollBuilder(false);
-                  setShowLocationPicker(false);
-                }}
-                title="Schedule post"
-                className={`p-2 rounded-full hover:bg-blue-500/10 transition-colors ${showScheduleModal ? 'text-blue-500 bg-blue-500/20' : 'text-blue-400'}`}
-              >
-                <Schedule />
-              </button>
+              <div className="relative group">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowScheduleModal(!showScheduleModal);
+                    setShowGifPicker(false);
+                    setShowEmojiPicker(false);
+                    setShowPollBuilder(false);
+                    setShowLocationPicker(false);
+                  }}
+                  title="Schedule"
+                  aria-label="Schedule"
+                  className={`p-2 rounded-full hover:bg-blue-500/10 transition-colors ${showScheduleModal ? 'text-blue-500 bg-blue-500/20' : 'text-blue-400'}`}
+                >
+                  <Schedule />
+                </button>
+                <div className="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-gray-900/95 border border-gray-700/60 text-[11px] text-gray-200 whitespace-nowrap shadow-lg z-30">
+                  Schedule
+                </div>
+              </div>
 
               {/* 6. Location */}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowLocationPicker(!showLocationPicker);
-                  setShowGifPicker(false);
-                  setShowEmojiPicker(false);
-                  setShowPollBuilder(false);
-                  setShowScheduleModal(false);
-                }}
-                title="Tag location"
-                className={`p-2 rounded-full hover:bg-blue-500/10 transition-colors ${selectedLocation || showLocationPicker ? 'text-blue-500 bg-blue-500/20' : 'text-blue-400'}`}
-              >
-                <Location />
-              </button>
+              <div className="relative group">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowLocationPicker(!showLocationPicker);
+                    setShowGifPicker(false);
+                    setShowEmojiPicker(false);
+                    setShowPollBuilder(false);
+                    setShowScheduleModal(false);
+                  }}
+                  title="Location"
+                  aria-label="Location"
+                  className={`p-2 rounded-full hover:bg-blue-500/10 transition-colors ${selectedLocation || showLocationPicker ? 'text-blue-500 bg-blue-500/20' : 'text-blue-400'}`}
+                >
+                  <Location />
+                </button>
+                <div className="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-gray-900/95 border border-gray-700/60 text-[11px] text-gray-200 whitespace-nowrap shadow-lg z-30">
+                  Location
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center gap-3">

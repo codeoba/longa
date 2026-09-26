@@ -308,85 +308,137 @@ export default function PostComponent({ post, onLike, onRetweet, onBookmark, onR
 
           {/* Actions */}
           <div className="flex items-center justify-between mt-3 max-w-[425px] -ml-2">
-            {/* Reply */}
-            <button
-              className="flex items-center gap-1 group"
-              onClick={(e) => { e.stopPropagation(); setShowReplyBox(!showReplyBox); }}
-            >
-              <div className="p-2 rounded-full group-hover:bg-blue-500/10 transition-colors">
-                <ReplyIcon />
+            {/* 1. Reply */}
+            <div className="relative group">
+              <button
+                className="flex items-center gap-1 group/btn"
+                title="Reply"
+                aria-label="Reply"
+                onClick={(e) => { e.stopPropagation(); setShowReplyBox(!showReplyBox); }}
+              >
+                <div className="p-2 rounded-full group-hover/btn:bg-blue-500/10 transition-colors">
+                  <ReplyIcon />
+                </div>
+                <span className="text-[13px] text-gray-500 group-hover/btn:text-blue-400 transition-colors">
+                  {post.replies > 0 ? formatNumber(post.replies) : ''}
+                </span>
+              </button>
+              <div className="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-gray-900/95 border border-gray-700/60 text-[11px] text-gray-200 whitespace-nowrap shadow-lg z-30">
+                Reply
               </div>
-              <span className="text-[13px] text-gray-500 group-hover:text-blue-400 transition-colors">
-                {post.replies > 0 ? formatNumber(post.replies) : ''}
-              </span>
-            </button>
+            </div>
 
-            {/* Retweet */}
-            <button
-              className="flex items-center gap-1 group"
-              onClick={(e) => { e.stopPropagation(); onRetweet(post.id); }}
-            >
-              <div className="p-2 rounded-full group-hover:bg-green-500/10 transition-colors">
-                <Retweet active={post.retweeted} />
+            {/* 2. Retweet */}
+            <div className="relative group">
+              <button
+                className="flex items-center gap-1 group/btn"
+                title={post.retweeted ? "Undo Repost" : "Repost"}
+                aria-label="Repost"
+                onClick={(e) => { e.stopPropagation(); onRetweet(post.id); }}
+              >
+                <div className="p-2 rounded-full group-hover/btn:bg-green-500/10 transition-colors">
+                  <Retweet active={post.retweeted} />
+                </div>
+                <span className={`text-[13px] transition-colors ${post.retweeted ? 'text-green-500' : 'text-gray-500 group-hover/btn:text-green-400'}`}>
+                  {post.retweets > 0 ? formatNumber(post.retweets) : ''}
+                </span>
+              </button>
+              <div className="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-gray-900/95 border border-gray-700/60 text-[11px] text-gray-200 whitespace-nowrap shadow-lg z-30">
+                {post.retweeted ? "Undo Repost" : "Repost"}
               </div>
-              <span className={`text-[13px] transition-colors ${post.retweeted ? 'text-green-500' : 'text-gray-500 group-hover:text-green-400'}`}>
-                {post.retweets > 0 ? formatNumber(post.retweets) : ''}
-              </span>
-            </button>
+            </div>
 
-            {/* Like */}
-            <button
-              className="flex items-center gap-1 group"
-              onClick={(e) => { e.stopPropagation(); onLike(post.id); }}
-            >
-              <div className="p-2 rounded-full group-hover:bg-pink-500/10 transition-colors">
-                <Heart filled={post.liked} />
+            {/* 3. Like */}
+            <div className="relative group">
+              <button
+                className="flex items-center gap-1 group/btn"
+                title={post.liked ? "Unlike" : "Like"}
+                aria-label="Like"
+                onClick={(e) => { e.stopPropagation(); onLike(post.id); }}
+              >
+                <div className="p-2 rounded-full group-hover/btn:bg-pink-500/10 transition-colors">
+                  <Heart filled={post.liked} />
+                </div>
+                <span className={`text-[13px] transition-colors ${post.liked ? 'text-pink-500' : 'text-gray-500 group-hover/btn:text-pink-400'}`}>
+                  {post.likes > 0 ? formatNumber(post.likes) : ''}
+                </span>
+              </button>
+              <div className="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-gray-900/95 border border-gray-700/60 text-[11px] text-gray-200 whitespace-nowrap shadow-lg z-30">
+                {post.liked ? "Unlike" : "Like"}
               </div>
-              <span className={`text-[13px] transition-colors ${post.liked ? 'text-pink-500' : 'text-gray-500 group-hover:text-pink-400'}`}>
-                {post.likes > 0 ? formatNumber(post.likes) : ''}
-              </span>
-            </button>
+            </div>
 
-            {/* Views */}
-            <button className="flex items-center gap-1 group" onClick={(e) => { e.stopPropagation(); handleViewClick(); }}>
-              <div className="p-2 rounded-full group-hover:bg-blue-500/10 transition-colors">
-                <Views />
+            {/* 4. Views */}
+            <div className="relative group">
+              <button
+                className="flex items-center gap-1 group/btn"
+                title="View Analytics"
+                aria-label="Views"
+                onClick={(e) => { e.stopPropagation(); handleViewClick(); }}
+              >
+                <div className="p-2 rounded-full group-hover/btn:bg-blue-500/10 transition-colors">
+                  <Views />
+                </div>
+                <span className="text-[13px] text-gray-500 group-hover/btn:text-blue-400 transition-colors">
+                  {post.views > 0 ? formatNumber(post.views) : ''}
+                </span>
+              </button>
+              <div className="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-gray-900/95 border border-gray-700/60 text-[11px] text-gray-200 whitespace-nowrap shadow-lg z-30">
+                Views
               </div>
-              <span className="text-[13px] text-gray-500 group-hover:text-blue-400 transition-colors">
-                {post.views > 0 ? formatNumber(post.views) : ''}
-              </span>
-            </button>
+            </div>
 
-            {/* Bookmark & Share */}
+            {/* 5. Bookmark, 6. Share & 7. AI Co-Pilot */}
             <div className="flex items-center">
-              <button
-                className="p-2 rounded-full hover:bg-blue-500/10 transition-colors group"
-                onClick={(e) => { e.stopPropagation(); onBookmark(post.id); }}
-              >
-                <svg viewBox="0 0 24 24" className={`w-5 h-5 ${post.bookmarked ? 'text-blue-400' : 'text-gray-500 group-hover:text-blue-400'}`} fill={post.bookmarked ? 'currentColor' : 'none'} stroke={post.bookmarked ? 'none' : 'currentColor'} strokeWidth="1.5">
-                  <path d="M4 4.5C4 3.12 5.119 2 6.5 2h11C18.881 2 20 3.12 20 4.5v18.44l-8-5.71-8 5.71V4.5z"/>
-                </svg>
-              </button>
-              <button
-                className="p-2 rounded-full hover:bg-blue-500/10 transition-colors group"
-                onClick={(e) => { e.stopPropagation(); setShowShareModal(true); }}
-              >
-                <Share />
-              </button>
+              <div className="relative group">
+                <button
+                  className="p-2 rounded-full hover:bg-blue-500/10 transition-colors"
+                  title={post.bookmarked ? "Remove from Bookmarks" : "Bookmark"}
+                  aria-label="Bookmark"
+                  onClick={(e) => { e.stopPropagation(); onBookmark(post.id); }}
+                >
+                  <svg viewBox="0 0 24 24" className={`w-5 h-5 ${post.bookmarked ? 'text-blue-400' : 'text-gray-500 hover:text-blue-400'}`} fill={post.bookmarked ? 'currentColor' : 'none'} stroke={post.bookmarked ? 'none' : 'currentColor'} strokeWidth="1.5">
+                    <path d="M4 4.5C4 3.12 5.119 2 6.5 2h11C18.881 2 20 3.12 20 4.5v18.44l-8-5.71-8 5.71V4.5z"/>
+                  </svg>
+                </button>
+                <div className="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-gray-900/95 border border-gray-700/60 text-[11px] text-gray-200 whitespace-nowrap shadow-lg z-30">
+                  {post.bookmarked ? "Bookmarked" : "Bookmark"}
+                </div>
+              </div>
+
+              <div className="relative group">
+                <button
+                  className="p-2 rounded-full hover:bg-blue-500/10 transition-colors"
+                  title="Share"
+                  aria-label="Share"
+                  onClick={(e) => { e.stopPropagation(); setShowShareModal(true); }}
+                >
+                  <Share />
+                </button>
+                <div className="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-gray-900/95 border border-gray-700/60 text-[11px] text-gray-200 whitespace-nowrap shadow-lg z-30">
+                  Share
+                </div>
+              </div>
 
               {/* AI Co-Pilot Button */}
-              <button
-                onClick={(e) => { e.stopPropagation(); handleTriggerCoPilot(); }}
-                className={`ml-1 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold transition active:scale-95 ${
-                  showCoPilot
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
-                    : 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20'
-                }`}
-                title="AI Co-Pilot Analysis"
-              >
-                <span>✨</span>
-                <span className="hidden sm:inline">Co-Pilot</span>
-              </button>
+              <div className="relative group">
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleTriggerCoPilot(); }}
+                  className={`ml-1 flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold transition active:scale-95 ${
+                    showCoPilot
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
+                      : 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20'
+                  }`}
+                  title="AI Co-Pilot Analysis"
+                  aria-label="AI Co-Pilot"
+                >
+                  <span>✨</span>
+                  <span className="hidden sm:inline">Co-Pilot</span>
+                </button>
+                <div className="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-150 absolute -bottom-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-md bg-gray-900/95 border border-gray-700/60 text-[11px] text-gray-200 whitespace-nowrap shadow-lg z-30">
+                  AI Co-Pilot
+                </div>
+              </div>
             </div>
           </div>
 
