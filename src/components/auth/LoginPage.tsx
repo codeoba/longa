@@ -125,26 +125,6 @@ export default function LoginPage({ onSwitchToRegister, onForgotPassword }: Logi
           </button>
         </form>
 
-        {/* Divider */}
-        <div className="relative my-6">
-          <div className={`absolute inset-0 flex items-center ${tc.borderSecondary}`}>
-            <div className={`w-full border-t ${tc.border}`}></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className={`px-2 ${tc.bgCard} ${tc.textMuted}`}>or</span>
-          </div>
-        </div>
-
-        {/* Demo Mode Button */}
-        <button
-          type="button"
-          onClick={loginAsDemo}
-          className={`w-full py-2.5 px-4 rounded-full border border-blue-400/40 text-blue-400 hover:bg-blue-500/10 font-bold transition-all text-sm flex items-center justify-center gap-2 mb-4`}
-        >
-          <span>🚀</span>
-          <span>Explore Longa (Instant Demo Mode)</span>
-        </button>
-
         {/* Sign up link */}
         <p className={`text-center text-sm ${tc.textSecondary}`}>
           Don't have an account?{' '}

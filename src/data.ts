@@ -121,261 +121,15 @@ export const users: User[] = [
   },
 ];
 
-export const replies: Record<string, Reply[]> = {
-  '1': [
-    { id: 'r1', user: users[4], content: 'This is incredible! Can\'t wait to try it out 🚀', timestamp: new Date(Date.now() - 1000 * 60 * 3), likes: 23, liked: false, replies: 2 },
-    { id: 'r2', user: users[6], content: 'Does it support multi-language codebases?', timestamp: new Date(Date.now() - 1000 * 60 * 2), likes: 8, liked: false, replies: 0 },
-    { id: 'r3', user: users[2], content: 'The UI looks amazing! Great work team 👏', timestamp: new Date(Date.now() - 1000 * 60 * 1), likes: 45, liked: false, replies: 1 },
-  ],
-  '3': [
-    { id: 'r4', user: users[0], content: 'This is groundbreaking! When can we access the API?', timestamp: new Date(Date.now() - 1000 * 60 * 25), likes: 156, liked: false, replies: 12 },
-    { id: 'r5', user: users[5], content: 'The implications for blockchain are enormous too', timestamp: new Date(Date.now() - 1000 * 60 * 20), likes: 89, liked: false, replies: 5 },
-    { id: 'r6', user: users[7], content: 'What about safety measures? This needs careful deployment.', timestamp: new Date(Date.now() - 1000 * 60 * 15), likes: 234, liked: false, replies: 18 },
-    { id: 'r7', user: users[4], content: 'I\'ve been testing the beta and it\'s phenomenal!', timestamp: new Date(Date.now() - 1000 * 60 * 10), likes: 67, liked: false, replies: 3 },
-  ],
-  '7': [
-    { id: 'r8', user: users[1], content: 'Congratulations! Well deserved 🎉', timestamp: new Date(Date.now() - 1000 * 60 * 150), likes: 345, liked: false, replies: 4 },
-    { id: 'r9', user: users[3], content: 'Open source for the win! 🙌', timestamp: new Date(Date.now() - 1000 * 60 * 140), likes: 178, liked: false, replies: 2 },
-  ],
-};
+export const replies: Record<string, Reply[]> = {};
 
-export const posts: Post[] = [
-  {
-    id: '1',
-    user: users[1],
-    content: '🚀 Just launched our new AI-powered code review tool! It can detect bugs, suggest improvements, and even write documentation automatically.\n\nThe future of software development is here. What features would you like to see next?\n\n#AI #DevTools #Innovation',
-    timestamp: new Date(Date.now() - 1000 * 60 * 5),
-    likes: 2341,
-    retweets: 567,
-    replies: 189,
-    views: 89000,
-    bookmarks: 432,
-    liked: false,
-    retweeted: false,
-    bookmarked: false,
-    isPremium: true,
-    replyList: replies['1'],
-  },
-  {
-    id: '2',
-    user: users[2],
-    content: '🎨 Design tip of the day:\n\nWhite space is not empty space — it\'s a powerful design element. Use it wisely to create hierarchy, improve readability, and make your designs breathe.\n\nLess is truly more in modern UI design.',
-    timestamp: new Date(Date.now() - 1000 * 60 * 15),
-    likes: 1892,
-    retweets: 445,
-    replies: 78,
-    views: 56000,
-    bookmarks: 890,
-    liked: true,
-    retweeted: false,
-    bookmarked: false,
-  },
-  {
-    id: '3',
-    user: users[3],
-    content: '🤖 Breaking: Our latest language model just passed the Turing test with 94% accuracy across 1000 evaluators.\n\nWe\'re entering a new era of human-AI interaction. The implications for education, healthcare, and creative industries are enormous.\n\nFull paper dropping next week.',
-    timestamp: new Date(Date.now() - 1000 * 60 * 30),
-    likes: 15600,
-    retweets: 4500,
-    replies: 2300,
-    views: 1200000,
-    bookmarks: 8900,
-    liked: false,
-    retweeted: true,
-    bookmarked: true,
-    isPremium: true,
-    replyList: replies['3'],
-  },
-  {
-    id: '4',
-    user: users[4],
-    content: '💡 Hot take: TypeScript is not just "JavaScript with types." It\'s a completely different way of thinking about software architecture.\n\nOnce you go TS, you never go back. The confidence it gives you when refactoring is unmatched.',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60),
-    likes: 3456,
-    retweets: 789,
-    replies: 567,
-    views: 145000,
-    bookmarks: 234,
-    liked: false,
-    retweeted: false,
-    bookmarked: false,
-    poll: {
-      id: 'poll1',
-      question: 'What\'s your primary programming language?',
-      options: [
-        { id: 'opt1', text: 'TypeScript/JavaScript', votes: 4521, percentage: 45, voted: false },
-        { id: 'opt2', text: 'Python', votes: 2890, percentage: 29, voted: false },
-        { id: 'opt3', text: 'Go', votes: 1456, percentage: 15, voted: false },
-        { id: 'opt4', text: 'Rust', votes: 1133, percentage: 11, voted: false },
-      ],
-      totalVotes: 10000,
-      endsAt: new Date(Date.now() + 1000 * 60 * 60 * 18),
-      hasVoted: false,
-    },
-  },
-  {
-    id: '5',
-    user: users[5],
-    content: '🔗 Web3 is not dead. It\'s just evolving.\n\nThe next wave of blockchain applications will focus on:\n\n• Real-world asset tokenization\n• Decentralized identity\n• Cross-chain interoperability\n• Zero-knowledge proofs for privacy\n\nWe\'re building the infrastructure for the next internet.',
-    timestamp: new Date(Date.now() - 1000 * 60 * 90),
-    likes: 5678,
-    retweets: 1234,
-    replies: 456,
-    views: 234000,
-    bookmarks: 1567,
-    liked: false,
-    retweeted: false,
-    bookmarked: false,
-    isPremium: true,
-  },
-  {
-    id: '6',
-    user: users[6],
-    content: '☁️ Cloud cost optimization checklist:\n\n✅ Right-size your instances\n✅ Use spot/preemptible instances\n✅ Implement auto-scaling\n✅ Clean up unused resources\n✅ Use reserved instances for predictable workloads\n✅ Monitor with cost alerts\n\nSaved our company $200K/year with these simple steps.',
-    timestamp: new Date(Date.now() - 1000 * 60 * 120),
-    likes: 8901,
-    retweets: 2345,
-    replies: 345,
-    views: 567000,
-    bookmarks: 4567,
-    liked: true,
-    retweeted: false,
-    bookmarked: false,
-  },
-  {
-    id: '7',
-    user: users[0],
-    content: '🌍 Excited to announce that our open-source project just hit 10,000 stars on GitHub!\n\nThank you to every contributor, bug reporter, and community member who made this possible.\n\nOpen source is the future. Let\'s keep building together! 🙏\n\n#OpenSource #GitHub #Community',
-    timestamp: new Date(Date.now() - 1000 * 60 * 180),
-    likes: 12345,
-    retweets: 3456,
-    replies: 789,
-    views: 890000,
-    bookmarks: 2345,
-    liked: false,
-    retweeted: false,
-    bookmarked: false,
-    pinned: true,
-    isPremium: true,
-    isOwn: true,
-    replyList: replies['7'],
-  },
-];
+export const posts: Post[] = [];
 
-export const notifications: Notification[] = [
-  {
-    id: '1',
-    type: 'like',
-    user: users[1],
-    content: 'liked your post',
-    postContent: '🌍 Excited to announce that our open-source project...',
-    timestamp: new Date(Date.now() - 1000 * 60 * 2),
-    read: false,
-  },
-  {
-    id: '2',
-    type: 'retweet',
-    user: users[3],
-    content: 'reposted your post',
-    postContent: '🌍 Excited to announce that our open-source project...',
-    timestamp: new Date(Date.now() - 1000 * 60 * 10),
-    read: false,
-  },
-  {
-    id: '3',
-    type: 'follow',
-    user: users[4],
-    content: 'followed you',
-    timestamp: new Date(Date.now() - 1000 * 60 * 30),
-    read: false,
-  },
-  {
-    id: '4',
-    type: 'mention',
-    user: users[2],
-    content: 'mentioned you in a post',
-    postContent: 'Great insights from @longa_user on open source development!',
-    timestamp: new Date(Date.now() - 1000 * 60 * 45),
-    read: true,
-  },
-  {
-    id: '5',
-    type: 'reply',
-    user: users[5],
-    content: 'replied to your post',
-    postContent: 'What do you think about the future of Web3?',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60),
-    read: true,
-  },
-  {
-    id: '6',
-    type: 'like',
-    user: users[6],
-    content: 'liked your reply',
-    timestamp: new Date(Date.now() - 1000 * 60 * 90),
-    read: true,
-  },
-  {
-    id: '7',
-    type: 'follow',
-    user: users[7],
-    content: 'followed you',
-    timestamp: new Date(Date.now() - 1000 * 60 * 120),
-    read: true,
-  },
-];
 
-export const messages: Message[] = [
-  {
-    id: '1',
-    user: users[1],
-    lastMessage: 'Hey! Did you see the new AI features?',
-    timestamp: new Date(Date.now() - 1000 * 60 * 5),
-    unread: true,
-    messages: [
-      { id: 'm1', text: 'Hey Amani! 👋', sent: false, time: '10:15 AM' },
-      { id: 'm2', text: 'Hi Zawadi! How are you?', sent: true, time: '10:18 AM' },
-      { id: 'm3', text: 'I\'m great! We just shipped something exciting', sent: false, time: '10:20 AM' },
-      { id: 'm4', text: 'Oh really? Tell me more!', sent: true, time: '10:22 AM' },
-      { id: 'm5', text: 'Hey! Did you see the new AI features?', sent: false, time: '10:30 AM' },
-    ],
-  },
-  {
-    id: '2',
-    user: users[2],
-    lastMessage: 'The design mockups are ready for review 🎨',
-    timestamp: new Date(Date.now() - 1000 * 60 * 30),
-    unread: true,
-    messages: [
-      { id: 'm6', text: 'Hey, I\'ve been working on the new UI', sent: false, time: '9:00 AM' },
-      { id: 'm7', text: 'Awesome! Can\'t wait to see it', sent: true, time: '9:05 AM' },
-      { id: 'm8', text: 'The design mockups are ready for review 🎨', sent: false, time: '9:30 AM' },
-    ],
-  },
-  {
-    id: '3',
-    user: users[3],
-    lastMessage: 'Let\'s schedule a call about the research paper',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
-    unread: false,
-    messages: [
-      { id: 'm9', text: 'The paper is almost done', sent: false, time: '8:00 AM' },
-      { id: 'm10', text: 'Great progress! When can we review?', sent: true, time: '8:15 AM' },
-      { id: 'm11', text: 'Let\'s schedule a call about the research paper', sent: false, time: '8:30 AM' },
-    ],
-  },
-  {
-    id: '4',
-    user: users[5],
-    lastMessage: 'Check out this smart contract pattern I found',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5),
-    unread: false,
-    messages: [
-      { id: 'm12', text: 'Found something interesting in DeFi', sent: false, time: '5:00 AM' },
-      { id: 'm13', text: 'Check out this smart contract pattern I found', sent: false, time: '5:30 AM' },
-    ],
-  },
-];
+export const notifications: Notification[] = [];
+
+export const messages: Message[] = [];
+
 
 export const trends: Trend[] = [
   { id: '1', category: 'Technology · Trending', name: '#AIRevolution', posts: '125K posts', description: 'Artificial Intelligence is transforming every industry' },
@@ -406,18 +160,8 @@ export const suggestedLists: UserList[] = [
 
 export const emojiList = ['😀', '😂', '🥰', '😎', '🤔', '👍', '👏', '🙌', '🔥', '💯', '🚀', '💡', '🎉', '❤️', '💪', '✨', '🌟', '🎯', '💻', '🤖', '☁️', '🔗', '🛡️', '📱', '⚡', '🌍', '🇹🇿', '🇰🇪', '🏆', '📊'];
 
-export const initialDrafts: Draft[] = [
-  {
-    id: 'd1',
-    content: 'Thinking about writing a thread on AI safety...',
-    createdAt: new Date(Date.now() - 1000 * 60 * 30),
-  },
-  {
-    id: 'd2',
-    content: 'Great insights from today\'s tech conference! Key takeaways:\n\n1. AI is transforming everything\n2. Open source is winning\n3. Community matters most',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
-  },
-];
+export const initialDrafts: Draft[] = [];
+
 
 export const spaces: Space[] = [
   {
@@ -508,12 +252,12 @@ export const communities: Community[] = [
 
 export const analyticsData: AnalyticsData = {
   period: '30d',
-  impressions: 1250000,
-  engagements: 89000,
-  engagementRate: 7.12,
-  followers: 15420,
-  followersChange: 1240,
-  topPosts: posts.slice(0, 3),
-  profileVisits: 34500,
-  mentions: 2340,
+  impressions: 0,
+  engagements: 0,
+  engagementRate: 0,
+  followers: 0,
+  followersChange: 0,
+  topPosts: [],
+  profileVisits: 0,
+  mentions: 0,
 };

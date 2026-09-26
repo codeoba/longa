@@ -213,10 +213,6 @@ INSERT INTO users (name, handle, email, password_hash, avatar, bio, verified, pr
 ('Zawadi Innovation', '@zawadi_innov', 'zawadi@example.com', '$2y$10$3w8BmYfVOvoKqUQrgA6cYO8FeL/qeLR0l6wxEeGBRBpnDLK3Fh1hS', '👩‍🔬', 'Innovation Lead @TechAfrica | AI & ML Researcher', TRUE, TRUE, 89200, 432, 12500, TRUE),
 ('Baraka Digital', '@barakadigital', 'baraka@example.com', '$2y$10$3w8BmYfVOvoKqUQrgA6cYO8FeL/qeLR0l6wxEeGBRBpnDLK3Fh1hS', '🎨', 'UI/UX Designer | Creative Director', TRUE, FALSE, 45600, 1200, 8900, TRUE);
 
-INSERT INTO posts (user_id, content, likes, retweets, replies, views) VALUES
-(1, '🚀 Karibu kwenye Longa! Mtandao mpya wa kijamii unaoleta mapinduzi Afrika na ulimwenguni.', 234, 56, 12, 5600),
-(2, '🤖 AI na teknolojia ya kisasa ndio msingi wa Longa. Karibuni sana!', 1567, 432, 89, 45000),
-(3, '🎨 Design safi, wepesi, na usalama wa hali ya juu ndio vigezo vyetu.', 892, 234, 45, 23000);
 
 -- ==================== PAYMENT & MONETIZATION ====================
 CREATE TABLE IF NOT EXISTS subscriptions (

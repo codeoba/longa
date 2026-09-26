@@ -69,13 +69,15 @@ function AppContent() {
   const [verifyToken, setVerifyToken] = useState('');
   const [currentPage, setCurrentPage] = useState<Page>('home');
 
-  // Load posts from localStorage or fallback to initialPosts
+  // Load posts from localStorage or fallback to empty array
   const [posts, setPosts] = useState<Post[]>(() => {
     try {
       const saved = localStorage.getItem('longa_posts');
       if (saved) {
         const parsed = JSON.parse(saved);
-        return parsed.map((p: any) => ({
+        const demoMockIds = new Set(['1', '2', '3', '4', '5', '6', '7', 'd1', 'd2']);
+        const cleaned = parsed.filter((p: any) => !demoMockIds.has(p.id) && !p.poll?.id?.startsWith('poll'));
+        return cleaned.map((p: any) => ({
           ...p,
           timestamp: new Date(p.timestamp),
           poll: p.poll ? { ...p.poll, endsAt: new Date(p.poll.endsAt) } : undefined,
@@ -84,7 +86,7 @@ function AppContent() {
     } catch (e) {
       console.error('Failed to parse saved posts:', e);
     }
-    return initialPosts;
+    return [];
   });
 
   // Persist posts to localStorage on change
@@ -154,12 +156,12 @@ function AppContent() {
     return () => unsubscribe();
   }, [activeUser?.id]);
 
-  // Load real posts from backend API via AJAX, merging with cached/mock
+  // Load real posts from backend API via AJAX
   useEffect(() => {
     const fetchBackendPosts = async () => {
       try {
         const res: any = await PostsAPI.getAll();
-        if (res && res.posts && Array.isArray(res.posts) && res.posts.length > 0) {
+        if (res && res.posts && Array.isArray(res.posts)) {
           const backendPosts: Post[] = res.posts.map((p: any) => ({
             id: p.id.toString(),
             user: {
@@ -186,14 +188,10 @@ function AppContent() {
             isOwn: activeUser?.id ? p.user_id.toString() === activeUser.id.toString() : false,
             replyList: [],
           }));
-          setPosts(prev => {
-            const existingIds = new Set(backendPosts.map(bp => bp.id));
-            const remaining = prev.filter(p => !existingIds.has(p.id));
-            return [...backendPosts, ...remaining];
-          });
+          setPosts(backendPosts);
         }
       } catch (e) {
-        console.warn('Could not fetch posts from backend, using local/cached posts:', e);
+        console.warn('Could not fetch posts from backend:', e);
       }
     };
     fetchBackendPosts();

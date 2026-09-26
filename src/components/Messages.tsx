@@ -277,38 +277,48 @@ export default function Messages() {
       ) : (
         /* Message List */
         <div>
-          {initialMessages.map((msg) => (
-            <div
-              key={msg.id}
-              onClick={() => setSelectedChat(msg.id)}
-              className={`flex items-center gap-3 px-4 py-3 ${tc.bgHover} transition-colors cursor-pointer border-b ${tc.borderSecondary}`}
-            >
-              <div className="relative flex-shrink-0">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xl">
-                  {msg.user.avatar}
-                </div>
-                {msg.unread && (
-                  <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-blue-500 rounded-full border-2 border-black" />
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1">
-                    <span className={`text-[15px] truncate ${msg.unread ? `font-bold ${tc.text}` : tc.textSecondary}`}>
-                      {msg.user.name}
-                    </span>
-                    <span className="text-gray-500 text-[15px] truncate">{msg.user.handle}</span>
+          {initialMessages.length > 0 ? (
+            initialMessages.map((msg) => (
+              <div
+                key={msg.id}
+                onClick={() => setSelectedChat(msg.id)}
+                className={`flex items-center gap-3 px-4 py-3 ${tc.bgHover} transition-colors cursor-pointer border-b ${tc.borderSecondary}`}
+              >
+                <div className="relative flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xl">
+                    {msg.user.avatar}
                   </div>
-                  <span className="text-[13px] text-gray-500 flex-shrink-0">
-                    {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
-                  </span>
+                  {msg.unread && (
+                    <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-blue-500 rounded-full border-2 border-black" />
+                  )}
                 </div>
-                <p className={`text-[13px] truncate mt-0.5 ${msg.unread ? `${tc.text} font-medium` : 'text-gray-500'}`}>
-                  {msg.lastMessage}
-                </p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1">
+                      <span className={`text-[15px] truncate ${msg.unread ? `font-bold ${tc.text}` : tc.textSecondary}`}>
+                        {msg.user.name}
+                      </span>
+                      <span className="text-gray-500 text-[15px] truncate">{msg.user.handle}</span>
+                    </div>
+                    <span className="text-[13px] text-gray-500 flex-shrink-0">
+                      {new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  <p className={`text-[13px] truncate mt-0.5 ${msg.unread ? `${tc.text} font-medium` : 'text-gray-500'}`}>
+                    {msg.lastMessage}
+                  </p>
+                </div>
               </div>
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+              <div className="text-4xl mb-3">💬</div>
+              <h3 className={`text-xl font-bold ${tc.text}`}>No messages yet</h3>
+              <p className="text-gray-500 text-sm mt-1 max-w-sm">
+                When you receive messages or start a conversation, they will appear here.
+              </p>
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>
