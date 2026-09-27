@@ -1,3 +1,4 @@
+import React, { useState, useMemo } from 'react';
 import { Post, Poll } from '../types';
 import PostComponent from './Post';
 import ComposeTweet from './ComposeTweet';
