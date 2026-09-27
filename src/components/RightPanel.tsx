@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { trends, users, currentUser } from '../data';
 import { Search, Verified, Premium, ThreeDots, Sparkles } from './Icons';
 import { useThemeClasses } from '../themeUtils';
+import Avatar from './Avatar';
 
 interface RightPanelProps {
   onNavigate: (page: string) => void;
@@ -12,7 +13,15 @@ interface RightPanelProps {
 export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: RightPanelProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
+  const [activeTrendMenu, setActiveTrendMenu] = useState<string | null>(null);
+  const [dismissedTrends, setDismissedTrends] = useState<string[]>([]);
   const tc = useThemeClasses();
+
+  useEffect(() => {
+    const close = () => setActiveTrendMenu(null);
+    window.addEventListener('click', close);
+    return () => window.removeEventListener('click', close);
+  }, []);
 
   const suggestedUsers = useMemo(() =>
     users.filter(u => u.id !== currentUser.id).slice(0, 3),
@@ -99,20 +108,80 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
       {/* Trends */}
       <div className={`mb-4 rounded-2xl border ${tc.border} ${tc.bgCard} overflow-hidden`}>
         <h2 className={`text-xl font-extrabold ${tc.text} px-4 pt-3 pb-2`}>What's happening</h2>
-        {trends.slice(0, 5).map((trend) => (
-          <div key={trend.id} className={`px-4 py-3 ${tc.bgHover} transition-colors cursor-pointer`}>
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-[13px] text-gray-500">{trend.category}</p>
-                <p className={`font-bold text-[15px] ${tc.text} mt-0.5`}>{trend.name}</p>
-                <p className="text-[13px] text-gray-500 mt-0.5">{trend.posts}</p>
+        {trends
+          .filter(t => !dismissedTrends.includes(t.id))
+          .slice(0, 5)
+          .map((trend) => (
+            <div
+              key={trend.id}
+              onClick={() => onNavigate('explore')}
+              className={`px-4 py-3 ${tc.bgHover} transition-colors cursor-pointer relative`}
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-[13px] text-gray-500">{trend.category}</p>
+                  <p className={`font-bold text-[15px] ${tc.text} mt-0.5 hover:underline`}>{trend.name}</p>
+                  <p className="text-[13px] text-gray-500 mt-0.5">{trend.posts}</p>
+                </div>
+                <div className="relative" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTrendMenu(activeTrendMenu === trend.id ? null : trend.id)}
+                    className={`p-1.5 rounded-full ${tc.bgHoverSecondary} hover:text-blue-400 text-gray-500 transition-colors`}
+                    title="Chaguzi zaidi"
+                  >
+                    <ThreeDots />
+                  </button>
+
+                  {activeTrendMenu === trend.id && (
+                    <div
+                      className={`absolute right-0 top-8 w-56 ${tc.bgModal} border ${tc.border} rounded-2xl shadow-2xl z-50 py-1.5 overflow-hidden animate-in fade-in zoom-in-95`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDismissedTrends(prev => [...prev, trend.id]);
+                          setActiveTrendMenu(null);
+                        }}
+                        className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 ${tc.bgHover} text-left text-xs ${tc.text}`}
+                      >
+                        <span className="text-base">🙁</span>
+                        <span>Sivutiwi na mada hii</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${window.location.origin}/?search=${encodeURIComponent(trend.name)}`);
+                          setActiveTrendMenu(null);
+                          alert(`Kiungo cha "${trend.name}" kimenakiliwa!`);
+                        }}
+                        className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 ${tc.bgHover} text-left text-xs ${tc.text}`}
+                      >
+                        <span className="text-base">🔗</span>
+                        <span>Nakili kiungo cha mada</span>
+                      </button>
+
+                      <div className={`h-px ${tc.borderSecondary} my-1`} />
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDismissedTrends(prev => [...prev, trend.id]);
+                          setActiveTrendMenu(null);
+                        }}
+                        className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 ${tc.bgHover} text-left text-xs text-red-400`}
+                      >
+                        <span className="text-base">🚫</span>
+                        <span>Ripoti: Spam / Usumbufu</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-              <button className={`p-1.5 rounded-full ${tc.bgHoverSecondary} hover:text-blue-400 text-gray-500 transition-colors`}>
-                <ThreeDots />
-              </button>
             </div>
-          </div>
-        ))}
+          ))}
         <button
           onClick={() => onNavigate('explore')}
           className={`px-4 py-3 text-blue-400 ${tc.bgHover} transition-colors text-[15px] w-full text-left`}
@@ -131,9 +200,7 @@ export default function RightPanel({ onNavigate, followedUsers, onFollowUser }: 
                 className="flex items-center gap-3 min-w-0"
                 onClick={() => onNavigate('user-profile')}
               >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg flex-shrink-0">
-                  {user.avatar}
-                </div>
+                <Avatar src={user.avatar} size="md" />
                 <div className="min-w-0">
                   <div className="flex items-center gap-1">
                     <span className={`font-bold text-[15px] ${tc.text} truncate hover:underline`}>{user.name}</span>
