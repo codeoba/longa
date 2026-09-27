@@ -44,16 +44,16 @@ export default function VideoPosts() {
       videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
       thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=350&fit=crop',
       title: 'AI & Next-Gen Automation 2026',
-      caption: '🚀 Tazama mfumo wetu mpya wa akili bandia (AI) unavyoweza kurahisisha kazi ngumu.',
-      category: 'Teknolojia',
+      caption: '🚀 Watch how our new generative platform streamlines developer workflows.',
+      category: 'Technology',
       duration: 45,
       likes: 2341,
       views: 89000,
       comments: 2,
       timestamp: new Date(Date.now() - 1000 * 60 * 30),
       commentList: [
-        { id: 'vc1', userName: 'Baraka Digital', userAvatar: '🎨', text: 'Ubunifu mzuri sana!', time: '10m ago' },
-        { id: 'vc2', userName: 'Neema AI', userAvatar: '🤖', text: 'Kazi nzuri timu nzima.', time: '5m ago' }
+        { id: 'vc1', userName: 'Baraka Digital', userAvatar: '🎨', text: 'Incredible demo! Super sleek.', time: '10m ago' },
+        { id: 'vc2', userName: 'Neema AI', userAvatar: '🤖', text: 'Impressive responsiveness and audio sync.', time: '5m ago' }
       ]
     },
     {
@@ -63,16 +63,16 @@ export default function VideoPosts() {
       userAvatar: '🎨',
       videoUrl: 'https://www.w3schools.com/html/movie.mp4',
       thumbnail: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=600&h=350&fit=crop',
-      title: 'Jinsi ya Kutengeneza UI Animations za Kisasa',
-      caption: '🎨 Mafunzo ya hatua kwa hatua kwa wabunifu wa kurasa za wavuti na simu.',
-      category: 'Mafunzo',
+      title: 'How to Build Modern High-FPS UI Animations',
+      caption: '🎨 Step-by-step masterclass on responsive transitions and micro-interactions.',
+      category: 'Tutorials',
       duration: 120,
       likes: 1892,
       views: 56000,
       comments: 1,
       timestamp: new Date(Date.now() - 1000 * 60 * 60),
       commentList: [
-        { id: 'vc3', userName: 'Amani Tech', userAvatar: '👨‍💻', text: 'Asante kwa somo hili zuri!', time: '20m ago' }
+        { id: 'vc3', userName: 'Amani Tech', userAvatar: '👨‍💻', text: 'Thanks for this practical tutorial!', time: '20m ago' }
       ]
     },
   ];
@@ -93,7 +93,7 @@ export default function VideoPosts() {
     return samplePosts;
   });
 
-  const [selectedCategory, setSelectedCategory] = useState<string>('Zote');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('');
@@ -103,7 +103,7 @@ export default function VideoPosts() {
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
   const [videoTitle, setVideoTitle] = useState('');
   const [videoCaption, setVideoCaption] = useState('');
-  const [videoCategory, setVideoCategory] = useState('Teknolojia');
+  const [videoCategory, setVideoCategory] = useState('Technology');
   const [customThumbnail, setCustomThumbnail] = useState<string | null>(null);
   const [detectedDuration, setDetectedDuration] = useState<number>(30);
 
@@ -118,19 +118,19 @@ export default function VideoPosts() {
     localStorage.setItem(VIDEO_POSTS_KEY, JSON.stringify(posts));
   }, [posts]);
 
-  const categories = ['Zote', 'Teknolojia', 'Mafunzo', 'Muziki', 'Vichekesho', 'Michezo', 'Biashara'];
+  const categories = ['All', 'Technology', 'Tutorials', 'Music', 'Comedy', 'Gaming', 'Business'];
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith('video/')) {
-      alert('Tafadhali chagua faili la video (MP4, WebM, MOV)');
+      alert('Please select a valid video file (MP4, WebM, MOV)');
       return;
     }
 
     if (file.size > 200 * 1024 * 1024) {
-      alert('Ukubwa wa video usizidi 200MB');
+      alert('Video file size must be less than 200MB');
       return;
     }
 
@@ -138,7 +138,6 @@ export default function VideoPosts() {
     const localUrl = URL.createObjectURL(file);
     setVideoPreviewUrl(localUrl);
 
-    // Auto set title if blank
     if (!videoTitle) {
       const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
       setVideoTitle(cleanName);
@@ -159,12 +158,12 @@ export default function VideoPosts() {
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedFile) {
-      alert('Tafadhali chagua faili la video kwanza');
+      alert('Please select a video file first');
       return;
     }
 
     setUploading(true);
-    setUploadStatus('Inapakia video kwenye seva...');
+    setUploadStatus('Uploading video to cloud...');
 
     try {
       let finalVideoUrl = '';
@@ -175,19 +174,18 @@ export default function VideoPosts() {
         finalVideoUrl = videoPreviewUrl || URL.createObjectURL(selectedFile);
       }
 
-      setUploadStatus('Inakamilisha mipangilio ya video...');
+      setUploadStatus('Finalizing video processing...');
 
-      // Fallback thumbnail if none provided
       const finalThumb = customThumbnail || 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=600&h=350&fit=crop';
 
       const newPost: VideoPost = {
         id: 'vid_' + Date.now(),
         userId: user?.id ? user.id.toString() : 'me',
-        userName: user?.name || 'Mtumiaji',
+        userName: user?.name || 'User',
         userAvatar: user?.avatar || '👤',
         videoUrl: finalVideoUrl,
         thumbnail: finalThumb,
-        title: videoTitle.trim() || 'Video Mpya',
+        title: videoTitle.trim() || 'New Video',
         caption: videoCaption.trim() || videoTitle.trim(),
         category: videoCategory,
         duration: Math.round(detectedDuration) || 30,
@@ -209,7 +207,7 @@ export default function VideoPosts() {
       setVideoCaption('');
       setCustomThumbnail(null);
     } catch (err: any) {
-      alert('Hitilafu wakati wa kupakia video: ' + (err.message || 'Jaribu tena'));
+      alert('Error uploading video: ' + (err.message || 'Please try again'));
       setUploading(false);
     }
   };
@@ -235,10 +233,10 @@ export default function VideoPosts() {
 
     const newComment: VideoComment = {
       id: 'c_' + Date.now(),
-      userName: user?.name || 'Mtumiaji',
+      userName: user?.name || 'User',
       userAvatar: user?.avatar || '👤',
       text: newCommentText.trim(),
-      time: 'Sasa hivi',
+      time: 'Just now',
     };
 
     const updatedComments = [newComment, ...(selectedVideo.commentList || [])];
@@ -265,7 +263,7 @@ export default function VideoPosts() {
     return num.toString();
   };
 
-  const filteredPosts = selectedCategory === 'Zote'
+  const filteredPosts = selectedCategory === 'All'
     ? posts
     : posts.filter(p => p.category === selectedCategory);
 
@@ -284,7 +282,7 @@ export default function VideoPosts() {
             onClick={() => setShowUploadModal(true)}
             className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full text-xs flex items-center gap-1.5 shadow-lg shadow-blue-500/25 transition-all"
           >
-            <span>+</span> Pakia Video
+            <span>+</span> Upload Video
           </button>
         </div>
 
@@ -311,13 +309,13 @@ export default function VideoPosts() {
         {filteredPosts.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">🎥</div>
-            <h3 className="text-lg font-bold mb-2">Hakuna video katika kategoria hii</h3>
-            <p className={`text-xs ${tc.textSecondary} mb-4`}>Kuwa wa kwanza kupakia video yako leo!</p>
+            <h3 className="text-lg font-bold mb-2">No videos found in this category</h3>
+            <p className={`text-xs ${tc.textSecondary} mb-4`}>Be the first to publish a video here!</p>
             <button
               onClick={() => setShowUploadModal(true)}
               className="px-5 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-full"
             >
-              Pakia Video Sasa
+              Upload Video Now
             </button>
           </div>
         ) : (
@@ -409,7 +407,7 @@ export default function VideoPosts() {
           />
           <div className={`relative w-full max-w-xl ${tc.bgModal} rounded-2xl border ${tc.border} p-6 shadow-2xl max-h-[90vh] overflow-y-auto`}>
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-800">
-              <h2 className="text-xl font-black">Studio ya Kupakia Video</h2>
+              <h2 className="text-xl font-black">Video Creator Studio</h2>
               {!uploading && (
                 <button
                   onClick={() => setShowUploadModal(false)}
@@ -431,9 +429,9 @@ export default function VideoPosts() {
                     <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-blue-500/20 flex items-center justify-center text-3xl">
                       🎥
                     </div>
-                    <p className="font-bold text-base mb-1">Bofya hapa kuchagua video</p>
+                    <p className="font-bold text-base mb-1">Click to select video</p>
                     <p className={`text-xs ${tc.textSecondary}`}>
-                      MP4, WebM au MOV • Ukubwa hadi 200MB
+                      MP4, WebM or MOV • Up to 200MB
                     </p>
                   </div>
                 ) : (
@@ -459,7 +457,7 @@ export default function VideoPosts() {
                         }}
                         className="text-red-400 hover:underline font-bold"
                       >
-                        Badilisha Video
+                        Change Video
                       </button>
                     </div>
                   </div>
@@ -476,14 +474,14 @@ export default function VideoPosts() {
                 {/* Title */}
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                    Kichwa cha Video (Title) *
+                    Video Title *
                   </label>
                   <input
                     type="text"
                     required
                     value={videoTitle}
                     onChange={(e) => setVideoTitle(e.target.value)}
-                    placeholder="Weka kichwa cha video..."
+                    placeholder="Enter an engaging video title..."
                     className={`w-full px-4 py-2.5 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-sm outline-none focus:border-blue-500`}
                   />
                 </div>
@@ -492,21 +490,21 @@ export default function VideoPosts() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                      Kategoria
+                      Category
                     </label>
                     <select
                       value={videoCategory}
                       onChange={(e) => setVideoCategory(e.target.value)}
                       className={`w-full px-3 py-2.5 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-xs outline-none`}
                     >
-                      {categories.filter(c => c !== 'Zote').map(c => (
+                      {categories.filter(c => c !== 'All').map(c => (
                         <option key={c} value={c}>{c}</option>
                       ))}
                     </select>
                   </div>
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                      Urefu (Sekunde)
+                      Duration (Seconds)
                     </label>
                     <input
                       type="number"
@@ -520,13 +518,13 @@ export default function VideoPosts() {
                 {/* Caption / Description */}
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                    Maelezo ya Video (Caption)
+                    Description & Hashtags
                   </label>
                   <textarea
                     rows={3}
                     value={videoCaption}
                     onChange={(e) => setVideoCaption(e.target.value)}
-                    placeholder="Eleza nini kilichomo kwenye video hii au ongeza #hashtags..."
+                    placeholder="Describe your video, add #tags and credits..."
                     className={`w-full px-4 py-2.5 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-xs outline-none focus:border-blue-500 resize-none`}
                   />
                 </div>
@@ -534,7 +532,7 @@ export default function VideoPosts() {
                 {/* Custom Thumbnail */}
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                    Picha ya Mbele (Thumbnail - Hiari)
+                    Cover Thumbnail (Optional)
                   </label>
                   <div className="flex items-center gap-3">
                     <button
@@ -542,7 +540,7 @@ export default function VideoPosts() {
                       onClick={() => thumbInputRef.current?.click()}
                       className={`px-4 py-2 rounded-xl border ${tc.border} ${tc.bgTertiary} text-xs font-bold text-blue-400 hover:border-blue-500`}
                     >
-                      📷 Chagua Picha ya Thumbnail
+                      📷 Choose Custom Thumbnail
                     </button>
                     {customThumbnail && (
                       <div className="w-12 h-8 rounded border border-gray-700 overflow-hidden">
@@ -566,14 +564,14 @@ export default function VideoPosts() {
                     onClick={() => setShowUploadModal(false)}
                     className={`flex-1 py-2.5 rounded-full border ${tc.border} text-xs font-bold hover:bg-gray-800`}
                   >
-                    Ghairi
+                    Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={!selectedFile || !videoTitle.trim()}
                     className="flex-1 py-2.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white font-bold text-xs rounded-full shadow-lg shadow-blue-500/25"
                   >
-                    Pakia na Chapisha Video
+                    Upload & Publish Video
                   </button>
                 </div>
               </form>
@@ -583,7 +581,7 @@ export default function VideoPosts() {
                 <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
                 <h3 className="text-lg font-bold mb-1">{uploadStatus}</h3>
                 <p className={`text-xs ${tc.textSecondary}`}>
-                  Tafadhali subiri wakati video inahifadhiwa...
+                  Please wait while your video is processed and saved...
                 </p>
               </div>
             )}
@@ -649,12 +647,12 @@ export default function VideoPosts() {
               {/* Comments Section */}
               <div className="flex-1 border-t border-gray-800 pt-3 flex flex-col">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
-                  Maoni ({selectedVideo.comments || 0})
+                  Comments ({selectedVideo.comments || 0})
                 </h4>
 
                 <div className="space-y-2.5 flex-1 overflow-y-auto max-h-48 pr-1">
                   {(selectedVideo.commentList || []).length === 0 ? (
-                    <p className="text-xs text-gray-500 text-center py-4">Kuwa wa kwanza kutoa maoni!</p>
+                    <p className="text-xs text-gray-500 text-center py-4">No comments yet. Be the first!</p>
                   ) : (
                     (selectedVideo.commentList || []).map(c => (
                       <div key={c.id} className="text-xs bg-gray-900/60 p-2.5 rounded-xl border border-gray-800/80">
@@ -674,7 +672,7 @@ export default function VideoPosts() {
                     type="text"
                     value={newCommentText}
                     onChange={(e) => setNewCommentText(e.target.value)}
-                    placeholder="Andika maoni yako hapa..."
+                    placeholder="Write a comment..."
                     className="flex-1 px-3 py-1.5 rounded-xl bg-gray-900 border border-gray-800 text-xs text-white outline-none focus:border-blue-500"
                   />
                   <button
@@ -682,7 +680,7 @@ export default function VideoPosts() {
                     disabled={!newCommentText.trim()}
                     className="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white font-bold text-xs rounded-xl"
                   >
-                    Tuma
+                    Post
                   </button>
                 </form>
               </div>

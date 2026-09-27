@@ -56,7 +56,7 @@ export default function Communities() {
           handle: '@zawadi',
           avatar: '👩‍🔬',
         },
-        content: 'Karibuni sana katika jumuiya yetu ya Tech & Startups! Je, ni mradi gani wa AI unaufanyia kazi wiki hii?',
+        content: 'Welcome to our Tech & Startups community! What AI project are you building this week?',
         createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
         likes: 18,
         liked: false,
@@ -76,9 +76,9 @@ export default function Communities() {
   const [selectedTopics, setSelectedTopics] = useState<string[]>(['Technology']);
   const [topicInput, setTopicInput] = useState('');
   const [rules, setRules] = useState<string[]>([
-    'Kuwa na heshima kwa wanajamii wote.',
-    'Epuka spam au viungo vya utapeli.',
-    'Zingatia mada kuu za jamii hii.',
+    'Be respectful to all community members.',
+    'No spam or promotional scam links.',
+    'Keep discussions relevant to the community topics.',
   ]);
   const [newRule, setNewRule] = useState('');
 
@@ -152,14 +152,14 @@ export default function Communities() {
     const newCommunity: Community = {
       id: 'comm_' + Date.now(),
       name: name.trim(),
-      description: description.trim() || 'Jumuiya mpya kwenye Longa',
+      description: description.trim() || 'A new vibrant community on Longa',
       avatar: avatar.trim() || '👥',
       banner: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&h=400&fit=crop',
       members: 1,
       isMember: true,
       isPrivate,
       admin: (user as User) || currentUser,
-      rules: rules.length > 0 ? rules : ['Kuwa na heshima na nidhamu kwa kila mmoja.'],
+      rules: rules.length > 0 ? rules : ['Be respectful and considerate to all members.'],
       topics: selectedTopics.length > 0 ? selectedTopics : ['General'],
     };
 
@@ -174,8 +174,8 @@ export default function Communities() {
     setIsPrivate(false);
     setSelectedTopics(['Technology']);
     setRules([
-      'Kuwa na heshima kwa wanajamii wote.',
-      'Epuka spam au viungo vya utapeli.',
+      'Be respectful to all community members.',
+      'No spam or promotional scam links.',
     ]);
   };
 
@@ -189,7 +189,6 @@ export default function Communities() {
       setPostImage(url);
     } catch (err) {
       console.error('Image upload failed:', err);
-      // Fallback
       setPostImage(URL.createObjectURL(file));
     } finally {
       setIsUploadingImage(false);
@@ -205,7 +204,7 @@ export default function Communities() {
       communityId: selectedCommunity.id,
       author: {
         id: user?.id ? user.id.toString() : 'me',
-        name: user?.name || 'Mtumiaji',
+        name: user?.name || 'User',
         handle: user?.handle || '@user',
         avatar: user?.avatar || '👤',
       },
@@ -260,7 +259,7 @@ export default function Communities() {
             <div className="min-w-0 flex-1">
               <h1 className="text-lg font-bold truncate">{selectedCommunity.name}</h1>
               <p className={`text-xs ${tc.textSecondary}`}>
-                {selectedCommunity.members.toLocaleString()} Wanachama {selectedCommunity.isPrivate ? '· 🔒 Private' : '· 🌐 Public'}
+                {selectedCommunity.members.toLocaleString()} Members {selectedCommunity.isPrivate ? '· 🔒 Private' : '· 🌐 Public'}
               </p>
             </div>
           </div>
@@ -292,7 +291,7 @@ export default function Communities() {
                   : 'bg-blue-500 hover:bg-blue-600 text-white'
               }`}
             >
-              {selectedCommunity.isMember ? 'Umejiunga ✓' : '+ Jiunge'}
+              {selectedCommunity.isMember ? 'Joined ✓' : '+ Join'}
             </button>
           </div>
 
@@ -311,7 +310,7 @@ export default function Communities() {
         {/* Community Rules Box */}
         <div className={`mx-4 my-4 p-4 rounded-xl border ${tc.border} ${tc.bgCard}`}>
           <h3 className="text-sm font-bold uppercase tracking-wider text-blue-400 mb-2.5 flex items-center gap-2">
-            <span>📜</span> Kanuni za Jumuiya
+            <span>📜</span> Community Rules
           </h3>
           <div className="space-y-1.5">
             {selectedCommunity.rules.map((rule, i) => (
@@ -334,7 +333,7 @@ export default function Communities() {
                 <textarea
                   value={postContent}
                   onChange={(e) => setPostContent(e.target.value)}
-                  placeholder={`Andika chapisho jipya katika ${selectedCommunity.name}...`}
+                  placeholder={`Post an update to ${selectedCommunity.name}...`}
                   rows={3}
                   className={`w-full bg-transparent border-none outline-none resize-none text-sm ${tc.text} placeholder-gray-500`}
                 />
@@ -354,7 +353,7 @@ export default function Communities() {
                 <div className="flex items-center justify-between pt-3 border-t border-gray-800 mt-2">
                   <div>
                     <label className={`cursor-pointer p-2 rounded-full ${tc.bgHoverSecondary} text-blue-400 inline-flex items-center gap-1.5 text-xs font-semibold`}>
-                      <span>📷 Weka Picha</span>
+                      <span>📷 Add Image</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -362,7 +361,7 @@ export default function Communities() {
                         className="hidden"
                       />
                     </label>
-                    {isUploadingImage && <span className="text-xs text-blue-400 ml-2 animate-pulse">Inapakia...</span>}
+                    {isUploadingImage && <span className="text-xs text-blue-400 ml-2 animate-pulse">Uploading...</span>}
                   </div>
 
                   <button
@@ -370,7 +369,7 @@ export default function Communities() {
                     disabled={!postContent.trim() && !postImage}
                     className="px-5 py-1.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white font-bold text-xs rounded-full transition-colors"
                   >
-                    Chapisha
+                    Post
                   </button>
                 </div>
               </div>
@@ -378,12 +377,12 @@ export default function Communities() {
           </div>
         ) : (
           <div className={`mx-4 mb-4 p-4 rounded-xl border border-dashed border-gray-700 text-center ${tc.bgCard}`}>
-            <p className="text-sm text-gray-400 mb-2">Jiunge na jumuiya hii ili uweze kuchapisha na kujadili pamoja na wenzako.</p>
+            <p className="text-sm text-gray-400 mb-2">Join this community to share posts and participate in discussions.</p>
             <button
               onClick={() => toggleMembership(selectedCommunity.id)}
               className="px-5 py-1.5 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-full"
             >
-              Jiunge Sasa
+              Join Now
             </button>
           </div>
         )}
@@ -391,14 +390,14 @@ export default function Communities() {
         {/* Community Feed */}
         <div className="px-4 space-y-3">
           <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">
-            Mijadala ya Hivi Karibuni ({currentPosts.length})
+            Recent Discussions ({currentPosts.length})
           </h3>
 
           {currentPosts.length === 0 ? (
             <div className={`text-center py-12 rounded-xl border ${tc.border} ${tc.bgCard}`}>
               <div className="text-5xl mb-3">💬</div>
-              <h4 className="font-bold text-base mb-1">Hakuna machapisho bado</h4>
-              <p className={`text-xs ${tc.textSecondary}`}>Kuwa wa kwanza kuanzisha mjadala katika jamii hii!</p>
+              <h4 className="font-bold text-base mb-1">No posts yet</h4>
+              <p className={`text-xs ${tc.textSecondary}`}>Be the first to start a conversation in this community!</p>
             </div>
           ) : (
             currentPosts.map(post => (
@@ -436,11 +435,11 @@ export default function Communities() {
                   </button>
                   <span className="flex items-center gap-1.5 hover:text-blue-400 cursor-pointer">
                     <span>💬</span>
-                    <span>Jibu</span>
+                    <span>Reply</span>
                   </span>
                   <span className="flex items-center gap-1.5 hover:text-green-400 cursor-pointer">
                     <span>🔗</span>
-                    <span>Shiriki</span>
+                    <span>Share</span>
                   </span>
                 </div>
               </div>
@@ -464,7 +463,7 @@ export default function Communities() {
             onClick={() => setShowCreateModal(true)}
             className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-full flex items-center gap-1.5 shadow-lg shadow-blue-500/25 transition-all"
           >
-            <span>+</span> Unda Jumuiya
+            <span>+</span> Create Community
           </button>
         </div>
 
@@ -476,7 +475,7 @@ export default function Communities() {
               activeTab === 'discover' ? 'text-blue-400 font-bold' : 'text-gray-400 hover:text-white'
             }`}
           >
-            Gundua Jumuiya ({discoverCommunities.length})
+            Discover ({discoverCommunities.length})
             {activeTab === 'discover' && (
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-1 bg-blue-500 rounded-full" />
             )}
@@ -487,7 +486,7 @@ export default function Communities() {
               activeTab === 'joined' ? 'text-blue-400 font-bold' : 'text-gray-400 hover:text-white'
             }`}
           >
-            Uliojiunga ({joinedCommunities.length})
+            Joined ({joinedCommunities.length})
             {activeTab === 'joined' && (
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-1 bg-blue-500 rounded-full" />
             )}
@@ -499,16 +498,16 @@ export default function Communities() {
       <div className="p-4">
         <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-900/40 via-purple-900/40 to-pink-900/40 border border-blue-500/30 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-black text-white">Ungana na Watu Wenye Maono Kama Yako</h2>
+            <h2 className="text-lg font-black text-white">Connect with Like-Minded Creators</h2>
             <p className="text-xs text-gray-300 mt-1 max-w-md">
-              Gundua jumuiya za teknolojia, sanaa, biashara au uanzishe jamii yako ya kipekee leo.
+              Discover communities in tech, design, business, and web3 or build your own dedicated community today.
             </p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
             className="px-4 py-2.5 bg-white text-black hover:bg-gray-100 font-bold text-xs rounded-xl flex-shrink-0 shadow-md ml-3"
           >
-            + Unda Jamii Yako
+            + Create Your Community
           </button>
         </div>
       </div>
@@ -519,18 +518,18 @@ export default function Communities() {
           <div className="text-center py-16 px-4">
             <div className="text-5xl mb-3">👥</div>
             <h3 className="text-lg font-bold mb-1">
-              {activeTab === 'joined' ? 'Hujajiunga na jamii yoyote bado' : 'Hakuna jamii mpya kwa sasa'}
+              {activeTab === 'joined' ? 'You have not joined any communities yet' : 'No new communities found'}
             </h3>
             <p className={`text-xs ${tc.textSecondary} mb-4`}>
               {activeTab === 'joined'
-                ? 'Gundua na ujiunge na jumuiya unazozipenda au uunde ya kwako.'
-                : 'Umejiunga na jumuiya zote zilizopo! Unaweza kuunda nyingine mpya.'}
+                ? 'Explore and join communities that match your passions, or create your own.'
+                : 'You have joined all available communities! Create a new one to get started.'}
             </p>
             <button
               onClick={() => setShowCreateModal(true)}
               className="px-5 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-full"
             >
-              Unda Jumuiya Mpya
+              Create a Community
             </button>
           </div>
         ) : (
@@ -555,7 +554,7 @@ export default function Communities() {
                 </p>
                 <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
                   <span className="font-semibold text-gray-300">
-                    👥 {community.members.toLocaleString()} wanachama
+                    👥 {community.members.toLocaleString()} members
                   </span>
                   <span>·</span>
                   <span className="text-blue-400">#{community.topics[0] || 'General'}</span>
@@ -572,7 +571,7 @@ export default function Communities() {
                     : 'bg-blue-500 hover:bg-blue-600 text-white'
                 }`}
               >
-                {community.isMember ? 'Umejiunga' : 'Jiunge'}
+                {community.isMember ? 'Joined' : 'Join'}
               </button>
             </div>
           ))
@@ -585,7 +584,7 @@ export default function Communities() {
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowCreateModal(false)} />
           <div className={`relative w-full max-w-lg ${tc.bgModal} rounded-2xl border ${tc.border} p-6 shadow-2xl max-h-[90vh] overflow-y-auto`}>
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-800">
-              <h2 className="text-xl font-black">Unda Jumuiya Mpya</h2>
+              <h2 className="text-xl font-black">Create New Community</h2>
               <button
                 onClick={() => setShowCreateModal(false)}
                 className={`p-1.5 rounded-full ${tc.bgHoverSecondary} text-gray-400 hover:text-white`}
@@ -598,7 +597,7 @@ export default function Communities() {
               {/* Avatar Selector */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                  Aikoni ya Jumuiya
+                  Community Icon
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {availableEmojis.map(emoji => (
@@ -621,14 +620,14 @@ export default function Communities() {
               {/* Name */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                  Jina la Jumuiya *
+                  Community Name *
                 </label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  placeholder="mf. Waandishi na Wabunifu Tanzania"
+                  placeholder="e.g. AI & Machine Learning Hub"
                   className={`w-full px-4 py-2.5 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-sm outline-none focus:border-blue-500`}
                 />
               </div>
@@ -636,13 +635,13 @@ export default function Communities() {
               {/* Description */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                  Maelezo Mafupi
+                  Description
                 </label>
                 <textarea
                   rows={2}
                   value={description}
                   onChange={e => setDescription(e.target.value)}
-                  placeholder="Eleza dhumuni na mambo yatakayojadiliwa katika jumuiya hii..."
+                  placeholder="What is this community about? What will be discussed?..."
                   className={`w-full px-4 py-2.5 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-sm outline-none focus:border-blue-500 resize-none`}
                 />
               </div>
@@ -650,7 +649,7 @@ export default function Communities() {
               {/* Topics / Tags */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                  Mada (Topics)
+                  Topics
                 </label>
                 <div className="flex gap-2 mb-2">
                   <input
@@ -663,7 +662,7 @@ export default function Communities() {
                         handleAddTopic();
                       }
                     }}
-                    placeholder="Andika mada kisha bonyeza Weka"
+                    placeholder="Type topic and click Add"
                     className={`flex-1 px-4 py-2 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-xs outline-none`}
                   />
                   <button
@@ -671,7 +670,7 @@ export default function Communities() {
                     onClick={handleAddTopic}
                     className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-xl"
                   >
-                    Weka
+                    Add
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -696,14 +695,14 @@ export default function Communities() {
               {/* Rules */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                  Kanuni za Jamii
+                  Community Rules
                 </label>
                 <div className="flex gap-2 mb-2">
                   <input
                     type="text"
                     value={newRule}
                     onChange={e => setNewRule(e.target.value)}
-                    placeholder="Ongeza kanuni mpya..."
+                    placeholder="Add a new rule..."
                     className={`flex-1 px-4 py-2 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-xs outline-none`}
                   />
                   <button
@@ -711,7 +710,7 @@ export default function Communities() {
                     onClick={handleAddRule}
                     className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white font-bold text-xs rounded-xl"
                   >
-                    + Kanuni
+                    + Rule
                   </button>
                 </div>
                 <div className="space-y-1 max-h-28 overflow-y-auto">
@@ -733,8 +732,8 @@ export default function Communities() {
               {/* Privacy */}
               <div className="flex items-center justify-between py-2 border-t border-gray-800">
                 <div>
-                  <p className="font-bold text-sm">Jumuiya ya Faragha (Private)</p>
-                  <p className="text-xs text-gray-400">Ni wanachama pekee watakaoweza kuona machapisho</p>
+                  <p className="font-bold text-sm">Private Community</p>
+                  <p className="text-xs text-gray-400">Only members will be able to view and post in this community</p>
                 </div>
                 <input
                   type="checkbox"
@@ -751,14 +750,14 @@ export default function Communities() {
                   onClick={() => setShowCreateModal(false)}
                   className={`flex-1 py-2.5 rounded-full border ${tc.border} text-sm font-bold hover:bg-gray-800`}
                 >
-                  Ghairi
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!name.trim()}
                   className="flex-1 py-2.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white font-bold text-sm rounded-full shadow-lg shadow-blue-500/30 transition-all"
                 >
-                  Unda Jumuiya
+                  Create Community
                 </button>
               </div>
             </form>

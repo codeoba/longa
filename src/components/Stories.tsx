@@ -28,7 +28,7 @@ const sampleStories: Story[] = [
     userAvatar: '👩‍🔬',
     type: 'image',
     content: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&h=900&fit=crop',
-    caption: '🚀 Maabara yetu mpya ya utafiti wa AI Dar es Salaam!',
+    caption: '🚀 Our new innovation lab in Dar es Salaam!',
     timestamp: new Date(Date.now() - 1000 * 60 * 30),
     views: 234,
     reactions: ['🔥', '❤️', '👏'],
@@ -40,7 +40,7 @@ const sampleStories: Story[] = [
     userName: 'Baraka Digital',
     userAvatar: '🎨',
     type: 'text',
-    content: 'Tumezindua mfumo mpya wa UI & Design Tokens leo! Angalia Longa 2.0 ✨',
+    content: 'Just launched our new UI & Design tokens today! Check out Longa 2.0 ✨',
     backgroundGradient: 'from-purple-600 via-indigo-600 to-pink-600',
     timestamp: new Date(Date.now() - 1000 * 60 * 60),
     views: 567,
@@ -162,7 +162,7 @@ export default function Stories() {
     const newStory: Story = {
       id: 'story_' + Date.now(),
       userId: user?.id ? user.id.toString() : 'me',
-      userName: user?.name || 'Mtumiaji',
+      userName: user?.name || 'User',
       userAvatar: user?.avatar || '👤',
       type: storyType,
       content: storyContent.trim(),
@@ -286,11 +286,11 @@ export default function Stories() {
         <div className="absolute bottom-4 inset-x-4 max-w-md mx-auto flex items-center justify-between gap-2 z-20">
           <input
             type="text"
-            placeholder="Jibu kwa ujumbe..."
+            placeholder="Reply to story..."
             className="flex-1 px-4 py-2.5 rounded-full bg-black/40 border border-white/20 text-white text-xs placeholder-white/60 outline-none backdrop-blur-md"
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                alert('Ujumbe umetumwa kwa ' + activeStory.userName);
+                alert('Message sent to ' + activeStory.userName);
                 (e.target as HTMLInputElement).value = '';
               }
             }}
@@ -316,7 +316,7 @@ export default function Stories() {
     <div className={`p-4 border-b ${tc.border}`}>
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-base font-extrabold flex items-center gap-2">
-          <span>⚡</span> Hadithi (Stories)
+          <span>⚡</span> Stories
         </h2>
         <span className={`text-xs ${tc.textSecondary}`}>{stories.length} stories</span>
       </div>
@@ -337,7 +337,7 @@ export default function Stories() {
               +
             </div>
           </div>
-          <span className={`text-xs font-semibold ${tc.textSecondary}`}>Hadithi Yako</span>
+          <span className={`text-xs font-semibold ${tc.textSecondary}`}>Your Story</span>
         </button>
 
         {/* Stories list */}
@@ -375,7 +375,7 @@ export default function Stories() {
           <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={() => setShowCreateModal(false)} />
           <div className={`relative w-full max-w-md ${tc.bgModal} rounded-2xl border ${tc.border} p-6 shadow-2xl`}>
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-800">
-              <h2 className="text-xl font-black">Unda Hadithi Mpya</h2>
+              <h2 className="text-xl font-black">Create Story</h2>
               <button
                 onClick={() => setShowCreateModal(false)}
                 className={`p-1.5 rounded-full ${tc.bgHoverSecondary} text-gray-400 hover:text-white`}
@@ -399,9 +399,9 @@ export default function Stories() {
                       : `${tc.bgTertiary} text-gray-400 hover:text-white`
                   }`}
                 >
-                  {type === 'image' && '📷 Picha'}
+                  {type === 'image' && '📷 Photo'}
                   {type === 'video' && '🎥 Video'}
-                  {type === 'text' && '✍️ Maandishi'}
+                  {type === 'text' && '✍️ Text'}
                 </button>
               ))}
             </div>
@@ -413,7 +413,7 @@ export default function Stories() {
                   <textarea
                     value={storyContent}
                     onChange={(e) => setStoryContent(e.target.value)}
-                    placeholder="Andika hadithi yako hapa..."
+                    placeholder="Type your story here..."
                     className="w-full h-full bg-transparent border-none outline-none resize-none text-white text-center font-bold text-lg placeholder-white/60"
                     maxLength={160}
                   />
@@ -422,7 +422,7 @@ export default function Stories() {
                 {/* Gradient Picker */}
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                    Chagua Rangi ya Nyuma
+                    Background Color
                   </label>
                   <div className="flex gap-2">
                     {GRADIENTS.map((grad) => (
@@ -460,10 +460,10 @@ export default function Stories() {
                     <div>
                       <div className="text-4xl mb-2">{storyType === 'image' ? '📸' : '🎬'}</div>
                       <p className="font-bold text-sm mb-1">
-                        Pakia {storyType === 'image' ? 'picha ya hadithi' : 'video fupi'}
+                        Upload {storyType === 'image' ? 'photo story' : 'video story'}
                       </p>
                       <label className="mt-2 inline-block px-5 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-full cursor-pointer shadow-md">
-                        {isUploading ? 'Inapakia...' : 'Chagua Faili'}
+                        {isUploading ? 'Uploading...' : 'Choose File'}
                         <input
                           type="file"
                           accept={storyType === 'image' ? 'image/*' : 'video/*'}
@@ -478,13 +478,13 @@ export default function Stories() {
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                    Maelezo ya Ziada (Caption)
+                    Caption (Optional)
                   </label>
                   <input
                     type="text"
                     value={storyCaption}
                     onChange={(e) => setStoryCaption(e.target.value)}
-                    placeholder="Weka maelezo mafupi..."
+                    placeholder="Add a short caption..."
                     className={`w-full px-4 py-2 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-xs outline-none focus:border-blue-500`}
                   />
                 </div>
@@ -497,14 +497,14 @@ export default function Stories() {
                 onClick={() => setShowCreateModal(false)}
                 className={`flex-1 py-2.5 rounded-full border ${tc.border} text-xs font-bold hover:bg-gray-800`}
               >
-                Ghairi
+                Cancel
               </button>
               <button
                 onClick={handleCreateStory}
                 disabled={!storyContent.trim() || isUploading}
                 className="flex-1 py-2.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white font-bold text-xs rounded-full shadow-lg shadow-blue-500/25"
               >
-                Shiriki Hadithi
+                Share Story
               </button>
             </div>
           </div>

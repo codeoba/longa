@@ -310,10 +310,10 @@ export default function Explore({ onNavigate }: ExploreProps) {
         ) : (
           <div className="flex flex-col items-center justify-center py-16 px-8">
             <h3 className={`text-2xl font-extrabold ${tc.text}`}>
-              {searchQuery ? `No results for "${searchQuery}"` : 'Hakuna mada zilizosalia'}
+              {searchQuery ? `No results for "${searchQuery}"` : 'No more topics available'}
             </h3>
             <p className="text-gray-500 text-[15px] mt-2 text-center">
-              {searchQuery ? 'Jaribu kutafuta maneno mengine.' : 'Mada zote zimeondolewa kwenye orodha yako.'}
+              {searchQuery ? 'Try searching for something else.' : 'All topics have been removed from your feed.'}
             </p>
           </div>
         )}

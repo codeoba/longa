@@ -47,12 +47,12 @@ export default function Spaces() {
   const [showStartModal, setShowStartModal] = useState(false);
   const [spaceTitle, setSpaceTitle] = useState('');
   const [spaceDescription, setSpaceDescription] = useState('');
-  const [spaceTopic, setSpaceTopic] = useState('Teknolojia & AI');
+  const [spaceTopic, setSpaceTopic] = useState('Technology & AI');
   const [isScheduled, setIsScheduled] = useState(false);
   const [scheduledDateTime, setScheduledDateTime] = useState('');
 
   // Live Note inside Space
-  const [liveNote, setLiveNote] = useState('🔥 Muhtasari wa Space:\n- Karibuni wote kwenye mazungumzo ya leo.\n- Bonyeza kitufe cha mkono ili kuomba nafasi ya kuongea.');
+  const [liveNote, setLiveNote] = useState('🔥 Space Highlights:\n- Welcome everyone to today\'s live audio room.\n- Tap the raise hand button if you would like to speak.');
   const [copiedNote, setCopiedNote] = useState(false);
 
   useEffect(() => {
@@ -197,11 +197,11 @@ export default function Spaces() {
   };
 
   const topicOptions = [
-    'Teknolojia & AI',
-    'Biashara & Startups',
-    'Muziki & Sanaa',
-    'Michezo & Burudani',
-    'Elimu & Sayansi',
+    'Technology & AI',
+    'Business & Startups',
+    'Music & Creative',
+    'Sports & Gaming',
+    'Education & Science',
     'Crypto & Web3',
   ];
 
@@ -216,7 +216,7 @@ export default function Spaces() {
               onClick={leaveSpace}
               className="px-4 py-1.5 rounded-full bg-black/40 text-white text-xs font-bold hover:bg-black/60 transition-colors border border-white/10"
             >
-              ✕ Toka Kwenye Space
+              ✕ Leave Space
             </button>
             <div className="flex items-center gap-2">
               <button
@@ -224,7 +224,7 @@ export default function Spaces() {
                 className={`p-2.5 rounded-full transition-transform active:scale-90 text-sm ${
                   handRaised ? 'bg-amber-400 text-black shadow-lg shadow-amber-400/30' : 'bg-black/40 text-white hover:bg-black/60 border border-white/10'
                 }`}
-                title="Nyanyua Mkono"
+                title="Raise Hand"
               >
                 ✋
               </button>
@@ -233,7 +233,7 @@ export default function Spaces() {
                 className={`p-2.5 rounded-full transition-transform active:scale-90 text-sm ${
                   isMuted ? 'bg-red-500 text-white' : 'bg-green-600 text-white hover:bg-green-700 border border-white/10'
                 }`}
-                title="Washa / Zima Maikrofoni"
+                title="Toggle Mic"
               >
                 {isMuted ? '🔇 Muted' : '🎤 Live Mic'}
               </button>
@@ -251,7 +251,7 @@ export default function Spaces() {
               LIVE AUDIO
             </span>
             <span>·</span>
-            <span>{activeSpace.listeners.toLocaleString()} wanasikiliza</span>
+            <span>{activeSpace.listeners.toLocaleString()} listening</span>
             <span>·</span>
             <span className="text-emerald-400 font-semibold">WebRTC 48kHz HD</span>
           </div>
@@ -284,25 +284,25 @@ export default function Spaces() {
               onClick={() => playSoundEffect('applause')}
               className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 hover:text-white border border-purple-500/30 active:scale-95 transition flex items-center gap-1.5"
             >
-              <span>👏</span> Makofi (Applause)
+              <span>👏</span> Applause
             </button>
             <button
               onClick={() => playSoundEffect('drumroll')}
               className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-pink-500/20 text-pink-300 hover:bg-pink-500/30 hover:text-white border border-pink-500/30 active:scale-95 transition flex items-center gap-1.5"
             >
-              <span>🥁</span> Ngoma (Drumroll)
+              <span>🥁</span> Drumroll
             </button>
             <button
               onClick={() => playSoundEffect('chime')}
               className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 hover:text-white border border-amber-500/30 active:scale-95 transition flex items-center gap-1.5"
             >
-              <span>🔔</span> Kengele (Chime)
+              <span>🔔</span> Crystal Chime
             </button>
             <button
               onClick={() => playSoundEffect('celebration')}
               className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 hover:text-white border border-emerald-500/30 active:scale-95 transition flex items-center gap-1.5"
             >
-              <span>🎉</span> Sherehe (Fanfare)
+              <span>🎉</span> Fanfare
             </button>
           </div>
         </div>
@@ -310,7 +310,7 @@ export default function Spaces() {
         {/* Speakers */}
         <div className="px-5 py-5 border-b border-[#38444d]/30">
           <h3 className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-            Wazungumzaji Waliopo ({activeSpace.speakers.length})
+            Active Speakers ({activeSpace.speakers.length})
           </h3>
           <div className="flex flex-wrap gap-6">
             {activeSpace.speakers.map(speaker => (
@@ -326,7 +326,7 @@ export default function Spaces() {
                 <span className={`text-xs font-bold text-center max-w-[84px] truncate ${isDark ? 'text-white' : 'text-gray-900'}`}>
                   {speaker.name.split(' ')[0]}
                 </span>
-                <span className="text-[10px] text-purple-400 font-semibold">Mwenyeji (Host)</span>
+                <span className="text-[10px] text-purple-400 font-semibold">Host / Speaker</span>
               </div>
             ))}
           </div>
@@ -336,7 +336,7 @@ export default function Spaces() {
         <div className="px-5 py-5 border-b border-[#38444d]/30">
           <div className="flex items-center justify-between mb-2">
             <h3 className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-500'} flex items-center gap-1.5`}>
-              <span>📝 Daftari la Pamoja (Live Notes)</span>
+              <span>📝 Live Note Canvas (Collaborative Scratchpad)</span>
             </h3>
             <button
               onClick={() => {
@@ -346,7 +346,7 @@ export default function Spaces() {
               }}
               className="text-xs text-blue-400 hover:underline"
             >
-              {copiedNote ? '✓ Umenakili' : 'Nakili Maelezo'}
+              {copiedNote ? '✓ Copied' : 'Copy Notes'}
             </button>
           </div>
           <textarea
@@ -362,7 +362,7 @@ export default function Spaces() {
         {/* Listeners */}
         <div className="px-5 py-5">
           <h3 className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-            Wasikilizaji ({activeSpace.listeners.toLocaleString()})
+            Listeners ({activeSpace.listeners.toLocaleString()})
           </h3>
           <div className="flex flex-wrap gap-2.5">
             {Array.from({ length: 14 }).map((_, i) => (
@@ -392,7 +392,7 @@ export default function Spaces() {
             onClick={() => setShowStartModal(true)}
             className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold text-xs rounded-full flex items-center gap-1.5 shadow-lg shadow-purple-500/25 transition-all"
           >
-            <span>🎙️</span> Anzisha Space
+            <span>🎙️</span> Start a Space
           </button>
         </div>
       </div>
@@ -401,16 +401,16 @@ export default function Spaces() {
       <div className="p-4">
         <div className="p-5 rounded-2xl bg-gradient-to-r from-purple-950/60 via-indigo-950/60 to-blue-950/60 border border-purple-500/40 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-black text-white">Sauti za Moja kwa Moja (Live Audio)</h2>
+            <h2 className="text-lg font-black text-white">Live Audio Conversations</h2>
             <p className="text-xs text-purple-200/80 mt-1 max-w-md">
-              Zungumza na wafuasi wako kwa sauti yenye uwazi wa hali ya juu na muda halisi (0ms delay).
+              Speak, debate, and share ideas in real-time with crystal-clear 48kHz audio rooms.
             </p>
           </div>
           <button
             onClick={() => setShowStartModal(true)}
             className="px-4 py-2.5 bg-purple-500 hover:bg-purple-600 text-white font-bold text-xs rounded-xl flex-shrink-0 shadow-md ml-3"
           >
-            + Unda Chumba
+            + Host Space
           </button>
         </div>
       </div>
@@ -419,12 +419,12 @@ export default function Spaces() {
       <div className="mb-6">
         <h2 className={`px-4 text-base font-extrabold mb-3 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
           <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
-          🔴 Zinaendelea Sasa (Live Now)
+          🔴 Live Now
         </h2>
 
         {liveSpaces.length === 0 ? (
           <div className="mx-4 p-8 text-center rounded-2xl border border-dashed border-gray-800">
-            <p className="text-sm text-gray-500">Hakuna space inayoendelea sasa hivi. Kuwa wa kwanza kuanzisha!</p>
+            <p className="text-sm text-gray-500">No active Spaces at this moment. Be the first to start one!</p>
           </div>
         ) : (
           liveSpaces.map(space => (
@@ -445,7 +445,7 @@ export default function Spaces() {
                       LIVE
                     </span>
                     <span className="text-xs text-gray-400">
-                      👥 {space.listeners.toLocaleString()} wanasikiliza
+                      👥 {space.listeners.toLocaleString()} listening
                     </span>
                     <span className="text-xs text-purple-400 font-semibold">#{space.tags[0] || 'Live'}</span>
                   </div>
@@ -467,12 +467,12 @@ export default function Spaces() {
                     </div>
                   ))}
                   <span className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Mwenyeji: {space.host.name}
+                    Hosted by {space.host.name}
                   </span>
                 </div>
 
                 <span className="px-3 py-1 rounded-full bg-purple-500 text-white font-bold text-xs">
-                  Sikiliza Sasa →
+                  Listen Now →
                 </span>
               </div>
             </div>
@@ -483,12 +483,12 @@ export default function Spaces() {
       {/* Upcoming Spaces */}
       <div>
         <h2 className={`px-4 text-base font-extrabold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-          ⏰ Zilizopangwa Hivi Karibuni (Upcoming)
+          ⏰ Scheduled Spaces
         </h2>
 
         {upcomingSpaces.length === 0 ? (
           <div className="mx-4 p-8 text-center rounded-2xl border border-dashed border-gray-800">
-            <p className="text-sm text-gray-500">Hakuna space iliyopangwa kwa sasa.</p>
+            <p className="text-sm text-gray-500">No scheduled Spaces found.</p>
           </div>
         ) : (
           upcomingSpaces.map(space => {
@@ -515,7 +515,7 @@ export default function Spaces() {
                       {space.host.avatar}
                     </div>
                     <span className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                      Mwenyeji: {space.host.name}
+                      Hosted by {space.host.name}
                     </span>
                   </div>
                   <button
@@ -526,7 +526,7 @@ export default function Spaces() {
                         : 'bg-purple-500/20 text-purple-300 hover:bg-purple-500/30'
                     }`}
                   >
-                    {hasReminder ? '🔔 Kikumbusho Kimewekwa' : '🔔 Weka Kikumbusho'}
+                    {hasReminder ? '🔔 Reminder Set' : '🔔 Set Reminder'}
                   </button>
                 </div>
               </div>
@@ -541,7 +541,7 @@ export default function Spaces() {
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowStartModal(false)} />
           <div className={`relative w-full max-w-lg ${isDark ? 'bg-[#15181c] text-white' : 'bg-white text-gray-900'} rounded-2xl border ${isDark ? 'border-gray-800' : 'border-gray-200'} p-6 shadow-2xl`}>
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-800">
-              <h2 className="text-xl font-black">🎙️ Anzisha Space Yako</h2>
+              <h2 className="text-xl font-black">🎙️ Start a Space</h2>
               <button
                 onClick={() => setShowStartModal(false)}
                 className="p-1.5 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white"
@@ -554,14 +554,14 @@ export default function Spaces() {
               {/* Title */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                  Mada Kuu ya Mazungumzo *
+                  Space Title *
                 </label>
                 <input
                   type="text"
                   required
                   value={spaceTitle}
                   onChange={e => setSpaceTitle(e.target.value)}
-                  placeholder="mf. Maendeleo ya AI na Ajira Afrika 2026"
+                  placeholder="e.g. Next-Gen AI & Tech Ecosystem 2026"
                   className={`w-full px-4 py-2.5 rounded-xl border ${isDark ? 'border-gray-800 bg-gray-900 text-white' : 'border-gray-300 bg-gray-50 text-black'} text-sm outline-none focus:border-purple-500`}
                 />
               </div>
@@ -569,13 +569,13 @@ export default function Spaces() {
               {/* Description */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                  Maelezo Mafupi
+                  Description
                 </label>
                 <textarea
                   rows={2}
                   value={spaceDescription}
                   onChange={e => setSpaceDescription(e.target.value)}
-                  placeholder="Eleza nini mtakachojadili na nani anayekaribishwa..."
+                  placeholder="What will you discuss? Who should join?..."
                   className={`w-full px-4 py-2.5 rounded-xl border ${isDark ? 'border-gray-800 bg-gray-900 text-white' : 'border-gray-300 bg-gray-50 text-black'} text-sm outline-none focus:border-purple-500 resize-none`}
                 />
               </div>
@@ -583,7 +583,7 @@ export default function Spaces() {
               {/* Topic Selector */}
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                  Kategoria
+                  Category
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {topicOptions.map(t => (
@@ -614,7 +614,7 @@ export default function Spaces() {
                       onChange={() => setIsScheduled(false)}
                       className="accent-purple-500"
                     />
-                    <span>🔴 Anza Moja kwa Moja Sasa</span>
+                    <span>🔴 Start Live Now</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer text-sm font-bold">
                     <input
@@ -624,14 +624,14 @@ export default function Spaces() {
                       onChange={() => setIsScheduled(true)}
                       className="accent-purple-500"
                     />
-                    <span>⏰ Panga Kwa Baadaye</span>
+                    <span>⏰ Schedule for Later</span>
                   </label>
                 </div>
 
                 {isScheduled && (
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                      Tarehe na Muda wa Space
+                      Date & Time
                     </label>
                     <input
                       type="datetime-local"
@@ -651,14 +651,14 @@ export default function Spaces() {
                   onClick={() => setShowStartModal(false)}
                   className={`flex-1 py-2.5 rounded-full border ${isDark ? 'border-gray-700 hover:bg-gray-800' : 'border-gray-300 hover:bg-gray-100'} text-sm font-bold`}
                 >
-                  Ghairi
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!spaceTitle.trim() || (isScheduled && !scheduledDateTime)}
                   className="flex-1 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:opacity-40 text-white font-bold text-sm rounded-full shadow-lg shadow-purple-500/30 transition-all"
                 >
-                  {isScheduled ? 'Panga Space' : 'Anzisha Sasa 🎙️'}
+                  {isScheduled ? 'Schedule Space' : 'Go Live Now 🎙️'}
                 </button>
               </div>
             </form>

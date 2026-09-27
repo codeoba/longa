@@ -79,7 +79,7 @@ export default function Profile({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploadingDirect('Inapakia picha ya jalada (banner)...');
+    setUploadingDirect('Uploading header banner...');
     try {
       const uploadRes = await uploadMedia(file);
       const newBannerUrl = uploadRes.url;
@@ -94,10 +94,10 @@ export default function Profile({
         updateUser({ ...authUser, banner: newBannerUrl });
       }
 
-      setStatusMessage({ type: 'success', text: 'Picha ya jalada (Banner) imebadilishwa kikamilifu!' });
+      setStatusMessage({ type: 'success', text: 'Header banner updated successfully!' });
       setTimeout(() => setStatusMessage(null), 3000);
     } catch (err: any) {
-      setStatusMessage({ type: 'error', text: err.message || 'Imeshindikana kupakia banner' });
+      setStatusMessage({ type: 'error', text: err.message || 'Failed to upload header banner' });
       setTimeout(() => setStatusMessage(null), 4000);
     } finally {
       setUploadingDirect(null);
@@ -110,7 +110,7 @@ export default function Profile({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploadingDirect('Inapakia picha ya profaili (avatar)...');
+    setUploadingDirect('Uploading profile avatar...');
     try {
       const uploadRes = await uploadMedia(file);
       const newAvatarUrl = uploadRes.url;
@@ -125,10 +125,10 @@ export default function Profile({
         updateUser({ ...authUser, avatar: newAvatarUrl });
       }
 
-      setStatusMessage({ type: 'success', text: 'Picha ya profaili (Avatar) imebadilishwa kikamilifu!' });
+      setStatusMessage({ type: 'success', text: 'Profile avatar updated successfully!' });
       setTimeout(() => setStatusMessage(null), 3000);
     } catch (err: any) {
-      setStatusMessage({ type: 'error', text: err.message || 'Imeshindikana kupakia picha ya profaili' });
+      setStatusMessage({ type: 'error', text: err.message || 'Failed to upload avatar' });
       setTimeout(() => setStatusMessage(null), 4000);
     } finally {
       setUploadingDirect(null);
@@ -152,7 +152,7 @@ export default function Profile({
       const uploadRes = await uploadMedia(file);
       setEditBanner(uploadRes.url);
     } catch (err: any) {
-      alert('Hitilafu ya kupakia banner: ' + (err.message || 'Jaribu tena'));
+      alert('Failed to upload banner: ' + (err.message || 'Please try again'));
     }
   };
 
@@ -172,7 +172,7 @@ export default function Profile({
       const uploadRes = await uploadMedia(file);
       setEditAvatar(uploadRes.url);
     } catch (err: any) {
-      alert('Hitilafu ya kupakia avatar: ' + (err.message || 'Jaribu tena'));
+      alert('Failed to upload avatar: ' + (err.message || 'Please try again'));
     }
   };
 
@@ -204,10 +204,10 @@ export default function Profile({
       setShowEditModal(false);
       setAvatarPreview(null);
       setBannerPreview(null);
-      setStatusMessage({ type: 'success', text: 'Profaili imehifadhiwa kikamilifu!' });
+      setStatusMessage({ type: 'success', text: 'Profile updated successfully!' });
       setTimeout(() => setStatusMessage(null), 3000);
     } catch (err: any) {
-      setStatusMessage({ type: 'error', text: err.message || 'Hitilafu ya kuhifadhi mabadiliko' });
+      setStatusMessage({ type: 'error', text: err.message || 'Failed to save profile changes' });
     } finally {
       setSaving(false);
     }
@@ -288,13 +288,13 @@ export default function Profile({
               type="button"
               onClick={() => bannerFileRef.current?.click()}
               className="px-3.5 py-1.5 bg-black/70 hover:bg-black/90 text-white rounded-full backdrop-blur-md transition-all shadow-lg flex items-center gap-2 text-xs font-semibold border border-white/20 hover:scale-105 active:scale-95"
-              title="Bonyeza hapa kubadilisha Banner yako"
+              title="Click here to change your banner"
             >
               <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <span>Badilisha Banner</span>
+              <span>Change Banner</span>
             </button>
           </div>
         )}
@@ -324,13 +324,13 @@ export default function Profile({
                   type="button"
                   onClick={() => avatarFileRef.current?.click()}
                   className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-all border-4 border-transparent cursor-pointer backdrop-blur-[2px]"
-                  title="Badilisha picha ya profaili"
+                  title="Change profile avatar"
                 >
                   <svg className="w-6 h-6 mb-0.5 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span className="text-[11px] font-bold">Badili Picha</span>
+                  <span className="text-[11px] font-bold">Change Avatar</span>
                 </button>
 
                 {/* Floating camera button for mobile & easy click */}
@@ -338,7 +338,7 @@ export default function Profile({
                   type="button"
                   onClick={() => avatarFileRef.current?.click()}
                   className="absolute bottom-0 right-0 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full border-2 border-black transition-transform hover:scale-110 shadow-lg flex items-center justify-center"
-                  title="Badilisha picha ya profaili"
+                  title="Change profile avatar"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -372,7 +372,7 @@ export default function Profile({
           <Premium />
         </h2>
         <p className="text-[15px] text-gray-500">{user.handle}</p>
-        <p className={`text-[15px] ${tc.text} mt-3 leading-relaxed`}>{user.bio || 'Hakuna wasifu uliowekwa bado.'}</p>
+        <p className={`text-[15px] ${tc.text} mt-3 leading-relaxed`}>{user.bio || 'No bio added yet.'}</p>
 
         <div className="flex flex-wrap items-center gap-4 mt-3 text-[15px] text-gray-500">
           {user.location && (
@@ -484,7 +484,7 @@ export default function Profile({
                     <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"/>
                   </svg>
                 </button>
-                <h2 className={`text-lg font-bold ${tc.text}`}>Hariri Profaili (Edit Profile)</h2>
+                <h2 className={`text-lg font-bold ${tc.text}`}>Edit Profile</h2>
               </div>
               <button
                 type="button"
@@ -498,7 +498,7 @@ export default function Profile({
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                   </svg>
                 )}
-                <span>{saving ? 'Inahifadhi...' : 'Hifadhi'}</span>
+                <span>{saving ? 'Saving...' : 'Save'}</span>
               </button>
             </div>
 
@@ -525,7 +525,7 @@ export default function Profile({
                     type="button"
                     onClick={() => modalBannerRef.current?.click()}
                     className="p-3 bg-black/60 hover:bg-black/80 rounded-full text-white backdrop-blur-md transition-all hover:scale-110"
-                    title="Weka Picha ya Banner"
+                    title="Upload Header Banner"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -537,7 +537,7 @@ export default function Profile({
                       type="button"
                       onClick={() => { setEditBanner(''); setBannerPreview(null); }}
                       className="p-3 bg-black/60 hover:bg-black/80 rounded-full text-white backdrop-blur-md transition-all hover:scale-110"
-                      title="Ondoa Banner"
+                      title="Remove Banner"
                     >
                       <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -569,7 +569,7 @@ export default function Profile({
                   <div
                     onClick={() => modalAvatarRef.current?.click()}
                     className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white cursor-pointer transition-opacity backdrop-blur-[1px]"
-                    title="Badilisha picha ya Avatar"
+                    title="Change Avatar Image"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -582,7 +582,7 @@ export default function Profile({
                 <div className="space-y-4">
                   {/* Avatar Emoji presets */}
                   <div>
-                    <label className="text-[13px] text-gray-500 block mb-1.5">Au chagua Avatar ya Emoji / Icon</label>
+                    <label className="text-[13px] text-gray-500 block mb-1.5">Or choose an Avatar Emoji / Icon</label>
                     <div className="flex flex-wrap gap-2">
                       {['👤', '🧑‍💻', '👩‍💻', '👨‍🚀', '👸', '👑', '🔥', '⚡', '🦁', '🌟', '🚀'].map((emoji) => (
                         <button
@@ -603,7 +603,7 @@ export default function Profile({
                   </div>
 
                   <div>
-                    <label className="text-[13px] text-gray-500 block mb-1">Jina (Name)</label>
+                    <label className="text-[13px] text-gray-500 block mb-1">Name</label>
                     <input
                       type="text"
                       value={editName}
@@ -613,29 +613,29 @@ export default function Profile({
                   </div>
 
                   <div>
-                    <label className="text-[13px] text-gray-500 block mb-1">Wasifu (Bio)</label>
+                    <label className="text-[13px] text-gray-500 block mb-1">Bio</label>
                     <textarea
                       value={editBio}
                       onChange={(e) => setEditBio(e.target.value)}
                       className={`w-full bg-transparent border ${tc.borderLight} rounded-lg px-3 py-2 ${tc.text} outline-none focus:border-blue-500 resize-none`}
                       rows={3}
-                      placeholder="Eleza kwa ufupi kukuhusu..."
+                      placeholder="Write a brief description about yourself..."
                     />
                   </div>
 
                   <div>
-                    <label className="text-[13px] text-gray-500 block mb-1">Mahali (Location)</label>
+                    <label className="text-[13px] text-gray-500 block mb-1">Location</label>
                     <input
                       type="text"
                       value={editLocation}
                       onChange={(e) => setEditLocation(e.target.value)}
-                      placeholder="Mfano: Dar es Salaam, Tanzania"
+                      placeholder="e.g. San Francisco, CA"
                       className={`w-full bg-transparent border ${tc.borderLight} rounded-lg px-3 py-2 ${tc.text} outline-none focus:border-blue-500`}
                     />
                   </div>
 
                   <div>
-                    <label className="text-[13px] text-gray-500 block mb-1">Tovuti (Website)</label>
+                    <label className="text-[13px] text-gray-500 block mb-1">Website</label>
                     <input
                       type="text"
                       value={editWebsite}

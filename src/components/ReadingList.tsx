@@ -21,32 +21,32 @@ const initialItems: ReadingListItem[] = [
   {
     id: '1',
     url: 'https://techcrunch.com',
-    title: 'The Future of AI in Africa 2026: Trends and Predictions',
-    description: 'Chunguza jinsi mifumo ya kijasusi ya AI inavyobadilisha sekta za kilimo, afya na teknolojia ya kifedha.',
+    title: 'The Future of AI in 2026: Trends and Predictions',
+    description: 'Explore generative foundation models and their impact on autonomous software engineering.',
     thumbnail: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=500&h=300&fit=crop',
     source: 'TechCrunch',
     savedAt: new Date(Date.now() - 1000 * 60 * 30),
     readTime: 8,
     isRead: false,
-    tags: ['AI', 'Teknolojia', 'Afrika'],
+    tags: ['AI', 'Tech', 'Trends'],
   },
   {
     id: '2',
     url: 'https://dev.to',
-    title: 'Mbinu 10 za Juu za TypeScript Unazopaswa Kuzijua',
-    description: 'Boresha uandishi wa kodi safi na inayoweza kuongezwa ukubwa kwa kutumia Generics na Conditional Types.',
+    title: '10 Advanced TypeScript Patterns Every Senior Engineer Needs',
+    description: 'Master template literal types, conditional inference, and strict type gymnastics.',
     thumbnail: 'https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=500&h=300&fit=crop',
     source: 'Dev.to',
     savedAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
     readTime: 12,
     isRead: false,
-    tags: ['TypeScript', 'Kodi', 'Web'],
+    tags: ['TypeScript', 'Code', 'Web'],
   },
   {
     id: '3',
     url: 'https://medium.com',
-    title: 'Jinsi ya Kujenga Mifumo Inayohimili Mamilioni ya Watumiaji',
-    description: 'Mikakati ya caching, microservices, na optimization ya database kwa mifumo ya kisasa.',
+    title: 'Building Scalable React & Real-Time Applications',
+    description: 'Micro-frontends, WebSockets, WebRTC signaling, and edge rendering best practices.',
     thumbnail: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=500&h=300&fit=crop',
     source: 'Medium',
     savedAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
@@ -119,7 +119,7 @@ export default function ReadingList() {
       try {
         source = new URL(cleanUrl).hostname.replace('www.', '');
       } catch {
-        source = 'Kiungo';
+        source = 'Link';
       }
     }
 
@@ -132,13 +132,13 @@ export default function ReadingList() {
       id: 'read_' + Date.now(),
       url: cleanUrl || '#',
       title: title.trim(),
-      description: description.trim() || 'Nukuu ya usomaji iliyohifadhiwa kwenye Longa.',
+      description: description.trim() || 'Saved article on Longa.',
       thumbnail: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=500&h=300&fit=crop',
       source,
       savedAt: new Date(),
       readTime: Number(readTime) || 5,
       isRead: false,
-      tags: tagsArray.length > 0 ? tagsArray : ['Makala'],
+      tags: tagsArray.length > 0 ? tagsArray : ['Article'],
     };
 
     setItems([newItem, ...items]);
@@ -158,16 +158,16 @@ export default function ReadingList() {
       <div className={`sticky top-0 z-30 ${tc.bgBackdrop} backdrop-blur-xl border-b ${tc.border}`}>
         <div className="flex items-center justify-between px-4 py-3">
           <div>
-            <h1 className="text-xl font-bold">Orodha ya Kusoma (Reading List)</h1>
+            <h1 className="text-xl font-bold">Reading List</h1>
             <p className={`text-xs ${tc.textSecondary}`}>
-              {items.filter(i => !i.isRead).length} ambazo hazijasomwa · Dakika {totalReadTime} za usomaji zilizobaki
+              {items.filter(i => !i.isRead).length} unread · {totalReadTime} min estimated reading time
             </p>
           </div>
           <button
             onClick={() => setShowAddModal(true)}
             className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full text-xs flex items-center gap-1.5 shadow-lg shadow-blue-500/25 transition-all"
           >
-            <span>+</span> Weka Makala
+            <span>+</span> Add Article
           </button>
         </div>
 
@@ -183,9 +183,9 @@ export default function ReadingList() {
                   : `${tc.bgTertiary} ${tc.textSecondary} hover:text-white`
               }`}
             >
-              {f === 'all' && 'Zote'}
-              {f === 'unread' && 'Hazijasomwa'}
-              {f === 'read' && 'Zilizosomwa'}
+              {f === 'all' && 'All'}
+              {f === 'unread' && 'Unread'}
+              {f === 'read' && 'Completed'}
             </button>
           ))}
         </div>
@@ -198,19 +198,19 @@ export default function ReadingList() {
             <div className="text-6xl mb-3">📖</div>
             <h3 className="text-base font-bold mb-1">
               {filter === 'all'
-                ? 'Hakuna makala kwenye orodha yako'
+                ? 'Your reading list is empty'
                 : filter === 'unread'
-                ? 'Umemaliza kusoma makala zote!'
-                : 'Bado hujaweka alama ya kumaliza makala yoyote'}
+                ? 'You are all caught up!'
+                : 'No completed articles yet'}
             </h3>
             <p className={`text-xs ${tc.textSecondary} mb-4`}>
-              Hifadhi makala unazotaka kuzisoma baadaye bila kupoteza viungo vyake.
+              Bookmark essays, technical documentation, or threads to read later.
             </p>
             <button
               onClick={() => setShowAddModal(true)}
               className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-full"
             >
-              + Ongeza Makala Mpya
+              + Add First Article
             </button>
           </div>
         ) : (
@@ -272,7 +272,7 @@ export default function ReadingList() {
                           : 'bg-blue-500/20 text-blue-400 hover:bg-blue-500/30'
                       }`}
                     >
-                      {item.isRead ? '✓ Imesomwa' : 'Weka Imesomwa'}
+                      {item.isRead ? '✓ Read' : 'Mark as Read'}
                     </button>
 
                     {item.url && item.url !== '#' && (
@@ -282,14 +282,14 @@ export default function ReadingList() {
                         rel="noopener noreferrer"
                         className="px-3 py-1 rounded-full bg-white text-black font-bold text-xs hover:bg-gray-200 transition-colors"
                       >
-                        Soma ↗
+                        Read ↗
                       </a>
                     )}
 
                     <button
                       onClick={() => handleDelete(item.id)}
                       className="p-1 text-gray-500 hover:text-red-400 transition-colors text-xs"
-                      title="Futa"
+                      title="Delete"
                     >
                       ✕
                     </button>
@@ -307,7 +307,7 @@ export default function ReadingList() {
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowAddModal(false)} />
           <div className={`relative w-full max-w-md ${tc.bgModal} rounded-2xl border ${tc.border} p-6 shadow-2xl`}>
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-800">
-              <h2 className="text-lg font-black">Hifadhi Makala Kwenye Reading List</h2>
+              <h2 className="text-lg font-black">Save Article to Reading List</h2>
               <button
                 onClick={() => setShowAddModal(false)}
                 className={`p-1.5 rounded-full ${tc.bgHoverSecondary} text-gray-400 hover:text-white`}
@@ -319,21 +319,21 @@ export default function ReadingList() {
             <form onSubmit={handleAddItem} className="space-y-3.5">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                  Kichwa cha Makala (Title) *
+                  Article Title *
                 </label>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="mf. Muhtasari wa Akili Bandia 2026"
+                  placeholder="e.g. Next-Gen Autonomous Agents in 2026"
                   className={`w-full px-4 py-2 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-xs outline-none focus:border-blue-500`}
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                  Kiungo cha Tovuti (URL)
+                  URL / Web Link
                 </label>
                 <input
                   type="text"
@@ -346,13 +346,13 @@ export default function ReadingList() {
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                  Muhtasari au Maelezo Mafupi
+                  Brief Summary / Notes
                 </label>
                 <textarea
                   rows={2}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Eleza nini umependa kuhusu makala hii..."
+                  placeholder="Key takeaways or summary..."
                   className={`w-full px-4 py-2 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-xs outline-none resize-none`}
                 />
               </div>
@@ -360,7 +360,7 @@ export default function ReadingList() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                    Muda wa Kusoma (Dakika)
+                    Reading Time (Min)
                   </label>
                   <input
                     type="number"
@@ -373,13 +373,13 @@ export default function ReadingList() {
                 </div>
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                    Lebo / Tags (Koma)
+                    Tags (Comma-separated)
                   </label>
                   <input
                     type="text"
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
-                    placeholder="Tech, AI, Biashara"
+                    placeholder="Tech, AI, Business"
                     className={`w-full px-4 py-2 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-xs outline-none`}
                   />
                 </div>
@@ -391,14 +391,14 @@ export default function ReadingList() {
                   onClick={() => setShowAddModal(false)}
                   className={`flex-1 py-2.5 rounded-full border ${tc.border} text-xs font-bold hover:bg-gray-800`}
                 >
-                  Ghairi
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!title.trim()}
                   className="flex-1 py-2.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white font-bold text-xs rounded-full shadow-lg shadow-blue-500/25"
                 >
-                  Hifadhi Makala
+                  Save Article
                 </button>
               </div>
             </form>

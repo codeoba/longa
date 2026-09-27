@@ -52,14 +52,14 @@ export const CreatorStore: React.FC = () => {
 
   // Rich Content
   const [description, setDescription] = useState(
-    '### Maelezo ya Bidhaa\nKiolezo hiki kimeandaliwa kwa ubora wa juu na kiko tayari kutumika kwenye miradi halisi ya uzalishaji.\n\n- Safi na rahisi kuelewa\n- Usaidizi wa haraka na miongozo kamili\n- Masasisho ya bure kwa miezi 12'
+    '### Product Overview\nThis template is production-ready and built with modern architectural standards.\n\n- Clean and easy to extend\n- Full documentation and active support\n- Lifetime access and updates'
   );
   const [descMode, setDescMode] = useState<'edit' | 'preview'>('edit');
   const [features, setFeatures] = useState<string[]>([
-    'Kodi zote chanzo (Full Source Code)',
+    'Full Source Code Included',
     'Figma UI Kit & Design Tokens',
-    'Msaada wa Kiufundi wa 24/7',
-    'Miongozo ya Hatua kwa Hatua (Step-by-Step Docs)'
+    '24/7 Dedicated Technical Support',
+    'Step-by-Step Documentation & Setup Guide'
   ]);
   const [featureInput, setFeatureInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -196,7 +196,7 @@ export const CreatorStore: React.FC = () => {
       const res = await uploadMedia(file);
       setCoverImage(res.url);
     } catch (err: any) {
-      alert('Hitilafu ya kupakia picha ya jalada: ' + (err.message || 'Jaribu tena'));
+      alert('Failed to upload cover image: ' + (err.message || 'Please try again'));
     } finally {
       setUploadingCover(false);
       if (e.target) e.target.value = '';
@@ -211,14 +211,14 @@ export const CreatorStore: React.FC = () => {
     try {
       for (let i = 0; i < files.length; i++) {
         if (galleryImages.length >= 6) {
-          alert('Unaweza kupakia hadi picha 6 za gallery pekee.');
+          alert('You can upload up to 6 gallery images.');
           break;
         }
         const res = await uploadMedia(files[i]);
         setGalleryImages(prev => [...prev, res.url]);
       }
     } catch (err: any) {
-      alert('Hitilafu ya kupakia picha: ' + (err.message || 'Jaribu tena'));
+      alert('Failed to upload image: ' + (err.message || 'Please try again'));
     } finally {
       setUploadingGallery(false);
       if (e.target) e.target.value = '';
@@ -241,7 +241,7 @@ export const CreatorStore: React.FC = () => {
       setFileName(file.name);
       setFileSize((file.size / (1024 * 1024)).toFixed(1) + ' MB');
     } catch (err: any) {
-      alert('Hitilafu ya kupakia faili: ' + (err.message || 'Jaribu tena'));
+      alert('Failed to upload file: ' + (err.message || 'Please try again'));
     } finally {
       setUploadingFile(false);
       if (e.target) e.target.value = '';
@@ -255,7 +255,7 @@ export const CreatorStore: React.FC = () => {
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const selected = description.substring(start, end);
-    const replacement = syntaxStart + (selected || 'maandishi') + syntaxEnd;
+    const replacement = syntaxStart + (selected || 'text') + syntaxEnd;
     const newText = description.substring(0, start) + replacement + description.substring(end);
     setDescription(newText);
     setTimeout(() => {
@@ -297,7 +297,7 @@ export const CreatorStore: React.FC = () => {
   const handlePublishProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || Number(price) <= 0) {
-      alert('Tafadhali weka Jina la bidhaa na Bei sahihi.');
+      alert('Please enter a product title and valid price.');
       return;
     }
 
@@ -349,7 +349,7 @@ export const CreatorStore: React.FC = () => {
       }
 
       setIsSellModalOpen(false);
-      alert('Hongera! Bidhaa yako imechapishwa kikamilifu kwenye Longa Store.');
+      alert('Congratulations! Your product has been published to Longa Store.');
     } catch {
       const fallbackItem: StoreItem = {
         id: 'prod_' + Date.now(),
@@ -425,7 +425,7 @@ export const CreatorStore: React.FC = () => {
               Creator Store & Digital Marketplace
             </h1>
             <p className="mt-2 text-sm md:text-base text-gray-400 max-w-xl">
-              Gundua, pakua, au uza programu (code), templeti, e-vitabu, na kozi moja kwa moja ukitumia mfumo wa kisasa wa malipo na usambazaji salama.
+              Discover, download, and sell source code, templates, e-books, and digital deliverables directly with instant Escrow-backed payments.
             </p>
           </div>
           <button
@@ -438,7 +438,7 @@ export const CreatorStore: React.FC = () => {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
             </svg>
-            <span>Chapisha Bidhaa (Sell a Product)</span>
+            <span>Sell a Product</span>
           </button>
         </div>
       </div>
@@ -466,7 +466,7 @@ export const CreatorStore: React.FC = () => {
           <div className="relative w-full md:w-72">
             <input
               type="text"
-              placeholder="Tafuta code, vitabu, templeti..."
+              placeholder="Search templates, software, assets..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               className={`w-full pl-10 pr-4 py-2.5 rounded-full text-sm border border-[#38444d]/50 ${tc.bgInput} ${tc.text} focus:outline-none focus:border-blue-500 transition`}
@@ -485,13 +485,13 @@ export const CreatorStore: React.FC = () => {
         ) : filteredProducts.length === 0 ? (
           <div className="text-center py-20 border border-dashed border-[#38444d]/50 rounded-2xl p-8">
             <p className="text-5xl mb-3">🛍️</p>
-            <h3 className="text-xl font-bold">Hakuna bidhaa iliyopatikana</h3>
-            <p className="text-gray-400 text-sm mt-1">Kuwa wa kwanza kuchapisha bidhaa ya kidijitali katika kipengele hiki!</p>
+            <h3 className="text-xl font-bold">No products found</h3>
+            <p className="text-gray-400 text-sm mt-1">Be the first creator to publish digital deliverables in this category!</p>
             <button
               onClick={() => setIsSellModalOpen(true)}
               className="mt-4 px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold shadow-md"
             >
-              Weka Bidhaa Sasa
+              Create Product Now
             </button>
           </div>
         ) : (
@@ -611,7 +611,7 @@ export const CreatorStore: React.FC = () => {
                         }}
                         className="px-4 py-2 rounded-full font-bold text-xs bg-blue-600 hover:bg-blue-500 text-white shadow-md active:scale-95 transition"
                       >
-                        Nunua Sasa
+                        Buy Now
                       </button>
                     </div>
                   </div>
@@ -636,8 +636,8 @@ export const CreatorStore: React.FC = () => {
                   🛍️
                 </div>
                 <div>
-                  <h2 className="text-lg md:text-xl font-bold">Studio ya Kuchapisha Bidhaa (Product Studio)</h2>
-                  <p className="text-xs text-gray-400">Unda bidhaa ya kidijitali yenye gallery ya picha, maelezo kamili na faili la kupakua.</p>
+                  <h2 className="text-lg md:text-xl font-bold">Creator Product Studio</h2>
+                  <p className="text-xs text-gray-400">Publish digital assets with media galleries, deliverables, and rich markdown formatting.</p>
                 </div>
               </div>
 
@@ -652,7 +652,7 @@ export const CreatorStore: React.FC = () => {
                   }`}
                 >
                   <span>👁️</span>
-                  <span>{previewCardMode ? 'Funga Hakiki' : 'Hakiki Bidhaa'}</span>
+                  <span>{previewCardMode ? 'Close Preview' : 'Live Preview'}</span>
                 </button>
                 <button
                   onClick={() => setIsSellModalOpen(false)}
@@ -666,10 +666,10 @@ export const CreatorStore: React.FC = () => {
             {/* Navigation Tabs */}
             <div className={`px-6 border-b border-[#38444d]/40 flex gap-2 overflow-x-auto ${tc.bgSecondary} py-2`}>
               {[
-                { id: 'basics', label: '1. Misingi & Faili', icon: '📝' },
-                { id: 'visuals', label: '2. Picha & Gallery', icon: '🖼️' },
-                { id: 'content', label: '3. Rich Editor & Vipengele', icon: '✍️' },
-                { id: 'pricing', label: '4. Bei & Leseni', icon: '🏷️' },
+                { id: 'basics', label: '1. Basics & Deliverable', icon: '📝' },
+                { id: 'visuals', label: '2. Visuals & Gallery', icon: '🖼️' },
+                { id: 'content', label: '3. Description & Features', icon: '✍️' },
+                { id: 'pricing', label: '4. Pricing & License', icon: '🏷️' },
               ].map(tab => (
                 <button
                   key={tab.id}
@@ -694,26 +694,26 @@ export const CreatorStore: React.FC = () => {
                 <div className="space-y-5 animate-in fade-in">
                   <div>
                     <label className="block text-xs font-bold text-gray-300 mb-1.5">
-                      Jina la Bidhaa (Product Title) <span className="text-red-400">*</span>
+                      Product Title <span className="text-red-400">*</span>
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder="Mfano: Next.js SaaS Starter Kit yenye M-Pesa & Stripe"
+                      placeholder="e.g. Next.js SaaS Starter Kit with Stripe & Auth"
                       value={title}
                       onChange={e => setTitle(e.target.value)}
                       maxLength={80}
                       className={`w-full px-4 py-2.5 rounded-xl text-sm border border-[#38444d] ${tc.bgInput} ${tc.text} focus:outline-none focus:border-blue-500`}
                     />
                     <div className="flex justify-between text-[11px] text-gray-500 mt-1">
-                      <span>Jina fupi na lenye kueleweka huongeza mauzo kwa 40%.</span>
+                      <span>Clear and compelling titles increase conversion by up to 40%.</span>
                       <span>{title.length}/80</span>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-gray-300 mb-1.5">Kipengele (Category)</label>
+                      <label className="block text-xs font-bold text-gray-300 mb-1.5">Category</label>
                       <select
                         value={category}
                         onChange={e => setCategory(e.target.value as any)}
@@ -730,15 +730,15 @@ export const CreatorStore: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-gray-300 mb-1.5">Aina ya Utoaji (Delivery Type)</label>
+                      <label className="block text-xs font-bold text-gray-300 mb-1.5">Delivery Type</label>
                       <select
                         value={deliveryType}
                         onChange={e => setDeliveryType(e.target.value as any)}
                         className={`w-full px-4 py-2.5 rounded-xl text-sm border border-[#38444d] ${tc.bgInput} ${tc.text} focus:outline-none focus:border-blue-500`}
                       >
-                        <option value="instant_download">📁 Pakua Faili Moja kwa Moja (Instant File Download)</option>
-                        <option value="link">🔗 Kiungo cha Nje (GitHub, Figma, Notion, Drive)</option>
-                        <option value="consultation_call">🤝 Miadi ya Maongezi (Calendly / Meeting Link)</option>
+                        <option value="instant_download">📁 Instant File Download (ZIP, PDF, APK)</option>
+                        <option value="link">🔗 External Link (GitHub repo, Figma, Notion, Drive)</option>
+                        <option value="consultation_call">🤝 Consultation / Meeting Link (Calendly, Meet)</option>
                       </select>
                     </div>
                   </div>
@@ -748,9 +748,9 @@ export const CreatorStore: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-blue-400 flex items-center gap-1.5">
                         <span>📦</span>
-                        <span>Deliverable / Faili Analopokea Mnunuzi:</span>
+                        <span>Customer Deliverable:</span>
                       </span>
-                      <span className="text-[11px] text-gray-400">Hufunguka kiotomatiki baada ya malipo</span>
+                      <span className="text-[11px] text-gray-400">Instantly unlocked upon checkout</span>
                     </div>
 
                     {deliveryType === 'instant_download' ? (
@@ -768,13 +768,13 @@ export const CreatorStore: React.FC = () => {
                           {uploadingFile ? (
                             <div className="flex items-center justify-center gap-2 text-sm text-blue-400">
                               <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-400 border-t-transparent" />
-                              <span>Inapakia faili lako...</span>
+                              <span>Uploading deliverable file...</span>
                             </div>
                           ) : fileUrl ? (
                             <div className="flex items-center justify-between px-3 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 text-xs">
                               <div className="flex items-center gap-2">
                                 <span>📄</span>
-                                <span className="font-bold">{fileName || 'faili_la_bidhaa.zip'}</span>
+                                <span className="font-bold">{fileName || 'product_asset.zip'}</span>
                                 {fileSize && <span className="text-gray-400">({fileSize})</span>}
                               </div>
                               <button
@@ -786,16 +786,16 @@ export const CreatorStore: React.FC = () => {
                                 }}
                                 className="text-red-400 hover:text-red-300 font-bold"
                               >
-                                Ondoa
+                                Remove
                               </button>
                             </div>
                           ) : (
                             <div>
                               <p className="text-2xl mb-1">📤</p>
                               <p className="text-xs font-semibold text-gray-200">
-                                Bofya hapa kupakia faili (ZIP, PDF, MP4, APK)
+                                Click here to upload deliverable file (ZIP, PDF, MP4, APK)
                               </p>
-                              <p className="text-[11px] text-gray-500 mt-1">Upeo: 25MB kwa kila faili</p>
+                              <p className="text-[11px] text-gray-500 mt-1">Up to 25MB per file</p>
                             </div>
                           )}
                         </div>
@@ -804,7 +804,7 @@ export const CreatorStore: React.FC = () => {
                       <div>
                         <input
                           type="url"
-                          placeholder="Mfano: https://github.com/mweka/starter-kit au kiungo cha Figma/Drive"
+                          placeholder="e.g. https://github.com/creator/starter-kit or Figma/Drive link"
                           value={externalLink}
                           onChange={e => setExternalLink(e.target.value)}
                           className={`w-full px-4 py-2.5 rounded-xl text-sm border border-[#38444d] ${tc.bgInput} ${tc.text} focus:outline-none focus:border-blue-500`}
@@ -822,14 +822,14 @@ export const CreatorStore: React.FC = () => {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <label className="text-xs font-bold text-gray-300">
-                        Picha Kuu ya Jalada (Cover Image) <span className="text-red-400">*</span>
+                        Cover Image <span className="text-red-400">*</span>
                       </label>
                       <button
                         type="button"
                         onClick={() => coverFileRef.current?.click()}
                         className="text-xs text-blue-400 hover:underline flex items-center gap-1"
                       >
-                        <span>📁 Pakia Kutoka Kwenye Kifaa</span>
+                        <span>📁 Upload from Device</span>
                       </button>
                     </div>
 
@@ -853,7 +853,7 @@ export const CreatorStore: React.FC = () => {
                           onClick={() => coverFileRef.current?.click()}
                           className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full text-xs font-bold shadow-lg"
                         >
-                          {uploadingCover ? 'Inapakia...' : 'Badilisha Picha'}
+                          {uploadingCover ? 'Uploading...' : 'Change Cover Image'}
                         </button>
                       </div>
                     </div>
@@ -864,10 +864,10 @@ export const CreatorStore: React.FC = () => {
                     <div className="flex items-center justify-between mb-3">
                       <div>
                         <h4 className="text-xs font-bold text-gray-200">
-                          Picha za Gallery & Screenshots ({galleryImages.length}/6)
+                          Gallery Images & Screenshots ({galleryImages.length}/6)
                         </h4>
                         <p className="text-[11px] text-gray-400">
-                          Weka picha za kuonyesha muonekano wa ndani wa bidhaa (Screenshots, UI, Vielelezo).
+                          Showcase UI screenshots, inside previews, or illustrations.
                         </p>
                       </div>
 
@@ -885,13 +885,13 @@ export const CreatorStore: React.FC = () => {
                         disabled={uploadingGallery || galleryImages.length >= 6}
                         className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 text-white rounded-full text-xs font-bold shadow flex items-center gap-1.5"
                       >
-                        <span>+ Ongeza Picha</span>
+                        <span>+ Add Images</span>
                       </button>
                     </div>
 
                     {uploadingGallery && (
                       <div className="py-2 text-center text-xs text-blue-400 animate-pulse">
-                        Inapakia picha za gallery...
+                        Uploading gallery images...
                       </div>
                     )}
 
@@ -901,7 +901,7 @@ export const CreatorStore: React.FC = () => {
                         className="border-2 border-dashed border-[#38444d] rounded-xl p-6 text-center cursor-pointer hover:border-blue-500/50 transition"
                       >
                         <p className="text-2xl mb-1">🖼️</p>
-                        <p className="text-xs text-gray-400">Bofya hapa kuchagua picha kadhaa za gallery</p>
+                        <p className="text-xs text-gray-400">Click to upload multiple gallery images</p>
                       </div>
                     ) : (
                       <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
@@ -913,7 +913,7 @@ export const CreatorStore: React.FC = () => {
                                 type="button"
                                 onClick={() => setCoverImage(imgUrl)}
                                 className="p-1 bg-blue-600 rounded text-white text-[10px]"
-                                title="Weka kama Cover"
+                                title="Set as Cover"
                               >
                                 ⭐
                               </button>
@@ -921,7 +921,7 @@ export const CreatorStore: React.FC = () => {
                                 type="button"
                                 onClick={() => removeGalleryImage(idx)}
                                 className="p-1 bg-red-600 rounded text-white text-[10px]"
-                                title="Futa picha hii"
+                                title="Remove Image"
                               >
                                 ✕
                               </button>
@@ -942,7 +942,7 @@ export const CreatorStore: React.FC = () => {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <label className="text-xs font-bold text-gray-300">
-                        Maelezo ya Kina (Rich Markdown Description)
+                        Product Description (Markdown Supported)
                       </label>
                       <div className="flex items-center bg-[#38444d]/30 rounded-lg p-0.5 border border-[#38444d]/50">
                         <button
@@ -952,7 +952,7 @@ export const CreatorStore: React.FC = () => {
                             descMode === 'edit' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'
                           }`}
                         >
-                          Andika (Editor)
+                          Write
                         </button>
                         <button
                           type="button"
@@ -961,7 +961,7 @@ export const CreatorStore: React.FC = () => {
                             descMode === 'preview' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'
                           }`}
                         >
-                          Hakiki (Preview)
+                          Preview
                         </button>
                       </div>
                     </div>
@@ -1037,7 +1037,7 @@ export const CreatorStore: React.FC = () => {
                           </button>
                           <button
                             type="button"
-                            onClick={() => insertFormatting('[Jina la Kiungo](', ')') }
+                            onClick={() => insertFormatting('[Link Title](', ')') }
                             className="p-1.5 hover:bg-gray-700 rounded text-xs text-gray-200"
                             title="Link [title](url)"
                           >
@@ -1047,10 +1047,10 @@ export const CreatorStore: React.FC = () => {
                           <div className="ml-auto flex items-center gap-1">
                             <button
                               type="button"
-                              onClick={() => insertFormatting('\n### ⚡ Vipengele Muhimu\n- \n- \n- \n')}
+                              onClick={() => insertFormatting('\n### ⚡ Key Features\n- Feature 1\n- Feature 2\n- Feature 3\n')}
                               className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-1 rounded hover:bg-blue-500/30"
                             >
-                              + Weka Violezo
+                              + Insert Template
                             </button>
                           </div>
                         </div>
@@ -1061,7 +1061,7 @@ export const CreatorStore: React.FC = () => {
                           rows={7}
                           value={description}
                           onChange={e => setDescription(e.target.value)}
-                          placeholder="Andika maelezo ya kina ya bidhaa yako kwa kutumia Markdown..."
+                          placeholder="Write detailed product information, tech stack, and documentation with Markdown..."
                           className={`w-full p-4 text-sm ${tc.bgInput} ${tc.text} outline-none resize-y`}
                         />
                       </div>
@@ -1089,16 +1089,16 @@ export const CreatorStore: React.FC = () => {
                   {/* Highlights / Features List Builder */}
                   <div className="p-4 rounded-2xl border border-[#38444d]/60 bg-[#38444d]/10">
                     <label className="text-xs font-bold text-gray-200 block mb-1">
-                      Vipengele vya Haraka (What's Included / Highlights)
+                      Key Highlights & Inclusions
                     </label>
                     <p className="text-[11px] text-gray-400 mb-3">
-                      Hivi huonekana kama alama za tiki za kijani kwenye kadi na maelezo ya bidhaa.
+                      These appear as verified checkmarks on the product card.
                     </p>
 
                     <div className="flex gap-2 mb-3">
                       <input
                         type="text"
-                        placeholder="Mfano: ✔️ Miongozo ya hatua kwa hatua ya usanidi"
+                        placeholder="e.g. Step-by-step setup documentation included"
                         value={featureInput}
                         onChange={e => setFeatureInput(e.target.value)}
                         onKeyDown={handleAddFeature}
@@ -1109,7 +1109,7 @@ export const CreatorStore: React.FC = () => {
                         onClick={handleAddFeature}
                         className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold"
                       >
-                        + Ongeza
+                        + Add
                       </button>
                     </div>
 
@@ -1139,23 +1139,23 @@ export const CreatorStore: React.FC = () => {
                 <div className="space-y-5 animate-in fade-in">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-gray-300 mb-1.5">Sarafu (Currency)</label>
+                      <label className="block text-xs font-bold text-gray-300 mb-1.5">Currency</label>
                       <select
                         value={currency}
                         onChange={e => setCurrency(e.target.value)}
                         className={`w-full px-4 py-2.5 rounded-xl text-sm border border-[#38444d] ${tc.bgInput} ${tc.text} focus:outline-none focus:border-blue-500`}
                       >
-                        <option value="USD">USD ($) - Marekani</option>
-                        <option value="TZS">TZS (TSh) - Tanzania</option>
-                        <option value="KES">KES (KSh) - Kenya</option>
-                        <option value="EUR">EUR (€) - Ulaya</option>
-                        <option value="GBP">GBP (£) - Uingereza</option>
+                        <option value="USD">USD ($) - US Dollar</option>
+                        <option value="TZS">TZS (TSh) - Tanzania Shilling</option>
+                        <option value="KES">KES (KSh) - Kenya Shilling</option>
+                        <option value="EUR">EUR (€) - Euro</option>
+                        <option value="GBP">GBP (£) - British Pound</option>
                       </select>
                     </div>
 
                     <div>
                       <label className="block text-xs font-bold text-gray-300 mb-1.5">
-                        Bei ya Kuuza (Selling Price) <span className="text-red-400">*</span>
+                        Selling Price <span className="text-red-400">*</span>
                       </label>
                       <input
                         type="number"
@@ -1169,12 +1169,12 @@ export const CreatorStore: React.FC = () => {
 
                     <div>
                       <label className="block text-xs font-bold text-gray-300 mb-1.5">
-                        Bei ya Awali (Compare-at / Discount)
+                        Compare-at Price (Discount)
                       </label>
                       <input
                         type="number"
                         min="0"
-                        placeholder="Mfano: 49"
+                        placeholder="e.g. 49"
                         value={originalPrice}
                         onChange={e => setOriginalPrice(e.target.value)}
                         className={`w-full px-4 py-2.5 rounded-xl text-sm border border-[#38444d] ${tc.bgInput} ${tc.text} focus:outline-none focus:border-blue-500`}
@@ -1184,21 +1184,21 @@ export const CreatorStore: React.FC = () => {
 
                   {Number(originalPrice) > Number(price) && (
                     <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center justify-between">
-                      <span>🏷️ Ofa itatokea kama:</span>
+                      <span>🏷️ Discount Badge:</span>
                       <span className="font-extrabold">
-                        {Math.round(((Number(originalPrice) - Number(price)) / Number(originalPrice)) * 100)}% PUNGUZO (OFF)
+                        {Math.round(((Number(originalPrice) - Number(price)) / Number(originalPrice)) * 100)}% OFF
                       </span>
                     </div>
                   )}
 
                   {/* License Selection */}
                   <div>
-                    <label className="block text-xs font-bold text-gray-300 mb-2">Leseni ya Matumizi (License)</label>
+                    <label className="block text-xs font-bold text-gray-300 mb-2">Usage License</label>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       {[
-                        { id: 'personal', title: 'Personal License', desc: 'Mradi mmoja usio wa kibiashara' },
-                        { id: 'commercial', title: 'Commercial License', desc: 'Miradi ya wateja na kibiashara' },
-                        { id: 'extended', title: 'Extended Unlimited', desc: 'Haki zote ikiwemo kusambaza upya' },
+                        { id: 'personal', title: 'Personal License', desc: 'Single personal, non-commercial project' },
+                        { id: 'commercial', title: 'Commercial License', desc: 'Commercial projects and client work' },
+                        { id: 'extended', title: 'Extended Unlimited', desc: 'Full rights including redistribution' },
                       ].map(lic => (
                         <div
                           key={lic.id}
@@ -1218,11 +1218,11 @@ export const CreatorStore: React.FC = () => {
 
                   {/* Tags */}
                   <div>
-                    <label className="block text-xs font-bold text-gray-300 mb-1.5">Tags & Maneno Muhimu</label>
+                    <label className="block text-xs font-bold text-gray-300 mb-1.5">Tags & Keywords</label>
                     <div className="flex gap-2 mb-2">
                       <input
                         type="text"
-                        placeholder="Andika tag kisha bonyeza Enter (mfano: React, Ebook, UI)"
+                        placeholder="Type tag and press Enter (e.g. React, SaaS, Template)"
                         value={tagInput}
                         onChange={e => setTagInput(e.target.value)}
                         onKeyDown={handleAddTag}
@@ -1233,7 +1233,7 @@ export const CreatorStore: React.FC = () => {
                         onClick={handleAddTag}
                         className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold"
                       >
-                        Weka
+                        Add
                       </button>
                     </div>
 
@@ -1254,7 +1254,7 @@ export const CreatorStore: React.FC = () => {
                 <div className="p-4 rounded-2xl border border-blue-500/40 bg-blue-950/30 space-y-3">
                   <h4 className="text-xs font-bold text-blue-400 flex items-center gap-2">
                     <span>👁️</span>
-                    <span>Muonekano wa Kadi Kwenye Duka (Live Card Preview):</span>
+                    <span>Live Store Card Preview:</span>
                   </h4>
                   
                   <div className="max-w-sm mx-auto rounded-2xl border border-[#38444d]/50 overflow-hidden bg-zinc-900 shadow-2xl">
@@ -1268,14 +1268,14 @@ export const CreatorStore: React.FC = () => {
                       </div>
                     </div>
                     <div className="p-4">
-                      <h4 className="font-bold text-sm line-clamp-1">{title || 'Jina la Bidhaa Yako'}</h4>
+                      <h4 className="font-bold text-sm line-clamp-1">{title || 'Your Product Title'}</h4>
                       <p className="text-xs text-gray-400 mt-1 line-clamp-2">
                         {description.replace(/[#*`_]/g, '')}
                       </p>
                       <div className="mt-4 pt-3 border-t border-gray-800 flex items-center justify-between text-xs">
                         <span className="text-emerald-400 font-bold">${price} {currency}</span>
                         <span className="px-3 py-1 bg-blue-600 rounded-full font-bold text-white text-[11px]">
-                          Nunua Sasa
+                          Buy Now
                         </span>
                       </div>
                     </div>
@@ -1301,7 +1301,7 @@ export const CreatorStore: React.FC = () => {
                     }}
                     className="px-4 py-2 rounded-full text-xs font-semibold text-gray-300 hover:text-white"
                   >
-                    Nyuma
+                    Back
                   </button>
                 )}
 
@@ -1315,7 +1315,7 @@ export const CreatorStore: React.FC = () => {
                     }}
                     className="px-6 py-2.5 rounded-full text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-md"
                   >
-                    Endelea →
+                    Continue →
                   </button>
                 ) : (
                   <button
@@ -1327,7 +1327,7 @@ export const CreatorStore: React.FC = () => {
                     {isSubmitting && (
                       <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent" />
                     )}
-                    <span>{isSubmitting ? 'Inachapisha...' : 'Chapisha Bidhaa Dukani'}</span>
+                    <span>{isSubmitting ? 'Publishing...' : 'Publish Product to Store'}</span>
                   </button>
                 )}
               </div>
@@ -1427,7 +1427,7 @@ export const CreatorStore: React.FC = () => {
                     }}
                     className="px-6 py-3 rounded-full font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/25 active:scale-95 transition"
                   >
-                    Nunua Sasa →
+                    Buy Now →
                   </button>
                 </div>
               </div>
@@ -1437,7 +1437,7 @@ export const CreatorStore: React.FC = () => {
                 <div className="p-5 rounded-2xl border border-blue-500/30 bg-blue-950/20">
                   <h3 className="text-sm font-bold text-blue-400 mb-3 flex items-center gap-2">
                     <span>✨</span>
-                    <span>Vipengele Vilivyojumuishwa (What's Included):</span>
+                    <span>What's Included:</span>
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {viewProduct.features.map((feat, i) => (
@@ -1452,7 +1452,7 @@ export const CreatorStore: React.FC = () => {
 
               {/* Description */}
               <div>
-                <h3 className="text-sm font-bold text-gray-200 mb-2">Maelezo ya Kina</h3>
+                <h3 className="text-sm font-bold text-gray-200 mb-2">Product Description</h3>
                 <div className="p-4 rounded-2xl border border-[#38444d]/40 bg-[#38444d]/10 text-sm leading-relaxed text-gray-300 space-y-2">
                   {viewProduct.description.split('\n').map((line, idx) => {
                     if (line.startsWith('### ')) {
@@ -1473,10 +1473,10 @@ export const CreatorStore: React.FC = () => {
               <div className="p-4 rounded-xl bg-gray-900 border border-gray-800 text-xs text-gray-400 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span>🔒</span>
-                  <span>Utoaji wa haraka na salama kupitia Longa Escrow.</span>
+                  <span>Instant deliverable release protected by Longa Escrow.</span>
                 </div>
                 {viewProduct.fileName && (
-                  <span className="text-gray-300 font-mono">Faili: {viewProduct.fileName} ({viewProduct.fileSize})</span>
+                  <span className="text-gray-300 font-mono">File: {viewProduct.fileName} ({viewProduct.fileSize})</span>
                 )}
               </div>
             </div>
@@ -1506,13 +1506,13 @@ export const CreatorStore: React.FC = () => {
                 <div className="w-16 h-16 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto text-3xl mb-4">
                   ✓
                 </div>
-                <h3 className="text-xl font-bold">Hongera! Malipo Yamekamilika</h3>
+                <h3 className="text-xl font-bold">Congratulations! Payment Successful</h3>
                 <p className="text-xs text-gray-400 mt-1">
-                  Sasa unamiliki <span className="text-white font-semibold">{checkoutProduct.title}</span>.
+                  You now own <span className="text-white font-semibold">{checkoutProduct.title}</span>.
                 </p>
 
                 <div className="mt-5 p-4 rounded-2xl bg-blue-950/40 border border-blue-500/30 text-left">
-                  <span className="text-xs text-blue-400 font-bold block mb-1">Nambari ya Leseni (Order Reference):</span>
+                  <span className="text-xs text-blue-400 font-bold block mb-1">License & Order Reference:</span>
                   <div className="flex items-center justify-between font-mono text-sm bg-black/40 px-3 py-2 rounded-lg text-emerald-400 border border-emerald-500/20">
                     <span>{purchaseSuccess}</span>
                     <button
@@ -1523,7 +1523,7 @@ export const CreatorStore: React.FC = () => {
                     </button>
                   </div>
                   <p className="text-[11px] text-gray-400 mt-2">
-                    Kiungo cha faili kimetumwa pia kwenye ujumbe (Messages) na Vault yako ya Longa.
+                    Your digital download link has also been sent to your Messages and Longa Vault.
                   </p>
                 </div>
 
@@ -1534,13 +1534,13 @@ export const CreatorStore: React.FC = () => {
                   }}
                   className="mt-6 w-full py-3 rounded-full font-bold bg-blue-600 hover:bg-blue-500 text-white text-sm"
                 >
-                  Nimemaliza (Done)
+                  Done
                 </button>
               </div>
             ) : (
               <div>
-                <h3 className="text-lg font-bold mb-1">Malipo ya Haraka (Instant Checkout)</h3>
-                <p className="text-xs text-gray-400 mb-4">Malipo salama ya moja kwa moja kupitia Escrow.</p>
+                <h3 className="text-lg font-bold mb-1">Instant Checkout</h3>
+                <p className="text-xs text-gray-400 mb-4">Direct secure payment protected by Escrow.</p>
 
                 <div className="flex items-center gap-3 p-3 rounded-2xl bg-[#38444d]/20 border border-[#38444d]/40 mb-4">
                   <img
@@ -1550,7 +1550,7 @@ export const CreatorStore: React.FC = () => {
                   />
                   <div className="flex-1 min-w-0">
                     <h4 className="font-bold text-sm truncate">{checkoutProduct.title}</h4>
-                    <p className="text-xs text-gray-400">Na {checkoutProduct.creatorName}</p>
+                    <p className="text-xs text-gray-400">By {checkoutProduct.creatorName}</p>
                     <p className="text-sm font-extrabold text-emerald-400 mt-0.5">
                       ${checkoutProduct.price} {checkoutProduct.currency}
                     </p>
@@ -1558,7 +1558,7 @@ export const CreatorStore: React.FC = () => {
                 </div>
 
                 <div className="space-y-2 mb-5">
-                  <span className="text-xs font-semibold block text-gray-300">Chagua Njia ya Malipo:</span>
+                  <span className="text-xs font-semibold block text-gray-300">Select Payment Method:</span>
                   <div
                     onClick={() => setPaymentMethod('wallet')}
                     className={`p-3 rounded-2xl border cursor-pointer flex items-center justify-between transition ${
@@ -1571,10 +1571,10 @@ export const CreatorStore: React.FC = () => {
                       <span>⚡</span>
                       <div>
                         <div className="font-semibold text-xs">Longa Creator Wallet</div>
-                        <div className="text-[10px] text-gray-400">Malipo ya papo hapo • Makato 0%</div>
+                        <div className="text-[10px] text-gray-400">Instant settlement • 0% platform fee</div>
                       </div>
                     </div>
-                    <span className="text-xs text-emerald-400 font-bold">$240.00 Salio</span>
+                    <span className="text-xs text-emerald-400 font-bold">$240.00 Balance</span>
                   </div>
 
                   <div
@@ -1588,7 +1588,7 @@ export const CreatorStore: React.FC = () => {
                     <div className="flex items-center gap-2.5 text-sm">
                       <span>💳</span>
                       <div>
-                        <div className="font-semibold text-xs">Kadi ya Benki (Credit / Debit Card)</div>
+                        <div className="font-semibold text-xs">Credit / Debit Card</div>
                         <div className="text-[10px] text-gray-400">Visa, Mastercard, Amex</div>
                       </div>
                     </div>
@@ -1605,8 +1605,8 @@ export const CreatorStore: React.FC = () => {
                     <div className="flex items-center gap-2.5 text-sm">
                       <span>📱</span>
                       <div>
-                        <div className="font-semibold text-xs">M-Pesa / Tigo Pesa / Airtel Money</div>
-                        <div className="text-[10px] text-gray-400">Arifa ya moja kwa moja ya simu (USSD Push)</div>
+                        <div className="font-semibold text-xs">Mobile Money (M-Pesa / Tigo Pesa / Airtel)</div>
+                        <div className="text-[10px] text-gray-400">Instant mobile push prompt (USSD Push)</div>
                       </div>
                     </div>
                   </div>
@@ -1621,7 +1621,7 @@ export const CreatorStore: React.FC = () => {
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                   ) : (
                     <>
-                      <span>Lipa ${checkoutProduct.price} & Fungua Faili</span>
+                      <span>Pay ${checkoutProduct.price} & Unlock Deliverable</span>
                       <span>→</span>
                     </>
                   )}

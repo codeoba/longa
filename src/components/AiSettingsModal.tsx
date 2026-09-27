@@ -81,12 +81,12 @@ export default function AiSettingsModal({ isOpen, onClose, onConfigSaved }: AiSe
       setTestResult({
         status: 'success',
         latency: res.latencyMs,
-        message: res.message || 'Muunganisho umefanikiwa kikamilifu!',
+        message: res.message || 'Connection successful!',
       });
     } else {
       setTestResult({
         status: 'error',
-        message: res.error || 'Imeshindwa kuunganishwa na API key hii.',
+        message: res.error || 'Failed to connect with this API key.',
       });
     }
   };
@@ -111,7 +111,7 @@ export default function AiSettingsModal({ isOpen, onClose, onConfigSaved }: AiSe
 
     saveAiConfig(newConfig);
     setConfig(newConfig);
-    setSaveFeedback('Mipangilio ya AI imehifadhiwa!');
+    setSaveFeedback('AI settings saved successfully!');
 
     if (onConfigSaved) {
       onConfigSaved(newConfig);
@@ -133,7 +133,7 @@ export default function AiSettingsModal({ isOpen, onClose, onConfigSaved }: AiSe
     setSelectedProviderId('builtin');
     setKeyInput('');
     setSelectedModel('longa-intelligence-v2');
-    setSaveFeedback('Umerudishwa kwenye Akili ya Asili ya Ndani ya Longa!');
+    setSaveFeedback('Reset to Longa Native Intelligence!');
     if (onConfigSaved) {
       onConfigSaved(newConfig);
     }
@@ -166,8 +166,8 @@ export default function AiSettingsModal({ isOpen, onClose, onConfigSaved }: AiSe
               </svg>
             </div>
             <div>
-              <h2 className={`text-lg font-bold ${tc.text}`}>Mipangilio ya Longa AI (Multi-Provider)</h2>
-              <p className="text-xs text-gray-500">Unganisha API Key za bure au za kulipia kutoka kampuni yoyote ya AI</p>
+              <h2 className={`text-lg font-bold ${tc.text}`}>Longa AI Settings (Multi-Provider)</h2>
+              <p className="text-xs text-gray-500">Connect free or paid API keys from any AI provider</p>
             </div>
           </div>
           <button
@@ -182,13 +182,13 @@ export default function AiSettingsModal({ isOpen, onClose, onConfigSaved }: AiSe
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
           {/* Informational Banner */}
           <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 border border-blue-500/20 text-xs text-blue-300 leading-relaxed">
-            <span className="font-bold text-blue-400">💡 Bring Your Own Key (BYOK):</span> Huna haja ya kutengeneza AI yako mwenyewe. Unaweza kutumia API key ya bure (k.m. <strong>Groq</strong> au <strong>Google Gemini</strong>) au ya kulipia (k.m. <strong>OpenAI GPT-4o</strong>, <strong>DeepSeek</strong>, <strong>Claude</strong>). Funguo zako zinahifadhiwa kwa usalama kwenye kompyuta yako pekee.
+            <span className="font-bold text-blue-400">💡 Bring Your Own Key (BYOK):</span> You do not need to host your own AI model. You can plug in a free API key (e.g. <strong>Groq</strong> or <strong>Google Gemini</strong>) or a paid key (e.g. <strong>OpenAI GPT-4o</strong>, <strong>DeepSeek</strong>, <strong>Claude</strong>). Your keys are saved locally and securely on your device.
           </div>
 
           {/* Provider Grid Selector */}
           <div>
             <label className={`block text-xs font-bold uppercase tracking-wider mb-2.5 ${tc.textSecondary}`}>
-              Chagua Kampuni ya AI (Provider):
+              Select AI Provider:
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               {Object.values(providers).map((prov) => {
@@ -209,17 +209,17 @@ export default function AiSettingsModal({ isOpen, onClose, onConfigSaved }: AiSe
                       <span className="text-xs font-bold truncate text-white">{prov.name}</span>
                       {prov.is_free ? (
                         <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                          Bure
+                          Free
                         </span>
                       ) : (
                         <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                          Kulipia
+                          Paid
                         </span>
                       )}
                     </div>
                     <div className="flex items-center justify-between text-[11px] text-gray-400">
                       <span className="truncate">{prov.company || 'Native'}</span>
-                      {hasKey && <span className="text-emerald-400 text-xs" title="Key ipo">●</span>}
+                      {hasKey && <span className="text-emerald-400 text-xs" title="Key saved">●</span>}
                     </div>
                   </button>
                 );
@@ -249,7 +249,7 @@ export default function AiSettingsModal({ isOpen, onClose, onConfigSaved }: AiSe
                   rel="noopener noreferrer"
                   className="text-xs font-semibold text-blue-400 hover:text-blue-300 flex items-center gap-1 underline underline-offset-2 shrink-0"
                 >
-                  Pata API Key Hapa ↗
+                  Get API Key ↗
                 </a>
               )}
             </div>
@@ -258,7 +258,7 @@ export default function AiSettingsModal({ isOpen, onClose, onConfigSaved }: AiSe
             {currentProvider.models && Object.keys(currentProvider.models).length > 0 && (
               <div>
                 <label className="block text-xs font-semibold text-gray-400 mb-1.5">
-                  Chagua Modeli (AI Model):
+                  Select AI Model:
                 </label>
                 <select
                   value={selectedModel || currentProvider.default_model}
@@ -279,14 +279,14 @@ export default function AiSettingsModal({ isOpen, onClose, onConfigSaved }: AiSe
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-semibold text-gray-400">
-                    API Key ya {currentProvider.name}:
+                    {currentProvider.name} API Key:
                   </label>
                   <button
                     type="button"
                     onClick={() => setShowKey(!showKey)}
                     className="text-[11px] text-gray-400 hover:text-gray-200"
                   >
-                    {showKey ? 'Ficha Key' : 'Onyesha Key'}
+                    {showKey ? 'Hide Key' : 'Show Key'}
                   </button>
                 </div>
                 <div className="relative">
@@ -294,7 +294,7 @@ export default function AiSettingsModal({ isOpen, onClose, onConfigSaved }: AiSe
                     type={showKey ? 'text' : 'password'}
                     value={keyInput}
                     onChange={(e) => setKeyInput(e.target.value)}
-                    placeholder={`Weka ${currentProvider.name} API Key yako hapa...`}
+                    placeholder={`Enter your ${currentProvider.name} API Key here...`}
                     className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-mono border outline-none transition-colors ${tc.bgInput} ${tc.text} ${tc.border} focus:border-blue-500 pr-24`}
                   />
                   <button
@@ -303,7 +303,7 @@ export default function AiSettingsModal({ isOpen, onClose, onConfigSaved }: AiSe
                     disabled={isTesting || !keyInput.trim()}
                     className="absolute right-1.5 top-1.5 bottom-1.5 px-3 rounded-lg text-xs font-bold bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 disabled:opacity-40 transition-colors"
                   >
-                    {isTesting ? 'Inapima...' : 'Jaribu Key'}
+                    {isTesting ? 'Testing...' : 'Test Key'}
                   </button>
                 </div>
 
@@ -326,7 +326,7 @@ export default function AiSettingsModal({ isOpen, onClose, onConfigSaved }: AiSe
               </div>
             ) : (
               <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-300">
-                ✨ Mfumo wa asili wa <strong>Longa Native AI</strong> hauhitaji API key yoyote na unafanya kazi mara moja bila mtandao wa nje au gharama!
+                ✨ The built-in <strong>Longa Native AI</strong> requires no external API key and works immediately with zero setup!
               </div>
             )}
           </div>
@@ -339,7 +339,7 @@ export default function AiSettingsModal({ isOpen, onClose, onConfigSaved }: AiSe
             onClick={handleResetToNative}
             className="text-xs text-gray-400 hover:text-white transition-colors underline underline-offset-4"
           >
-            Rejesha ya Ndani (Bure)
+            Reset to Built-in (Free)
           </button>
 
           <div className="flex items-center gap-3">
@@ -349,14 +349,14 @@ export default function AiSettingsModal({ isOpen, onClose, onConfigSaved }: AiSe
               onClick={onClose}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${tc.bgTertiary} ${tc.textSecondary} hover:text-white`}
             >
-              Funga
+              Close
             </button>
             <button
               type="button"
               onClick={handleSave}
               className="px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/25 transition-all"
             >
-              Hifadhi na Tumia
+              Save & Apply
             </button>
           </div>
         </div>

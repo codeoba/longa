@@ -32,7 +32,7 @@ export default function BookmarkCollections() {
     {
       id: '1',
       name: 'Tech & AI Articles',
-      description: 'Makala na mifumo ya kisasa ya teknolojia',
+      description: 'Cutting-edge machine learning and infrastructure news',
       icon: '💻',
       isPrivate: false,
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30),
@@ -40,15 +40,15 @@ export default function BookmarkCollections() {
     {
       id: '2',
       name: 'Design & UI Inspiration',
-      description: 'Mifano na mbinu za ubunifu wa kurasa na programu',
+      description: 'Modern aesthetic inspiration, layouts, and components',
       icon: '🎨',
       isPrivate: false,
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 60),
     },
     {
       id: '3',
-      name: 'Biashara & Uwekezaji',
-      description: 'Mbinu za ukuaji wa biashara na fedha',
+      name: 'Business & Ventures',
+      description: 'Startup strategies, monetization, and growth',
       icon: '📈',
       isPrivate: true,
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15),
@@ -59,7 +59,7 @@ export default function BookmarkCollections() {
     {
       id: 'b1',
       collectionId: '1',
-      postContent: '🚀 Mfumo wetu mpya wa AI umewezesha kufanya code review kwa haraka mara 3 zaidi.',
+      postContent: '🚀 Our new AI code review engine speeds up pull request turnaround by 3x.',
       postAuthor: 'Zawadi Innovation',
       postAuthorAvatar: '👩‍🔬',
       savedAt: new Date(Date.now() - 1000 * 60 * 30),
@@ -68,7 +68,7 @@ export default function BookmarkCollections() {
     {
       id: 'b2',
       collectionId: '2',
-      postContent: '💡 Umuhimu wa kutumia Micro-interactions kwenye UI ili kuwavutia watumiaji.',
+      postContent: '💡 Why thoughtful micro-interactions define premium software in 2026.',
       postAuthor: 'Baraka Digital',
       postAuthorAvatar: '🎨',
       savedAt: new Date(Date.now() - 1000 * 60 * 60 * 3),
@@ -146,7 +146,7 @@ export default function BookmarkCollections() {
   };
 
   const handleDeleteCollection = (id: string) => {
-    if (window.confirm('Je, una uhakika unataka kufuta mkusanyiko huu?')) {
+    if (window.confirm('Are you sure you want to delete this collection?')) {
       setCollections(collections.filter(c => c.id !== id));
       setBookmarks(bookmarks.filter(b => b.collectionId !== id));
       if (selectedCollection?.id === id) {
@@ -168,10 +168,10 @@ export default function BookmarkCollections() {
       id: 'bm_' + Date.now(),
       collectionId: selectedCollection.id,
       postContent: bookmarkContent.trim(),
-      postAuthor: bookmarkAuthor.trim() || user?.name || 'Mtumiaji',
+      postAuthor: bookmarkAuthor.trim() || user?.name || 'User',
       postAuthorAvatar: user?.avatar || '🔖',
       savedAt: new Date(),
-      tags: tagsArray.length > 0 ? tagsArray : ['Kikumbusho'],
+      tags: tagsArray.length > 0 ? tagsArray : ['Bookmark'],
     };
 
     setBookmarks([newBookmark, ...bookmarks]);
@@ -213,7 +213,7 @@ export default function BookmarkCollections() {
                   <span>{selectedCollection.name}</span>
                 </h1>
                 <p className={`text-xs ${tc.textSecondary}`}>
-                  {collectionBookmarks.length} vialamisho {selectedCollection.isPrivate ? '· 🔒 Private' : '· 🌐 Public'}
+                  {collectionBookmarks.length} bookmarks {selectedCollection.isPrivate ? '· 🔒 Private' : '· 🌐 Public'}
                 </p>
               </div>
             </div>
@@ -223,12 +223,12 @@ export default function BookmarkCollections() {
                 onClick={() => setShowAddBookmarkModal(true)}
                 className="px-3.5 py-1.5 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-full shadow-md"
               >
-                + Weka Kialamisho
+                + Add Bookmark
               </button>
               <button
                 onClick={() => handleDeleteCollection(selectedCollection.id)}
                 className={`p-2 rounded-full ${tc.bgHoverSecondary} text-red-400 hover:bg-red-500/10`}
-                title="Futa Mkusanyiko"
+                title="Delete Collection"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -250,15 +250,15 @@ export default function BookmarkCollections() {
           {collectionBookmarks.length === 0 ? (
             <div className={`text-center py-16 rounded-2xl border ${tc.border} ${tc.bgCard}`}>
               <div className="text-5xl mb-3">{selectedCollection.icon}</div>
-              <h3 className="text-base font-bold mb-1">Hakuna vialamisho bado</h3>
+              <h3 className="text-base font-bold mb-1">No bookmarks yet</h3>
               <p className={`text-xs ${tc.textSecondary} mb-4`}>
-                Weka machapisho au maelezo unayotaka kuyahifadhi kwenye mkusanyiko huu.
+                Save posts, thoughts, or resources to this collection.
               </p>
               <button
                 onClick={() => setShowAddBookmarkModal(true)}
                 className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-full"
               >
-                + Ongeza Kialamisho cha Kwanza
+                + Add First Bookmark
               </button>
             </div>
           ) : (
@@ -272,16 +272,16 @@ export default function BookmarkCollections() {
                     <div>
                       <p className="font-bold text-xs">{bookmark.postAuthor}</p>
                       <p className={`text-[10px] ${tc.textSecondary}`}>
-                        Imehifadhiwa {bookmark.savedAt.toLocaleDateString()}
+                        Saved {bookmark.savedAt.toLocaleDateString()}
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={() => handleDeleteBookmark(bookmark.id)}
                     className="p-1 text-gray-500 hover:text-red-400 rounded transition-colors text-xs"
-                    title="Ondoa Kwenye Mkusanyiko"
+                    title="Remove from Collection"
                   >
-                    ✕ Ondoa
+                    ✕ Remove
                   </button>
                 </div>
 
@@ -305,7 +305,7 @@ export default function BookmarkCollections() {
             <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowAddBookmarkModal(false)} />
             <div className={`relative w-full max-w-md ${tc.bgModal} rounded-2xl border ${tc.border} p-6 shadow-2xl`}>
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-800">
-                <h2 className="text-lg font-black">Ongeza Kialamisho Kwenye {selectedCollection.name}</h2>
+                <h2 className="text-lg font-black">Add Bookmark to {selectedCollection.name}</h2>
                 <button
                   onClick={() => setShowAddBookmarkModal(false)}
                   className={`p-1.5 rounded-full ${tc.bgHoverSecondary} text-gray-400 hover:text-white`}
@@ -317,40 +317,40 @@ export default function BookmarkCollections() {
               <form onSubmit={handleAddBookmarkSubmit} className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                    Maudhui au Nukuu ya Chapisho *
+                    Bookmark Content / Notes *
                   </label>
                   <textarea
                     rows={4}
                     required
                     value={bookmarkContent}
                     onChange={(e) => setBookmarkContent(e.target.value)}
-                    placeholder="Weka maneno au kiungo cha chapisho..."
+                    placeholder="Enter text, quote, or post link..."
                     className={`w-full px-4 py-2.5 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-xs outline-none focus:border-blue-500 resize-none`}
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                    Mwandishi (Author)
+                    Author / Source
                   </label>
                   <input
                     type="text"
                     value={bookmarkAuthor}
                     onChange={(e) => setBookmarkAuthor(e.target.value)}
-                    placeholder="mf. Zawadi Innovation au @zawadi"
+                    placeholder="e.g. Zawadi Innovation or @zawadi"
                     className={`w-full px-4 py-2 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-xs outline-none`}
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                    Lebo / Tags (Tenganisha kwa koma)
+                    Tags (Comma-separated)
                   </label>
                   <input
                     type="text"
                     value={bookmarkTags}
                     onChange={(e) => setBookmarkTags(e.target.value)}
-                    placeholder="mf. AI, Tech, Startup"
+                    placeholder="e.g. AI, Tech, Startup"
                     className={`w-full px-4 py-2 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-xs outline-none`}
                   />
                 </div>
@@ -361,14 +361,14 @@ export default function BookmarkCollections() {
                     onClick={() => setShowAddBookmarkModal(false)}
                     className={`flex-1 py-2.5 rounded-full border ${tc.border} text-xs font-bold hover:bg-gray-800`}
                   >
-                    Ghairi
+                    Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={!bookmarkContent.trim()}
                     className="flex-1 py-2.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white font-bold text-xs rounded-full shadow-lg shadow-blue-500/25"
                   >
-                    Hifadhi Kialamisho
+                    Save Bookmark
                   </button>
                 </div>
               </form>
@@ -387,13 +387,13 @@ export default function BookmarkCollections() {
         <div className="flex items-center justify-between px-4 py-3">
           <div>
             <h1 className="text-xl font-bold">Bookmark Collections</h1>
-            <p className={`text-xs ${tc.textSecondary}`}>Panga na uhifadhi machapisho yako katika folda</p>
+            <p className={`text-xs ${tc.textSecondary}`}>Organize your saved items and thoughts into folders</p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
             className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full text-xs flex items-center gap-1.5 shadow-lg shadow-blue-500/25 transition-all"
           >
-            <span>+</span> Mkusanyiko Mpya
+            <span>+</span> New Collection
           </button>
         </div>
       </div>
@@ -404,8 +404,8 @@ export default function BookmarkCollections() {
         <div
           onClick={() => setSelectedCollection({
             id: 'all',
-            name: 'Vialamisho Vyote (All)',
-            description: 'Machapisho yote yaliyohifadhiwa kwenye akaunti yako',
+            name: 'All Bookmarks',
+            description: 'All saved bookmarks across your account',
             icon: '📑',
             isPrivate: false,
             createdAt: new Date(),
@@ -416,9 +416,9 @@ export default function BookmarkCollections() {
             📑
           </div>
           <div className="flex-1">
-            <h3 className="font-bold text-sm">Vialamisho Vyote</h3>
+            <h3 className="font-bold text-sm">All Bookmarks</h3>
             <p className={`text-xs ${tc.textSecondary}`}>
-              Jumla ya machapisho {bookmarks.length} yamehifadhiwa
+              {bookmarks.length} total items saved
             </p>
           </div>
           <span className="text-gray-500">→</span>
@@ -447,7 +447,7 @@ export default function BookmarkCollections() {
                   </p>
                 )}
                 <p className="text-[11px] text-gray-500 mt-1">
-                  Vialamisho {count} · Iliundwa {collection.createdAt.toLocaleDateString()}
+                  {count} bookmarks · Created {collection.createdAt.toLocaleDateString()}
                 </p>
               </div>
               <span className="text-gray-500">→</span>
@@ -462,7 +462,7 @@ export default function BookmarkCollections() {
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowCreateModal(false)} />
           <div className={`relative w-full max-w-md ${tc.bgModal} rounded-2xl border ${tc.border} p-6 shadow-2xl`}>
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-800">
-              <h2 className="text-lg font-black">Unda Mkusanyiko Mpya</h2>
+              <h2 className="text-lg font-black">Create New Collection</h2>
               <button
                 onClick={() => setShowCreateModal(false)}
                 className={`p-1.5 rounded-full ${tc.bgHoverSecondary} text-gray-400 hover:text-white`}
@@ -474,7 +474,7 @@ export default function BookmarkCollections() {
             {/* Icon selector */}
             <div className="mb-3">
               <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
-                Chagua Aikoni
+                Choose Icon
               </label>
               <div className="flex gap-2 flex-wrap max-h-24 overflow-y-auto pr-1">
                 {icons.map(icon => (
@@ -497,14 +497,14 @@ export default function BookmarkCollections() {
             {/* Name */}
             <div className="mb-3">
               <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                Jina la Mkusanyiko *
+                Collection Name *
               </label>
               <input
                 type="text"
                 required
                 value={newCollectionName}
                 onChange={(e) => setNewCollectionName(e.target.value)}
-                placeholder="mf. Nakala za Biashara"
+                placeholder="e.g. Design Inspiration"
                 className={`w-full px-4 py-2 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-xs outline-none focus:border-blue-500`}
               />
             </div>
@@ -512,13 +512,13 @@ export default function BookmarkCollections() {
             {/* Description */}
             <div className="mb-3">
               <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                Maelezo (Hiari)
+                Description (Optional)
               </label>
               <textarea
                 rows={2}
                 value={newCollectionDesc}
                 onChange={(e) => setNewCollectionDesc(e.target.value)}
-                placeholder="Eleza nini kitakachohifadhiwa humu..."
+                placeholder="What will be stored here?..."
                 className={`w-full px-4 py-2 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-xs outline-none focus:border-blue-500 resize-none`}
               />
             </div>
@@ -526,8 +526,8 @@ export default function BookmarkCollections() {
             {/* Privacy toggle */}
             <div className="flex items-center justify-between py-2 border-t border-gray-800 mb-4">
               <div>
-                <p className="text-xs font-bold">Weka Faragha (Private)</p>
-                <p className="text-[11px] text-gray-500">Mkusanyiko huu utaonekana kwako pekee</p>
+                <p className="text-xs font-bold">Private Collection</p>
+                <p className="text-[11px] text-gray-500">Visible only to you</p>
               </div>
               <input
                 type="checkbox"
@@ -544,7 +544,7 @@ export default function BookmarkCollections() {
                 onClick={() => setShowCreateModal(false)}
                 className={`flex-1 py-2.5 rounded-full border ${tc.border} text-xs font-bold hover:bg-gray-800`}
               >
-                Ghairi
+                Cancel
               </button>
               <button
                 type="button"
@@ -552,7 +552,7 @@ export default function BookmarkCollections() {
                 disabled={!newCollectionName.trim()}
                 className="flex-1 py-2.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white font-bold text-xs rounded-full shadow-lg shadow-blue-500/25"
               >
-                Unda Mkusanyiko
+                Create Collection
               </button>
             </div>
           </div>

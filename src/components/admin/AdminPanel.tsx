@@ -98,7 +98,7 @@ export default function AdminPanel() {
     setFeatures(newFeatures);
 
     await updateAdminFeatures({ [key]: updatedVal });
-    showToast(`Kipengele '${key}' kimebadilishwa kuwa: ${updatedVal ? 'WASHWA (ON)' : 'ZIMWA (OFF)'}`);
+    showToast(`Feature '${key}' toggled: ${updatedVal ? 'ENABLED (ON)' : 'DISABLED (OFF)'}`);
   };
 
   // User Actions
@@ -106,20 +106,20 @@ export default function AdminPanel() {
     const newVerified = !user.verified;
     setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, verified: newVerified } : u)));
     await performUserAction(user.id, 'toggle_verified', newVerified);
-    showToast(`${user.name} amewekewa Verified: ${newVerified ? 'Ndio (Badge Ipo)' : 'Hapana'}`);
+    showToast(`${user.name} verified badge: ${newVerified ? 'Granted' : 'Revoked'}`);
   };
 
   const handleUserPremiumToggle = async (user: AdminUser) => {
     const newPremium = !user.premium;
     setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, premium: newPremium } : u)));
     await performUserAction(user.id, 'toggle_premium', newPremium);
-    showToast(`${user.name} Premium imebadilishwa: ${newPremium ? 'Activated' : 'Revoked'}`);
+    showToast(`${user.name} Premium status changed: ${newPremium ? 'Activated' : 'Revoked'}`);
   };
 
   const handleUserRoleChange = async (userId: string, newRole: 'admin' | 'creator' | 'moderator' | 'user') => {
     setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u)));
     await performUserAction(userId, 'change_role', newRole);
-    showToast(`Jukumu la mtumiaji limebadilishwa kuwa: ${newRole.toUpperCase()}`);
+    showToast(`User role changed to: ${newRole.toUpperCase()}`);
   };
 
   const handleConfirmBan = async () => {
@@ -140,22 +140,22 @@ export default function AdminPanel() {
       isCurrentlyBanned ? 'Admin unban' : banReason || 'Violated community guidelines'
     );
 
-    showToast(isCurrentlyBanned ? `Mtumiaji @${banModalUser.handle} ameondolewa ban!` : `Mtumiaji @${banModalUser.handle} amepigwa BAN!`);
+    showToast(isCurrentlyBanned ? `User @${banModalUser.handle} unbanned!` : `User @${banModalUser.handle} has been suspended!`);
     setBanModalUser(null);
     setBanReason('');
   };
 
   // Moderation Actions
   const handleDeletePost = async (post: FlaggedPost) => {
-    if (!confirm(`Una uhakika unataka kufuta chapisho hili la @${post.author_handle}?`)) return;
+    if (!confirm(`Are you sure you want to delete this post by @${post.author_handle}?`)) return;
     setFlaggedPosts((prev) => prev.filter((p) => p.id !== post.id));
     await deletePostAsAdmin(post.post_id);
-    showToast(`Chapisho la @${post.author_handle} limefutwa kabisa!`);
+    showToast(`Post by @${post.author_handle} has been deleted!`);
   };
 
   const handleDismissReport = (id: string) => {
     setFlaggedPosts((prev) => prev.filter((p) => p.id !== id));
-    showToast('Ripoti imeondolewa kwenye foleni (Marked as Safe)');
+    showToast('Report dismissed from queue (Marked as Safe)');
   };
 
   // Payout actions
@@ -164,7 +164,7 @@ export default function AdminPanel() {
       prev.map((p) => (p.id === payoutId ? { ...p, status: action === 'approve' ? 'approved' : 'rejected' } : p))
     );
     await processPayoutAction(payoutId, action);
-    showToast(`Ombi la malipo #${payoutId} limeidhinishwa: ${action.toUpperCase()}`);
+    showToast(`Payout request #${payoutId} updated: ${action.toUpperCase()}`);
   };
 
   return (
@@ -199,7 +199,7 @@ export default function AdminPanel() {
                 </span>
               </div>
               <p className="text-xs text-gray-400">
-                Usimamizi wa Kina wa Vipengele, Watumiaji, Usalama na Mapato ya Jukwaa
+                Comprehensive control center for platform features, users, moderation, and financials
               </p>
             </div>
           </div>
@@ -213,7 +213,7 @@ export default function AdminPanel() {
             <button
               onClick={loadData}
               className={`p-2 rounded-xl border ${tc.border} ${tc.bgHoverSecondary} text-gray-300 hover:text-white transition-colors`}
-              title="Pakia Upya Takwimu"
+              title="Refresh Data"
             >
               🔄
             </button>
@@ -258,7 +258,7 @@ export default function AdminPanel() {
       <div className="flex-1 px-6 py-6 space-y-6 max-w-7xl w-full mx-auto">
         {loading && (
           <div className="text-center py-12 text-gray-400 animate-pulse text-sm">
-            Inapakia taarifa za Mission Control...
+            Loading Mission Control data...
           </div>
         )}
 
@@ -268,33 +268,33 @@ export default function AdminPanel() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className={`p-5 rounded-3xl border ${tc.bgSecondary} ${tc.border} relative overflow-hidden group`}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Jumla ya Watumiaji</span>
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Users</span>
                   <span className="text-lg">👥</span>
                 </div>
                 <div className="text-3xl font-black text-white">{kpis?.total_users.toLocaleString()}</div>
                 <div className="flex items-center gap-2 mt-2 text-xs text-emerald-400">
-                  <span>↑ +18.4% wiki hii</span>
+                  <span>↑ +18.4% this week</span>
                   <span className="text-gray-500">•</span>
-                  <span className="text-gray-400">{kpis?.active_today} wako hewani</span>
+                  <span className="text-gray-400">{kpis?.active_today} active today</span>
                 </div>
               </div>
 
               <div className={`p-5 rounded-3xl border ${tc.bgSecondary} ${tc.border} relative overflow-hidden group`}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Mapato ya Jukwaa</span>
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Platform Revenue</span>
                   <span className="text-lg">💵</span>
                 </div>
                 <div className="text-3xl font-black text-emerald-400">
                   ${kpis?.total_revenue_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </div>
                 <div className="flex items-center gap-2 mt-2 text-xs text-emerald-400">
-                  <span>${kpis?.total_tips_paid_usd.toLocaleString()} zimetolewa kwa wabunifu</span>
+                  <span>${kpis?.total_tips_paid_usd.toLocaleString()} paid out to creators</span>
                 </div>
               </div>
 
               <div className={`p-5 rounded-3xl border ${tc.bgSecondary} ${tc.border} relative overflow-hidden group`}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Machapisho & Reels</span>
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Posts & Reels</span>
                   <span className="text-lg">📱</span>
                 </div>
                 <div className="text-3xl font-black text-indigo-400">{kpis?.total_posts.toLocaleString()}</div>
@@ -307,7 +307,7 @@ export default function AdminPanel() {
 
               <div className={`p-5 rounded-3xl border ${tc.bgSecondary} ${tc.border} relative overflow-hidden group`}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Maombi ya AI (Requests)</span>
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">AI Requests Processed</span>
                   <span className="text-lg">🤖</span>
                 </div>
                 <div className="text-3xl font-black text-purple-400">{kpis?.ai_requests_processed.toLocaleString()}</div>
@@ -322,7 +322,7 @@ export default function AdminPanel() {
               {/* Trends Bar Chart Visualizer */}
               <div className={`lg:col-span-2 p-6 rounded-3xl border ${tc.bgSecondary} ${tc.border}`}>
                 <h3 className="text-sm font-bold text-white mb-4 flex items-center justify-between">
-                  <span>📈 Mwelekeo wa Ukuaji wa Siku 7 (Growth & Activity)</span>
+                  <span>📈 7-Day Growth & Activity Trends</span>
                   <span className="text-xs text-blue-400 font-normal">Real-Time Data</span>
                 </h3>
                 <div className="space-y-4">
@@ -331,9 +331,9 @@ export default function AdminPanel() {
                       <div className="flex justify-between text-xs font-semibold">
                         <span className="text-gray-300">{t.day}</span>
                         <div className="flex gap-4 text-gray-400">
-                          <span>Watumiaji: <strong className="text-blue-400">+{t.users}</strong></span>
+                          <span>Users: <strong className="text-blue-400">+{t.users}</strong></span>
                           <span>Posts: <strong className="text-indigo-400">+{t.posts}</strong></span>
-                          <span>Mapato: <strong className="text-emerald-400">${t.revenue}</strong></span>
+                          <span>Revenue: <strong className="text-emerald-400">${t.revenue}</strong></span>
                         </div>
                       </div>
                       <div className="h-2 w-full bg-gray-800 rounded-full overflow-hidden flex">
@@ -346,12 +346,12 @@ export default function AdminPanel() {
 
               {/* Revenue Breakdown */}
               <div className={`p-6 rounded-3xl border ${tc.bgSecondary} ${tc.border} space-y-4`}>
-                <h3 className="text-sm font-bold text-white mb-2">💰 Mgawanyo wa Mapato</h3>
+                <h3 className="text-sm font-bold text-white mb-2">💰 Revenue Breakdown</h3>
                 <div className="space-y-3 text-xs">
                   <div className="p-3 rounded-2xl bg-gray-900/60 border border-gray-800 flex justify-between items-center">
                     <div>
-                      <p className="font-bold text-white">Usajili wa Premium (Verified)</p>
-                      <p className="text-[11px] text-gray-400">Ada za kila mwezi</p>
+                      <p className="font-bold text-white">Premium Subscriptions (Verified)</p>
+                      <p className="text-[11px] text-gray-400">Monthly creator badges & tier subscriptions</p>
                     </div>
                     <span className="font-mono text-sm font-bold text-emerald-400">
                       ${revenueBreakdown?.premium_subscriptions.toLocaleString()}
@@ -361,7 +361,7 @@ export default function AdminPanel() {
                   <div className="p-3 rounded-2xl bg-gray-900/60 border border-gray-800 flex justify-between items-center">
                     <div>
                       <p className="font-bold text-white">Creator Store Commissions</p>
-                      <p className="text-[11px] text-gray-400">{features?.platform_commission_pct || 10}% ya mauzo ya bidhaa</p>
+                      <p className="text-[11px] text-gray-400">{features?.platform_commission_pct || 10}% on digital goods</p>
                     </div>
                     <span className="font-mono text-sm font-bold text-blue-400">
                       ${revenueBreakdown?.creator_store_fees.toLocaleString()}
@@ -370,8 +370,8 @@ export default function AdminPanel() {
 
                   <div className="p-3 rounded-2xl bg-gray-900/60 border border-gray-800 flex justify-between items-center">
                     <div>
-                      <p className="font-bold text-white">Ada za Tips & Zawadi</p>
-                      <p className="text-[11px] text-gray-400">Makato ya huduma</p>
+                      <p className="font-bold text-white">Tips & Gifts Fees</p>
+                      <p className="text-[11px] text-gray-400">Platform transaction service fees</p>
                     </div>
                     <span className="font-mono text-sm font-bold text-purple-400">
                       ${revenueBreakdown?.tipping_commissions.toLocaleString()}
@@ -380,7 +380,7 @@ export default function AdminPanel() {
                 </div>
 
                 <div className="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-300">
-                  ⚡ <strong>Admin Tip:</strong> Unaweza kurekebisha asilimia ya makato kwenye tabu ya <em>Feature Switches</em>.
+                  ⚡ <strong>Admin Tip:</strong> You can adjust commission percentages in the <em>Feature Switches</em> tab.
                 </div>
               </div>
             </div>
@@ -394,7 +394,7 @@ export default function AdminPanel() {
             <div className={`p-5 rounded-3xl border ${features.maintenance_mode ? 'bg-red-500/15 border-red-500/40' : `${tc.bgSecondary} ${tc.border}`} flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
               <div>
                 <h3 className="text-sm font-black text-white flex items-center gap-2">
-                  <span>🚧 Hali ya Matengenezo (Maintenance Mode Kill-Switch)</span>
+                  <span>🚧 Maintenance Mode Kill-Switch</span>
                   {features.maintenance_mode && (
                     <span className="px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-black uppercase">
                       Active (Locked)
@@ -402,7 +402,7 @@ export default function AdminPanel() {
                   )}
                 </h3>
                 <p className="text-xs text-gray-400 mt-1">
-                  Inapowashwa, watumiaji wa kawaida wanazuiliwa kuingia na kuona ujumbe wa matengenezo.
+                  When activated, non-admin users will see a maintenance notice and will not be able to interact.
                 </p>
               </div>
               <button
@@ -413,30 +413,30 @@ export default function AdminPanel() {
                     : 'bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700'
                 }`}
               >
-                {features.maintenance_mode ? 'ZIMA MATENGENEZO' : 'WASHA MATENGENEZO'}
+                {features.maintenance_mode ? 'DISABLE MAINTENANCE' : 'ENABLE MAINTENANCE'}
               </button>
             </div>
 
             {/* Feature Flags Grid */}
             <div className={`p-6 rounded-3xl border ${tc.bgSecondary} ${tc.border} space-y-4`}>
-              <h3 className="text-sm font-bold text-white mb-2">🎛️ Vidhibiti vya Vipengele vya Jukwaa (Live Feature Switches)</h3>
+              <h3 className="text-sm font-bold text-white mb-2">🎛️ Live Feature Switches & Kill-Switches</h3>
               <p className="text-xs text-gray-400 mb-4">
-                Washa au zima vipengele vya Longa kwa mbofyo mmoja bila kuanzisha upya seva:
+                Enable or disable platform features in real time without restarting the server:
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
-                  { key: 'ai_suite_enabled', label: 'Longa AI Chat & Suite', desc: 'Uwezo mkuu wa akili mnemba', icon: '🤖' },
-                  { key: 'ai_copilot_enabled', label: 'Feed AI Co-Pilot', desc: 'Vitufe vya TL;DR & Fact-check kwenye posts', icon: '💡' },
-                  { key: 'webrtc_calling_enabled', label: 'WebRTC Video & Voice Calls', desc: 'Simu za moja kwa moja kwenye DMs', icon: '📹' },
-                  { key: 'reels_enabled', label: 'Longa Reels (Shorts)', desc: 'Kicheza video za wima za mtindo wa TikTok', icon: '📱' },
-                  { key: 'spaces_audio_enabled', label: 'Audio Spaces & Soundboard', desc: 'Vyumba vya sauti na milio ya moja kwa moja', icon: '🎙️' },
-                  { key: 'store_marketplace_enabled', label: 'Creator Store & Marketplace', desc: 'Soko la bidhaa na kazi za dijitali', icon: '🏪' },
-                  { key: 'prediction_markets_enabled', label: 'Prediction Markets', desc: 'Masoko ya utabiri wa kidijitali', icon: '🏆' },
-                  { key: 'monetization_enabled', label: 'Tipping & Monetization', desc: 'Malipo ya zawadi, M-Pesa na usajili', icon: '💳' },
-                  { key: 'whisper_messages_enabled', label: 'Secret Whisper Messages', desc: 'Ujumbe unaojifuta baada ya sekunde 30', icon: '🔒' },
-                  { key: 'user_registration_enabled', label: 'Usajili Mpya wa Watumiaji', desc: 'Ruhusu watumiaji wapya kujiunga', icon: '👤' },
-                  { key: 'require_email_verification', label: 'Lazimisha Uthibitisho wa Email', desc: 'Kuzuia kuingia bila ku-verify email', icon: '📧' },
+                  { key: 'ai_suite_enabled', label: 'Longa AI Chat & Suite', desc: 'Core platform AI assistant capabilities', icon: '🤖' },
+                  { key: 'ai_copilot_enabled', label: 'Feed AI Co-Pilot', desc: 'TL;DR & Fact-check action buttons on posts', icon: '💡' },
+                  { key: 'webrtc_calling_enabled', label: 'WebRTC Video & Voice Calls', desc: 'Direct peer-to-peer calling in DMs', icon: '📹' },
+                  { key: 'reels_enabled', label: 'Longa Reels (Shorts)', desc: 'Full-screen vertical short video player', icon: '📱' },
+                  { key: 'spaces_audio_enabled', label: 'Audio Spaces & Soundboard', desc: 'Live drop-in audio stages and sound FX', icon: '🎙️' },
+                  { key: 'store_marketplace_enabled', label: 'Creator Store & Marketplace', desc: 'Digital storefronts and creator downloads', icon: '🏪' },
+                  { key: 'prediction_markets_enabled', label: 'Prediction Markets', desc: 'Interactive crowd prediction contracts', icon: '🏆' },
+                  { key: 'monetization_enabled', label: 'Tipping & Monetization', desc: 'Direct creator tips, gifts, and payouts', icon: '💳' },
+                  { key: 'whisper_messages_enabled', label: 'Secret Whisper Messages', desc: 'Self-destructing private messages', icon: '🔒' },
+                  { key: 'user_registration_enabled', label: 'Public User Registration', desc: 'Allow new accounts to sign up', icon: '👤' },
+                  { key: 'require_email_verification', label: 'Require Email Verification', desc: 'Enforce verification before full access', icon: '📧' },
                 ].map((item) => {
                   const isEnabled = !!features[item.key as keyof FeatureFlags];
                   return (
@@ -481,7 +481,7 @@ export default function AdminPanel() {
               <div className="pt-6 border-t border-gray-800 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-xs font-bold text-white mb-1.5">
-                    Asilimia ya Ada ya Jukwaa (Platform Commission):{' '}
+                    Platform Commission Rate:{' '}
                     <span className="text-blue-400 font-mono">{features.platform_commission_pct}%</span>
                   </label>
                   <input
@@ -497,13 +497,13 @@ export default function AdminPanel() {
                     className="w-full accent-blue-500"
                   />
                   <p className="text-[11px] text-gray-400 mt-1">
-                    Asilimia inayokatwa na Longa kwenye mauzo ya Creator Store na Creator Tipping.
+                    Percentage retained by Longa on digital store sales and creator tips.
                   </p>
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-white mb-1.5">
-                    Kikomo cha Maswali ya Bure ya AI kwa Siku (Free AI Quota):{' '}
+                    Free Daily AI Quota:{' '}
                     <span className="text-blue-400 font-mono">{features.free_ai_daily_limit} queries</span>
                   </label>
                   <input
@@ -517,7 +517,7 @@ export default function AdminPanel() {
                     className={`w-full px-3.5 py-2 rounded-xl text-xs border ${tc.bgInput} ${tc.text} ${tc.border}`}
                   />
                   <p className="text-[11px] text-gray-400 mt-1">
-                    Watumiaji wa kawaida hupata maswali haya kabla ya kuombwa kuweka API Key yao au kujiunga na Premium.
+                    Number of free AI queries per user/day before requiring their own API Key or Premium.
                   </p>
                 </div>
               </div>
@@ -535,18 +535,18 @@ export default function AdminPanel() {
                   type="text"
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
-                  placeholder="Tafuta mtumiaji kwa jina, handle (@amanitech), au email..."
+                  placeholder="Search user by name, handle (@username), or email..."
                   className={`w-full px-4 py-2.5 rounded-2xl text-xs border outline-none ${tc.bgInput} ${tc.text} ${tc.border} focus:border-blue-500`}
                 />
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-xs text-gray-400 font-semibold">Jukumu:</span>
+                <span className="text-xs text-gray-400 font-semibold">Role:</span>
                 <select
                   value={roleFilter}
                   onChange={(e) => setRoleFilter(e.target.value)}
                   className={`px-3 py-2 rounded-xl text-xs border outline-none ${tc.bgInput} ${tc.text} ${tc.border}`}
                 >
-                  <option value="all">Wote ({users.length})</option>
+                  <option value="all">All ({users.length})</option>
                   <option value="admin">Admins</option>
                   <option value="creator">Creators</option>
                   <option value="moderator">Moderators</option>
@@ -561,12 +561,12 @@ export default function AdminPanel() {
                 <table className="w-full text-left text-xs">
                   <thead className={`border-b ${tc.border} bg-gray-900/60 text-gray-400 font-bold uppercase tracking-wider`}>
                     <tr>
-                      <th className="px-5 py-3.5">Mtumiaji</th>
-                      <th className="px-4 py-3.5">Jukumu</th>
+                      <th className="px-5 py-3.5">User</th>
+                      <th className="px-4 py-3.5">Role</th>
                       <th className="px-4 py-3.5">Status</th>
-                      <th className="px-4 py-3.5">Beji & Premium</th>
-                      <th className="px-4 py-3.5">Salio</th>
-                      <th className="px-5 py-3.5 text-right">Vitendo vya Utawala</th>
+                      <th className="px-4 py-3.5">Badge & Premium</th>
+                      <th className="px-4 py-3.5">Balance</th>
+                      <th className="px-5 py-3.5 text-right">Admin Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-800">
@@ -624,7 +624,7 @@ export default function AdminPanel() {
                                 ? 'bg-blue-500/20 text-blue-400 border-blue-500/40'
                                 : 'bg-gray-800 text-gray-400 border-gray-700 hover:text-white'
                             }`}
-                            title="Bonyeza kutoa au kubatilisha Blue Badge"
+                            title="Click to toggle Blue Verification Badge"
                           >
                             {u.verified ? '✓ Verified' : '+ Verify'}
                           </button>
@@ -654,7 +654,7 @@ export default function AdminPanel() {
                                 : 'bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30'
                             }`}
                           >
-                            {u.status === 'banned' ? 'Ondoa Ban' : 'Piga Ban'}
+                            {u.status === 'banned' ? 'Unban' : 'Suspend'}
                           </button>
                         </td>
                       </tr>
@@ -671,17 +671,17 @@ export default function AdminPanel() {
           <div className="space-y-6 animate-fade-in">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-bold text-white">Maudhui Yaliyoripotiwa na Wanajamii (Flagged Content)</h3>
-                <p className="text-xs text-gray-400">Pitia malalamiko ya machapisho yenye viashiria vya utapeli au kashfa:</p>
+                <h3 className="text-sm font-bold text-white">Reported Community Content (Flagged Queue)</h3>
+                <p className="text-xs text-gray-400">Review reported posts for scams, hate speech, or terms violations:</p>
               </div>
               <span className="text-xs font-bold text-gray-400">
-                Jumla ya ripoti: <strong className="text-red-400">{flaggedPosts.length}</strong>
+                Total reports: <strong className="text-red-400">{flaggedPosts.length}</strong>
               </span>
             </div>
 
             {flaggedPosts.length === 0 ? (
               <div className={`p-8 rounded-3xl border ${tc.bgSecondary} ${tc.border} text-center text-gray-400 text-xs`}>
-                🎉 Hakuna maudhui yaliyoripotiwa kwa sasa. Mfumo uko salama!
+                🎉 No pending flagged content in queue. System is healthy!
               </div>
             ) : (
               <div className="space-y-4">
@@ -697,7 +697,7 @@ export default function AdminPanel() {
                           </span>
                         </div>
                         <p className="text-[11px] text-gray-500 mt-0.5">
-                          Iliripotiwa mara {post.reports_count} • {post.created_at}
+                          Reported {post.reports_count} times • {post.created_at}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -711,7 +711,7 @@ export default function AdminPanel() {
                           onClick={() => handleDeletePost(post)}
                           className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white transition-all shadow-md shadow-red-500/20"
                         >
-                          Futa Chapisho
+                          Delete Post
                         </button>
                       </div>
                     </div>
@@ -730,8 +730,8 @@ export default function AdminPanel() {
           <div className="space-y-6 animate-fade-in">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-bold text-white">Maombi ya Malipo ya Watayarishi (Creator Payouts)</h3>
-                <p className="text-xs text-gray-400">Idhinisha kutoa pesa za mapato ya bidhaa na zawadi:</p>
+                <h3 className="text-sm font-bold text-white">Creator Payout Requests</h3>
+                <p className="text-xs text-gray-400">Approve or decline creator withdrawal requests for store sales and tips:</p>
               </div>
             </div>
 
@@ -740,12 +740,12 @@ export default function AdminPanel() {
                 <table className="w-full text-left text-xs">
                   <thead className={`border-b ${tc.border} bg-gray-900/60 text-gray-400 font-bold uppercase tracking-wider`}>
                     <tr>
-                      <th className="px-5 py-3.5">Mtayarishi</th>
-                      <th className="px-4 py-3.5">Kiasi</th>
-                      <th className="px-4 py-3.5">Njia ya Malipo</th>
-                      <th className="px-4 py-3.5">Tarehe</th>
-                      <th className="px-4 py-3.5">Hali</th>
-                      <th className="px-5 py-3.5 text-right">Kitendo</th>
+                      <th className="px-5 py-3.5">Creator</th>
+                      <th className="px-4 py-3.5">Amount</th>
+                      <th className="px-4 py-3.5">Payment Method</th>
+                      <th className="px-4 py-3.5">Date</th>
+                      <th className="px-4 py-3.5">Status</th>
+                      <th className="px-5 py-3.5 text-right">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-800">
@@ -787,17 +787,17 @@ export default function AdminPanel() {
                                 onClick={() => handlePayout(p.id, 'approve')}
                                 className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-md shadow-emerald-500/20"
                               >
-                                Idhinisha Malipo
+                                Approve Payout
                               </button>
                               <button
                                 onClick={() => handlePayout(p.id, 'reject')}
                                 className="px-3 py-1.5 rounded-xl text-xs font-bold bg-gray-800 hover:bg-gray-700 text-red-400 transition-colors"
                               >
-                                Kataa
+                                Decline
                               </button>
                             </>
                           ) : (
-                            <span className="text-gray-500 text-xs">Imekamilika</span>
+                            <span className="text-gray-500 text-xs">Completed</span>
                           )}
                         </td>
                       </tr>
@@ -812,7 +812,7 @@ export default function AdminPanel() {
         {/* Tab 6: Audit Logs */}
         {!loading && activeTab === 'logs' && (
           <div className="space-y-6 animate-fade-in">
-            <h3 className="text-sm font-bold text-white">Kumbukumbu za Utawala (Security & Action Audit Logs)</h3>
+            <h3 className="text-sm font-bold text-white">Security & System Audit Logs</h3>
             <div className={`p-4 rounded-3xl border ${tc.bgSecondary} ${tc.border} space-y-3`}>
               {auditLogs.map((log) => (
                 <div key={log.id} className="p-3.5 rounded-2xl bg-black/40 border border-gray-800 text-xs flex items-start justify-between gap-4">
@@ -842,7 +842,7 @@ export default function AdminPanel() {
               <span className="text-3xl">⚠️</span>
               <div>
                 <h3 className="text-base font-bold text-white">
-                  {banModalUser.status === 'banned' ? 'Ondoa Ban kwa Mtumiaji' : 'Thibitisha Kumpiga Ban Mtumiaji'}
+                  {banModalUser.status === 'banned' ? 'Reactivate User Account' : 'Confirm User Suspension'}
                 </h3>
                 <p className="text-xs text-gray-400">
                   {banModalUser.name} ({banModalUser.handle})
@@ -853,12 +853,12 @@ export default function AdminPanel() {
             {banModalUser.status !== 'banned' && (
               <div>
                 <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-                  Sababu ya Ban (Itahifadhiwa kwenye Audit Log):
+                  Suspension Reason (Saved to Audit Log):
                 </label>
                 <textarea
                   value={banReason}
                   onChange={(e) => setBanReason(e.target.value)}
-                  placeholder="Eleza sababu ya kumfungia mtumiaji huyu (k.m. Ulaghai, Phishing, au Lugha Chafu)..."
+                  placeholder="State the reason for suspending this user (e.g., Fraud, Phishing, Hate Speech)..."
                   className={`w-full px-3.5 py-2.5 rounded-2xl text-xs border outline-none ${tc.bgInput} ${tc.text} ${tc.border} focus:border-red-500 h-24`}
                 />
               </div>
@@ -870,7 +870,7 @@ export default function AdminPanel() {
                 onClick={() => setBanModalUser(null)}
                 className="px-4 py-2 rounded-xl text-xs font-bold text-gray-400 hover:text-white"
               >
-                Ghairi
+                Cancel
               </button>
               <button
                 type="button"
@@ -881,7 +881,7 @@ export default function AdminPanel() {
                     : 'bg-red-600 hover:bg-red-700 shadow-red-500/25'
                 }`}
               >
-                {banModalUser.status === 'banned' ? 'Thibitisha Kufungua' : 'Ndio, Piga Ban'}
+                {banModalUser.status === 'banned' ? 'Confirm Reactivation' : 'Confirm Suspension'}
               </button>
             </div>
           </div>

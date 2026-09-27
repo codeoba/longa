@@ -39,7 +39,7 @@ export default function ProfileEditPage({ onBack }: ProfileEditPageProps) {
       const res = await uploadMedia(file);
       setBanner(res.url);
     } catch (err: any) {
-      setMessage({ type: 'error', text: 'Imeshindikana kupakia banner: ' + (err.message || 'Jaribu tena') });
+      setMessage({ type: 'error', text: 'Failed to upload banner: ' + (err.message || 'Please try again') });
     }
   };
 
@@ -55,7 +55,7 @@ export default function ProfileEditPage({ onBack }: ProfileEditPageProps) {
       const res = await uploadMedia(file);
       setAvatar(res.url);
     } catch (err: any) {
-      setMessage({ type: 'error', text: 'Imeshindikana kupakia picha: ' + (err.message || 'Jaribu tena') });
+      setMessage({ type: 'error', text: 'Failed to upload photo: ' + (err.message || 'Please try again') });
     }
   };
 
@@ -77,7 +77,7 @@ export default function ProfileEditPage({ onBack }: ProfileEditPageProps) {
       await UsersAPI.update(user!.id, payload);
 
       updateUser({ ...user!, ...payload });
-      setMessage({ type: 'success', text: 'Profaili imehifadhiwa kikamilifu!' });
+      setMessage({ type: 'success', text: 'Profile updated successfully!' });
       
       setTimeout(() => {
         onBack();
@@ -149,14 +149,14 @@ export default function ProfileEditPage({ onBack }: ProfileEditPageProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span>{currentBanner ? 'Badilisha Banner' : 'Weka Picha ya Banner'}</span>
+            <span>{currentBanner ? 'Change Banner' : 'Upload Banner'}</span>
           </button>
           {currentBanner && (
             <button
               type="button"
               onClick={() => { setBanner(''); setBannerPreview(null); }}
               className="p-2 bg-black/70 hover:bg-black/90 text-red-400 rounded-full transition-all hover:scale-105"
-              title="Ondoa banner"
+              title="Remove banner"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -192,7 +192,7 @@ export default function ProfileEditPage({ onBack }: ProfileEditPageProps) {
               type="button"
               onClick={() => avatarInputRef.current?.click()}
               className="absolute bottom-0 right-0 w-8 h-8 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center justify-center text-white border-2 border-black shadow-md transition-transform hover:scale-110"
-              title="Badilisha picha ya Avatar"
+              title="Change profile avatar"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />

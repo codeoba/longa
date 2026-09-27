@@ -23,9 +23,9 @@ const samplePosts: NearbyPost[] = [
     userId: '2',
     userName: 'Zawadi Innovation',
     userAvatar: '👩‍🔬',
-    content: '🚀 Karibuni kwenye ofisi zetu mpya za ubunifu Dar es Salaam! Tunapokea wageni na wavumbuzi wa teknolojia wiki hii yote.',
+    content: '🚀 Welcome to our new tech and design workspace! Open house this entire week with live coding sessions.',
     distance: 2.3,
-    location: 'Kijitonyama, Dar es Salaam',
+    location: 'Innovation District, Downtown',
     timestamp: new Date(Date.now() - 1000 * 60 * 30),
     likes: 234,
     comments: 45,
@@ -35,9 +35,9 @@ const samplePosts: NearbyPost[] = [
     userId: '3',
     userName: 'Baraka Digital',
     userAvatar: '🎨',
-    content: '🎨 Warsha ya bure ya usanifu wa UI inafanyika Jumamosi hii. Karibuni sana!',
+    content: '🎨 Free product design meetup this Saturday at the creative hub. RSVP open!',
     distance: 5.7,
-    location: 'Mwenge, Dar es Salaam',
+    location: 'Central Plaza',
     timestamp: new Date(Date.now() - 1000 * 60 * 60),
     likes: 189,
     comments: 23,
@@ -47,9 +47,9 @@ const samplePosts: NearbyPost[] = [
     userId: '4',
     userName: 'Neema AI',
     userAvatar: '🤖',
-    content: '🤖 Tunatafuta wahandisi wa programu wenye shauku ya mifumo ya AI kwa ajili ya mradi wetu mpya.',
+    content: '🤖 Looking for software engineers and ML practitioners in the area for a high-impact startup launch.',
     distance: 8.1,
-    location: 'Masaki, Dar es Salaam',
+    location: 'Westside Tech Park',
     timestamp: new Date(Date.now() - 1000 * 60 * 90),
     likes: 567,
     comments: 89,
@@ -88,7 +88,7 @@ export default function LocationBasedFeatures() {
   // Share Nearby Post Modal
   const [showShareModal, setShowShareModal] = useState(false);
   const [postContent, setPostContent] = useState('');
-  const [postLocationName, setPostLocationName] = useState('Kijitonyama, Dar es Salaam');
+  const [postLocationName, setPostLocationName] = useState('Central District');
 
   useEffect(() => {
     localStorage.setItem(NEARBY_POSTS_KEY, JSON.stringify(nearbyPosts));
@@ -108,7 +108,6 @@ export default function LocationBasedFeatures() {
             setLoading(false);
           },
           () => {
-            // Default to Dar es Salaam fallback
             setCurrentLocation({ lat: -6.7924, lng: 39.2083 });
             setLocationEnabled(true);
             setLoading(false);
@@ -134,11 +133,11 @@ export default function LocationBasedFeatures() {
     const newPost: NearbyPost = {
       id: 'np_' + Date.now(),
       userId: user?.id ? user.id.toString() : 'me',
-      userName: user?.name || 'Mtumiaji',
+      userName: user?.name || 'User',
       userAvatar: user?.avatar || '👤',
       content: postContent.trim(),
-      distance: 0.1, // Right here!
-      location: postLocationName.trim() || 'Hapa Hapa Karibu Yako',
+      distance: 0.1,
+      location: postLocationName.trim() || 'Right Here (Nearby)',
       timestamp: new Date(),
       likes: 1,
       comments: 0,
@@ -157,9 +156,9 @@ export default function LocationBasedFeatures() {
 
   const formatDistance = (km: number) => {
     if (km < 1) {
-      return `${Math.round(km * 1000)}m mbali`;
+      return `${Math.round(km * 1000)}m away`;
     }
-    return `${km.toFixed(1)}km mbali`;
+    return `${km.toFixed(1)}km away`;
   };
 
   const formatTime = (date: Date) => {
@@ -177,8 +176,8 @@ export default function LocationBasedFeatures() {
         {/* Header */}
         <div className={`sticky top-0 z-30 ${tc.bgBackdrop} backdrop-blur-xl border-b ${tc.border}`}>
           <div className="px-4 py-3">
-            <h1 className="text-xl font-bold">Watu na Machapisho ya Karibu (Nearby)</h1>
-            <p className={`text-xs ${tc.textSecondary}`}>Gundua machapisho ya watu walio karibu na eneo lako</p>
+            <h1 className="text-xl font-bold">Nearby</h1>
+            <p className={`text-xs ${tc.textSecondary}`}>Discover posts and creators in your immediate vicinity</p>
           </div>
         </div>
 
@@ -186,16 +185,16 @@ export default function LocationBasedFeatures() {
         <div className="p-4">
           <div className={`${tc.bgCard} rounded-2xl p-8 border ${tc.border} text-center shadow-lg`}>
             <div className="text-6xl mb-4">📍</div>
-            <h3 className="text-lg font-bold mb-2">Ruhusu Mahali Ulipo (Enable Location)</h3>
+            <h3 className="text-lg font-bold mb-2">Enable Location Access</h3>
             <p className={`text-xs ${tc.textSecondary} mb-6 max-w-sm mx-auto`}>
-              Ruhusu Longa kutambua eneo lako takriban ili uweze kuona na kuchapisha machapisho ya watu wa karibu yako.
+              Allow approximate location to explore happenings, events, and community updates near you.
             </p>
             <button
               onClick={enableLocation}
               disabled={loading}
               className="px-6 py-2.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-bold rounded-full text-xs flex items-center gap-2 mx-auto shadow-lg shadow-blue-500/25"
             >
-              {loading ? 'Inatafuta Mahali...' : 'Washa Mahali Ulipo'}
+              {loading ? 'Detecting Location...' : 'Enable Location'}
             </button>
           </div>
         </div>
@@ -211,7 +210,7 @@ export default function LocationBasedFeatures() {
           <div>
             <h1 className="text-xl font-bold">Nearby</h1>
             <p className={`text-xs ${tc.textSecondary}`}>
-              Inaonyesha machapisho yaliyo ndani ya kilomita {radius}
+              Showing posts within {radius}km radius
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -219,13 +218,13 @@ export default function LocationBasedFeatures() {
               onClick={() => setShowShareModal(true)}
               className="px-3.5 py-1.5 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-full shadow-md"
             >
-              + Chapisha Eneo Lako
+              + Post Check-in
             </button>
             <button
               onClick={disableLocation}
               className={`px-3 py-1.5 rounded-full text-xs ${tc.bgTertiary} ${tc.textSecondary} hover:text-white`}
             >
-              Zima
+              Disable
             </button>
           </div>
         </div>
@@ -252,15 +251,15 @@ export default function LocationBasedFeatures() {
         {nearbyPosts.filter(p => p.distance <= radius).length === 0 ? (
           <div className={`text-center py-16 rounded-2xl border ${tc.border} ${tc.bgCard}`}>
             <div className="text-6xl mb-3">📍</div>
-            <h3 className="text-base font-bold mb-1">Hakuna machapisho karibu na radius hii</h3>
+            <h3 className="text-base font-bold mb-1">No posts found within this distance</h3>
             <p className={`text-xs ${tc.textSecondary} mb-4`}>
-              Ongeza masafa ya utafutaji au uwe wa kwanza kuchapisha habari za hapa!
+              Try expanding your search radius or share the first local update!
             </p>
             <button
               onClick={() => setShowShareModal(true)}
               className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs rounded-full"
             >
-              + Chapisha Sasisho Hapa
+              + Post First Check-in
             </button>
           </div>
         ) : (
@@ -297,11 +296,11 @@ export default function LocationBasedFeatures() {
                   </button>
                   <span className="flex items-center gap-1.5 hover:text-blue-400 cursor-pointer">
                     <span>💬</span>
-                    <span>{post.comments} maoni</span>
+                    <span>{post.comments} comments</span>
                   </span>
                   <span className="flex items-center gap-1.5 text-blue-400 font-semibold ml-auto cursor-pointer">
                     <span>🗺️</span>
-                    <span>Elekea Hapo</span>
+                    <span>Directions</span>
                   </span>
                 </div>
               </div>
@@ -315,7 +314,7 @@ export default function LocationBasedFeatures() {
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowShareModal(false)} />
           <div className={`relative w-full max-w-md ${tc.bgModal} rounded-2xl border ${tc.border} p-6 shadow-2xl`}>
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-800">
-              <h2 className="text-lg font-black">📍 Chapisha Sasisho la Eneo Lako</h2>
+              <h2 className="text-lg font-black">📍 Share Local Update</h2>
               <button
                 onClick={() => setShowShareModal(false)}
                 className={`p-1.5 rounded-full ${tc.bgHoverSecondary} text-gray-400 hover:text-white`}
@@ -327,28 +326,28 @@ export default function LocationBasedFeatures() {
             <form onSubmit={handleShareNearbyPost} className="space-y-3.5">
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                  Eneo / Jina la Mtaa au Jengo *
+                  Location / Venue / Neighborhood *
                 </label>
                 <input
                   type="text"
                   required
                   value={postLocationName}
                   onChange={(e) => setPostLocationName(e.target.value)}
-                  placeholder="mf. Kariakoo, Dar es Salaam au Posta Mpya"
+                  placeholder="e.g. Innovation Hub, Downtown"
                   className={`w-full px-4 py-2 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-xs outline-none focus:border-blue-500`}
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1">
-                  Ujumbe au Taarifa ya Eneo Hili *
+                  Message / Event / Notice *
                 </label>
                 <textarea
                   rows={4}
                   required
                   value={postContent}
                   onChange={(e) => setPostContent(e.target.value)}
-                  placeholder="Ni nini kinachoendelea hapa? Tangaza tukio, ofa au jambo la kijamii..."
+                  placeholder="What's happening nearby? Share deals, meetups or questions..."
                   className={`w-full px-4 py-2.5 rounded-xl border ${tc.border} ${tc.bgInput} ${tc.text} text-xs outline-none focus:border-blue-500 resize-none`}
                 />
               </div>
@@ -359,14 +358,14 @@ export default function LocationBasedFeatures() {
                   onClick={() => setShowShareModal(false)}
                   className={`flex-1 py-2.5 rounded-full border ${tc.border} text-xs font-bold hover:bg-gray-800`}
                 >
-                  Ghairi
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={!postContent.trim()}
                   className="flex-1 py-2.5 bg-blue-500 hover:bg-blue-600 disabled:opacity-40 text-white font-bold text-xs rounded-full shadow-lg shadow-blue-500/25"
                 >
-                  Chapisha Hapa
+                  Post Nearby
                 </button>
               </div>
             </form>

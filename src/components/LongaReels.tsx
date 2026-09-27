@@ -190,7 +190,7 @@ export const LongaReels: React.FC = () => {
 
     // Check size limit: 30MB
     if (file.size > 30 * 1024 * 1024) {
-      alert('Tafadhali chagua video isiyozidi 30MB.');
+      alert('Please select a video under 30MB.');
       return;
     }
 
@@ -202,7 +202,7 @@ export const LongaReels: React.FC = () => {
         setAudioTrack(`${user?.name || 'Original Audio'} • Sound`);
       }
     } catch (err: any) {
-      alert('Hitilafu ya kupakia video: ' + (err.message || 'Jaribu tena'));
+      alert('Failed to upload video: ' + (err.message || 'Please try again'));
     } finally {
       setUploadingVideo(false);
       if (e.target) e.target.value = '';
@@ -228,7 +228,7 @@ export const LongaReels: React.FC = () => {
   const handlePublishReel = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!uploadVideoUrl.trim()) {
-      alert('Tafadhali pakia video kwanza kabla ya kuchapisha.');
+      alert('Please upload a video before publishing.');
       return;
     }
 
@@ -240,7 +240,7 @@ export const LongaReels: React.FC = () => {
       creatorHandle: user?.handle || '@creator',
       creatorAvatar: user?.avatar || '👤',
       videoUrl: uploadVideoUrl,
-      caption: caption || 'Video mpya kutoka Longa Reels ✨',
+      caption: caption || 'New reel on Longa ✨',
       likesCount: 1,
       commentsCount: 0,
       sharesCount: 0,
@@ -352,10 +352,10 @@ export const LongaReels: React.FC = () => {
                 setIsCreateModalOpen(true);
               }}
               className="px-3.5 py-1.5 rounded-full font-bold text-xs bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30 flex items-center gap-1.5 active:scale-95 transition backdrop-blur-md border border-white/20 hover:scale-105"
-              title="Weka au tengeneza Reel mpya (Create Reel)"
+              title="Create a new Reel"
             >
               <span className="text-sm">📹</span>
-              <span>+ Unda Reel</span>
+              <span>+ Create Reel</span>
             </button>
 
             {/* Mute / Unmute Button */}
@@ -381,7 +381,7 @@ export const LongaReels: React.FC = () => {
               e.stopPropagation();
               setIsCreateModalOpen(true);
             }}
-            title="Bofya hapa kupakia Reel yako"
+            title="Click here to upload your Reel"
           >
             <Avatar src={currentReel.creatorAvatar} size="md" className="border-2 border-white shadow-lg" />
             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shadow hover:scale-110 transition">
@@ -527,8 +527,8 @@ export const LongaReels: React.FC = () => {
               <div className="flex items-center gap-2.5">
                 <span className="text-xl">📹</span>
                 <div>
-                  <h3 className="font-bold text-base text-white">Unda Reel Mpya (Post a Reel)</h3>
-                  <p className="text-[11px] text-gray-400">Pakia video fupi ya wima (9:16) kwa wafuasi wako.</p>
+                  <h3 className="font-bold text-base text-white">Create New Reel</h3>
+                  <p className="text-[11px] text-gray-400">Upload a 9:16 vertical video for your audience.</p>
                 </div>
               </div>
               <button
@@ -545,7 +545,7 @@ export const LongaReels: React.FC = () => {
               {/* Video Upload Area */}
               <div>
                 <label className="block text-xs font-bold text-gray-300 mb-2">
-                  Video ya Reel (MP4, WebM, MOV) <span className="text-red-400">*</span>
+                  Reel Video (MP4, WebM, MOV) <span className="text-red-400">*</span>
                 </label>
 
                 <input
@@ -570,7 +570,7 @@ export const LongaReels: React.FC = () => {
                       type="button"
                       onClick={() => setUploadVideoUrl('')}
                       className="absolute top-3 right-3 p-1.5 bg-black/80 hover:bg-red-600 rounded-full text-white text-xs transition"
-                      title="Ondoa video hii"
+                      title="Remove this video"
                     >
                       ✕
                     </button>
@@ -583,15 +583,15 @@ export const LongaReels: React.FC = () => {
                     {uploadingVideo ? (
                       <div className="flex flex-col items-center justify-center gap-2 text-blue-400">
                         <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-400 border-t-transparent" />
-                        <span className="text-xs font-bold">Inapakia video yako...</span>
+                        <span className="text-xs font-bold">Uploading video...</span>
                       </div>
                     ) : (
                       <div>
                         <div className="w-12 h-12 rounded-full bg-blue-600/20 text-blue-400 flex items-center justify-center mx-auto text-2xl mb-2">
                           📹
                         </div>
-                        <p className="text-xs font-bold text-white">Bofya hapa kuchagua video kutoka kwenye kifaa chako</p>
-                        <p className="text-[11px] text-gray-400 mt-1">Muundo wa wima (9:16) unapendekezwa • Hadi 30MB</p>
+                        <p className="text-xs font-bold text-white">Click here to upload a video from your device</p>
+                        <p className="text-[11px] text-gray-400 mt-1">Vertical 9:16 format recommended • Up to 30MB</p>
                       </div>
                     )}
                   </div>
@@ -600,7 +600,7 @@ export const LongaReels: React.FC = () => {
                 {/* Or paste link */}
                 <div className="mt-3">
                   <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-[11px] text-gray-400">Au weka kiungo (URL) cha video ya moja kwa moja:</span>
+                    <span className="text-[11px] text-gray-400">Or paste direct video URL:</span>
                   </div>
                   <input
                     type="url"
@@ -615,13 +615,13 @@ export const LongaReels: React.FC = () => {
               {/* Caption */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-bold text-gray-300">Maelezo (Caption)</label>
+                  <label className="text-xs font-bold text-gray-300">Caption</label>
                   <span className="text-[11px] text-gray-500">{caption.length}/280</span>
                 </div>
                 <textarea
                   rows={3}
                   maxLength={280}
-                  placeholder="Andika ujumbe au maelezo ya video yako..."
+                  placeholder="Write a captivating caption..."
                   value={caption}
                   onChange={e => setCaption(e.target.value)}
                   className={`w-full p-3 rounded-xl text-xs border border-[#38444d] ${tc.bgInput} ${tc.text} focus:outline-none focus:border-blue-500 resize-none`}
@@ -644,10 +644,10 @@ export const LongaReels: React.FC = () => {
 
               {/* Audio Track */}
               <div>
-                <label className="block text-xs font-bold text-gray-300 mb-1.5">Jina la Wimbo au Sauti (Audio Track)</label>
+                <label className="block text-xs font-bold text-gray-300 mb-1.5">Audio Track</label>
                 <input
                   type="text"
-                  placeholder="Mfano: Jina Lako • Original Audio"
+                  placeholder="e.g. Your Name • Original Audio"
                   value={audioTrack}
                   onChange={e => setAudioTrack(e.target.value)}
                   className={`w-full px-3.5 py-2 rounded-xl text-xs border border-[#38444d] ${tc.bgInput} ${tc.text} focus:outline-none focus:border-blue-500`}
@@ -660,7 +660,7 @@ export const LongaReels: React.FC = () => {
                 <div className="flex gap-2 mb-2">
                   <input
                     type="text"
-                    placeholder="Weka tag kisha bonyeza Enter (mfano: Tech, Viral)"
+                    placeholder="Enter tag and press Enter (e.g. Tech, Viral)"
                     value={tagInput}
                     onChange={e => setTagInput(e.target.value)}
                     onKeyDown={handleAddTag}
@@ -671,7 +671,7 @@ export const LongaReels: React.FC = () => {
                     onClick={handleAddTag}
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold"
                   >
-                    Weka
+                    Add
                   </button>
                 </div>
 
@@ -692,7 +692,7 @@ export const LongaReels: React.FC = () => {
                   onClick={() => setIsCreateModalOpen(false)}
                   className="px-4 py-2.5 rounded-full text-xs font-semibold text-gray-400 hover:text-white"
                 >
-                  Ghairi (Cancel)
+                  Cancel
                 </button>
                 <button
                   type="submit"
@@ -702,7 +702,7 @@ export const LongaReels: React.FC = () => {
                   {isPublishing && (
                     <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent" />
                   )}
-                  <span>{isPublishing ? 'Inachapisha...' : 'Chapisha Reel Sasa'}</span>
+                  <span>{isPublishing ? 'Publishing...' : 'Publish Reel Now'}</span>
                 </button>
               </div>
             </form>

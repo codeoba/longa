@@ -10,7 +10,7 @@ export default function LongaAI() {
     {
       id: '1',
       role: 'assistant',
-      content: "Habari! Mimi ni **Longa AI**, msaidizi wako mahiri wa akili mnemba ndani ya Longa. Sasa nina uwezo wa kutumia API keys kutoka kampuni zote kubwa za AI (**Google Gemini**, **Groq**, **OpenRouter**, **OpenAI GPT-4o**, **DeepSeek**, **Claude**, au **Mistral**) au kufanya kazi bure 100% kupitia Akili ya Ndani ya Longa!\n\nUnaweza kubonyeza kitufe cha **⚙️ AI Settings** hapo juu kubadili mtoa huduma au kuweka API key yako. Ungependa tushirikiane katika lipi leo?",
+      content: "Hello! I am **Longa AI**, your intelligent assistant within Longa. I can connect to API keys from major AI providers (**Google Gemini**, **Groq**, **OpenRouter**, **OpenAI GPT-4o**, **DeepSeek**, **Claude**, or **Mistral**), or operate 100% free using Longa Native AI!\n\nClick the **⚙️ AI Settings** button above to switch providers or add your own key. How can I help you today?",
       timestamp: new Date(),
     },
   ]);
@@ -36,7 +36,7 @@ export default function LongaAI() {
     const systemNotice: AIMessage = {
       id: Date.now().toString(),
       role: 'assistant',
-      content: `⚡ **Mipangilio ya AI Imesasishwa:** Sasa unatumia **${providerName}** (Modeli: \`${modelName}\`). Mazungumzo yote yanayofuata yataendeshwa na injini hii!`,
+      content: `⚡ **AI Configuration Updated:** You are now connected to **${providerName}** (Model: \`${modelName}\`). All subsequent replies will be generated using this model!`,
       timestamp: new Date(),
     };
     setMessages(prev => [...prev, systemNotice]);
@@ -44,13 +44,13 @@ export default function LongaAI() {
 
   const generateLocalResponse = (userPrompt: string): string => {
     const clean = userPrompt.toLowerCase();
-    if (clean.includes('habari') || clean.includes('mambo') || clean.includes('vipi')) {
-      return "Salama kabisa! Ndani ya Longa AI, unaweza kuunganisha API key yoyote ya bure au ya kulipia. Je, unataka tushirikiane kuandika chapisho au una swali la kiteknolojia?";
+    if (clean.includes('hello') || clean.includes('hi') || clean.includes('hey')) {
+      return "Hello! Within Longa AI, you can connect your free or paid API keys anytime. Would you like assistance drafting a post or brainstorming tech ideas?";
     }
-    if (clean.includes('tweet') || clean.includes('post') || clean.includes('chapisho')) {
-      return "💡 **Wazo la Chapisho lenye Mvuto wa Hali ya Juu:**\n\n\"Mustakabali wa teknolojia barani Afrika haujengwi kesho—unajengwa sasa hivi na wabunifu wanaoamua kubadili changamoto kuwa fursa. 🚀✨ #TechAfrica #LongaInnovation\"\n\n*Kidokezo cha Longa:* Ongeza picha au kura ya maoni (poll) ili kuongeza mwingiliano wa wafuasi!";
+    if (clean.includes('tweet') || clean.includes('post') || clean.includes('draft')) {
+      return "💡 **High-Engagement Post Idea:**\n\n\"The future of technology is being shaped right now by creators transforming challenges into breakthroughs. 🚀✨ #TechInnovation #Longa\"\n\n*Longa Tip:* Add a photo or poll to maximize follower engagement!";
     }
-    return `Hilo ni wazo zuri sana kuhusu **"${userPrompt.slice(0, 40)}..."**.\n\nNdani ya mfumo wetu wa **Longa AI**, tunazingatia mikakati mitatu mikuu:\n1. Ubunifu wa awali na mvuto (Hook)\n2. Mwingiliano wa hadhira\n3. Uendelevu wa jamii.\n\nJe, ungependa tuandae muundo wa kina au msimbo wa mfano?`;
+    return `That is a great thought regarding **"${userPrompt.slice(0, 40)}..."**.\n\nWithin **Longa AI**, we recommend focusing on three core pillars:\n1. Engaging opening hooks\n2. Interactive audience discussion\n3. Community longevity.\n\nWould you like a detailed breakdown or sample template?`;
   };
 
   const handleSend = async () => {
@@ -115,10 +115,10 @@ export default function LongaAI() {
   };
 
   const suggestedPrompts = [
-    '💡 Nisaidie kuandika post ya Longa',
-    '📈 Mbinu za kupata wafuasi zaidi',
-    '🤖 Eleza jinsi ya kuunganisha Groq / Gemini API',
-    '⚡ Wazo la biashara ya teknolojia 2026',
+    '💡 Help me draft an engaging post',
+    '📈 Strategies to grow my followers',
+    '🤖 How to connect Groq or Gemini API',
+    '⚡ Tech startup idea for 2026',
   ];
 
   const activeProvider = aiConfig.activeProvider || 'builtin';
@@ -161,7 +161,7 @@ export default function LongaAI() {
           <button
             onClick={() => setIsSettingsOpen(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-700 hover:border-blue-500/50 bg-gray-900/60 hover:bg-blue-500/10 text-xs font-semibold text-gray-200 hover:text-blue-400 transition-all shadow-sm"
-            title="Sanidi API Keys za Gemini, Groq, OpenRouter, OpenAI, n.k."
+            title="Configure API Keys for Gemini, Groq, OpenRouter, OpenAI, etc."
           >
             <span>⚙️</span>
             <span className="hidden sm:inline">AI Settings</span>
@@ -203,7 +203,7 @@ export default function LongaAI() {
                 <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '150ms' }} />
                 <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                 <span className="text-xs text-gray-400 ml-1.5">
-                  Longa AI ({activeProvider}) inajibu...
+                  Longa AI ({activeProvider}) is typing...
                 </span>
               </div>
             </div>
@@ -216,7 +216,7 @@ export default function LongaAI() {
       {messages.length <= 2 && (
         <div className="px-4 pb-2">
           <p className={`text-xs font-semibold mb-2 ${tc.textTertiary} uppercase tracking-wider`}>
-            Mada Zinazopendekezwa:
+            Suggested Prompts:
           </p>
           <div className="flex flex-wrap gap-2">
             {suggestedPrompts.map((prompt, i) => (
@@ -240,7 +240,7 @@ export default function LongaAI() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder={`Uliza chochote kupitia ${activeProvider.toUpperCase()}...`}
+            placeholder={`Ask anything via ${activeProvider.toUpperCase()}...`}
             className={`flex-1 px-4 py-2.5 rounded-full outline-none border focus:border-blue-500 transition-colors ${tc.bgInput} ${tc.text} placeholder-gray-500 ${tc.border}`}
           />
           <button
@@ -248,7 +248,7 @@ export default function LongaAI() {
             disabled={!input.trim()}
             className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 disabled:opacity-40 text-white font-bold px-6 py-2.5 rounded-full transition-all duration-200 text-sm shadow-md shadow-blue-500/20"
           >
-            Tuma
+            Send
           </button>
         </div>
       </div>
