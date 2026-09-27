@@ -1,16 +1,67 @@
-import React, { useState } from 'react';
-import { Space } from '../types';
-import { spaces as initialSpaces } from '../data';
-import { ArrowLeft, Verified } from './Icons';
+import React, { useState, useEffect } from 'react';
+import { Space, User } from '../types';
+import { spaces as initialSpaces, currentUser } from '../data';
+import { ArrowLeft } from './Icons';
 import { useTheme } from '../ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
+
+const SPACES_STORAGE_KEY = 'longa_spaces_v2';
+const REMINDERS_STORAGE_KEY = 'longa_space_reminders_v2';
 
 export default function Spaces() {
-  const [spaces, setSpaces] = useState(initialSpaces);
+  const { user } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  const [spaces, setSpaces] = useState<Space[]>(() => {
+    try {
+      const saved = localStorage.getItem(SPACES_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.map((s: any) => ({
+          ...s,
+          startedAt: new Date(s.startedAt),
+        }));
+      }
+    } catch (e) {
+      console.warn('Failed to load spaces from cache:', e);
+    }
+    return initialSpaces;
+  });
+
+  const [remindedSpaces, setRemindedSpaces] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(REMINDERS_STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      // ignore
+    }
+    return [];
+  });
+
   const [activeSpace, setActiveSpace] = useState<Space | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [handRaised, setHandRaised] = useState(false);
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+
+  // Host Space Modal State
+  const [showStartModal, setShowStartModal] = useState(false);
+  const [spaceTitle, setSpaceTitle] = useState('');
+  const [spaceDescription, setSpaceDescription] = useState('');
+  const [spaceTopic, setSpaceTopic] = useState('Teknolojia & AI');
+  const [isScheduled, setIsScheduled] = useState(false);
+  const [scheduledDateTime, setScheduledDateTime] = useState('');
+
+  // Live Note inside Space
+  const [liveNote, setLiveNote] = useState('🔥 Muhtasari wa Space:\n- Karibuni wote kwenye mazungumzo ya leo.\n- Bonyeza kitufe cha mkono ili kuomba nafasi ya kuongea.');
+  const [copiedNote, setCopiedNote] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem(SPACES_STORAGE_KEY, JSON.stringify(spaces));
+  }, [spaces]);
+
+  useEffect(() => {
+    localStorage.setItem(REMINDERS_STORAGE_KEY, JSON.stringify(remindedSpaces));
+  }, [remindedSpaces]);
 
   const liveSpaces = spaces.filter(s => s.isLive);
   const upcomingSpaces = spaces.filter(s => !s.isLive);
@@ -22,6 +73,12 @@ export default function Spaces() {
   const leaveSpace = () => {
     setActiveSpace(null);
     setHandRaised(false);
+  };
+
+  const toggleReminder = (spaceId: string) => {
+    setRemindedSpaces(prev =>
+      prev.includes(spaceId) ? prev.filter(id => id !== spaceId) : [...prev, spaceId]
+    );
   };
 
   // Web Audio Soundboard Synthesizer
@@ -76,7 +133,6 @@ export default function Spaces() {
           osc.start(ctx.currentTime + i * 0.06);
           osc.stop(ctx.currentTime + i * 0.06 + 0.05);
         }
-        // Final crash
         setTimeout(() => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
@@ -109,12 +165,50 @@ export default function Spaces() {
     }
   };
 
-  const [liveNote, setLiveNote] = useState('🔥 Main takeaways:\n- Scalable architecture in 2026 demands reactive state sync.\n- Longa AI composer boosts engagement by 3.4x.');
-  const [copiedNote, setCopiedNote] = useState(false);
+  const handleCreateSpace = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!spaceTitle.trim()) return;
 
+    const hostUser: User = (user as User) || currentUser;
+
+    const newSpace: Space = {
+      id: 'space_' + Date.now(),
+      title: spaceTitle.trim(),
+      description: spaceDescription.trim() || undefined,
+      host: hostUser,
+      speakers: [hostUser],
+      listeners: isScheduled ? 0 : 1,
+      isLive: !isScheduled,
+      startedAt: isScheduled && scheduledDateTime ? new Date(scheduledDateTime) : new Date(),
+      tags: [spaceTopic],
+    };
+
+    setSpaces([newSpace, ...spaces]);
+    setShowStartModal(false);
+
+    if (!isScheduled) {
+      setActiveSpace(newSpace);
+    }
+
+    setSpaceTitle('');
+    setSpaceDescription('');
+    setIsScheduled(false);
+    setScheduledDateTime('');
+  };
+
+  const topicOptions = [
+    'Teknolojia & AI',
+    'Biashara & Startups',
+    'Muziki & Sanaa',
+    'Michezo & Burudani',
+    'Elimu & Sayansi',
+    'Crypto & Web3',
+  ];
+
+  // Active Live Space View
   if (activeSpace) {
     return (
-      <div className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-white text-gray-900'} pb-12`}>
+      <div className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-white text-gray-900'} pb-16`}>
         {/* Space Header */}
         <div className="bg-gradient-to-br from-purple-950 via-indigo-950 to-blue-950 px-5 py-7 border-b border-purple-500/30">
           <div className="flex items-center justify-between mb-4">
@@ -122,35 +216,44 @@ export default function Spaces() {
               onClick={leaveSpace}
               className="px-4 py-1.5 rounded-full bg-black/40 text-white text-xs font-bold hover:bg-black/60 transition-colors border border-white/10"
             >
-              ✕ Leave Space
+              ✕ Toka Kwenye Space
             </button>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setHandRaised(!handRaised)}
-                className={`p-2.5 rounded-full transition-transform active:scale-90 text-sm ${handRaised ? 'bg-amber-400 text-black shadow-lg shadow-amber-400/30' : 'bg-black/40 text-white hover:bg-black/60 border border-white/10'}`}
-                title="Raise Hand"
+                className={`p-2.5 rounded-full transition-transform active:scale-90 text-sm ${
+                  handRaised ? 'bg-amber-400 text-black shadow-lg shadow-amber-400/30' : 'bg-black/40 text-white hover:bg-black/60 border border-white/10'
+                }`}
+                title="Nyanyua Mkono"
               >
                 ✋
               </button>
               <button
                 onClick={() => setIsMuted(!isMuted)}
-                className={`p-2.5 rounded-full transition-transform active:scale-90 text-sm ${isMuted ? 'bg-red-500 text-white' : 'bg-black/40 text-white hover:bg-black/60 border border-white/10'}`}
-                title="Toggle Mic"
+                className={`p-2.5 rounded-full transition-transform active:scale-90 text-sm ${
+                  isMuted ? 'bg-red-500 text-white' : 'bg-green-600 text-white hover:bg-green-700 border border-white/10'
+                }`}
+                title="Washa / Zima Maikrofoni"
               >
-                {isMuted ? '🔇' : '🎤'}
+                {isMuted ? '🔇 Muted' : '🎤 Live Mic'}
               </button>
             </div>
           </div>
+
           <h2 className="text-2xl font-black text-white mb-2">{activeSpace.title}</h2>
+          {activeSpace.description && (
+            <p className="text-sm text-purple-200/90 mb-3">{activeSpace.description}</p>
+          )}
+
           <div className="flex items-center gap-3 text-xs text-purple-200">
             <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/30 font-bold">
               <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
               LIVE AUDIO
             </span>
             <span>·</span>
-            <span>{activeSpace.listeners.toLocaleString()} listening</span>
+            <span>{activeSpace.listeners.toLocaleString()} wanasikiliza</span>
             <span>·</span>
-            <span className="text-emerald-400 font-semibold">HD WebRTC 48kHz</span>
+            <span className="text-emerald-400 font-semibold">WebRTC 48kHz HD</span>
           </div>
 
           {/* Live Waveform Indicator */}
@@ -161,7 +264,7 @@ export default function Spaces() {
                 className="w-1 bg-gradient-to-t from-purple-500 to-pink-400 rounded-full animate-pulse"
                 style={{
                   height: `${isMuted ? 8 : h}%`,
-                  animationDuration: `${0.4 + (i % 5) * 0.15}s`
+                  animationDuration: `${0.4 + (i % 5) * 0.15}s`,
                 }}
               />
             ))}
@@ -181,25 +284,25 @@ export default function Spaces() {
               onClick={() => playSoundEffect('applause')}
               className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 hover:text-white border border-purple-500/30 active:scale-95 transition flex items-center gap-1.5"
             >
-              <span>👏</span> Applause
+              <span>👏</span> Makofi (Applause)
             </button>
             <button
               onClick={() => playSoundEffect('drumroll')}
               className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-pink-500/20 text-pink-300 hover:bg-pink-500/30 hover:text-white border border-pink-500/30 active:scale-95 transition flex items-center gap-1.5"
             >
-              <span>🥁</span> Drumroll
+              <span>🥁</span> Ngoma (Drumroll)
             </button>
             <button
               onClick={() => playSoundEffect('chime')}
               className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 hover:text-white border border-amber-500/30 active:scale-95 transition flex items-center gap-1.5"
             >
-              <span>🔔</span> Crystal Chime
+              <span>🔔</span> Kengele (Chime)
             </button>
             <button
               onClick={() => playSoundEffect('celebration')}
               className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 hover:text-white border border-emerald-500/30 active:scale-95 transition flex items-center gap-1.5"
             >
-              <span>🎉</span> Fanfare
+              <span>🎉</span> Sherehe (Fanfare)
             </button>
           </div>
         </div>
@@ -207,7 +310,7 @@ export default function Spaces() {
         {/* Speakers */}
         <div className="px-5 py-5 border-b border-[#38444d]/30">
           <h3 className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-            Active Speakers ({activeSpace.speakers.length})
+            Wazungumzaji Waliopo ({activeSpace.speakers.length})
           </h3>
           <div className="flex flex-wrap gap-6">
             {activeSpace.speakers.map(speaker => (
@@ -223,7 +326,7 @@ export default function Spaces() {
                 <span className={`text-xs font-bold text-center max-w-[84px] truncate ${isDark ? 'text-white' : 'text-gray-900'}`}>
                   {speaker.name.split(' ')[0]}
                 </span>
-                <span className="text-[10px] text-purple-400 font-semibold">Host / Speaker</span>
+                <span className="text-[10px] text-purple-400 font-semibold">Mwenyeji (Host)</span>
               </div>
             ))}
           </div>
@@ -233,7 +336,7 @@ export default function Spaces() {
         <div className="px-5 py-5 border-b border-[#38444d]/30">
           <div className="flex items-center justify-between mb-2">
             <h3 className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-500'} flex items-center gap-1.5`}>
-              <span>📝 Live Note Canvas (Collaborative Scratchpad)</span>
+              <span>📝 Daftari la Pamoja (Live Notes)</span>
             </h3>
             <button
               onClick={() => {
@@ -243,133 +346,323 @@ export default function Spaces() {
               }}
               className="text-xs text-blue-400 hover:underline"
             >
-              {copiedNote ? '✓ Copied' : 'Copy Notes'}
+              {copiedNote ? '✓ Umenakili' : 'Nakili Maelezo'}
             </button>
           </div>
-          <p className="text-xs text-gray-500 mb-2">Speakers & listeners can sync key ideas and links live during this Space.</p>
           <textarea
             rows={4}
             value={liveNote}
             onChange={e => setLiveNote(e.target.value)}
-            className={`w-full p-3 rounded-xl text-xs font-mono border border-[#38444d]/50 ${isDark ? 'bg-gray-900/60 text-purple-200' : 'bg-gray-100 text-gray-900'} focus:outline-none focus:border-purple-500 transition leading-relaxed`}
+            className={`w-full p-3 rounded-xl text-xs font-mono border border-[#38444d]/50 ${
+              isDark ? 'bg-gray-900/60 text-purple-200' : 'bg-gray-100 text-gray-900'
+            } focus:outline-none focus:border-purple-500 transition leading-relaxed`}
           />
         </div>
 
         {/* Listeners */}
         <div className="px-5 py-5">
           <h3 className={`text-xs font-bold uppercase tracking-wider mb-3 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-            Listeners ({activeSpace.listeners.toLocaleString()})
+            Wasikilizaji ({activeSpace.listeners.toLocaleString()})
           </h3>
           <div className="flex flex-wrap gap-2.5">
-            {Array.from({ length: 18 }).map((_, i) => (
-              <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-sm border border-white/5">
+            {Array.from({ length: 14 }).map((_, i) => (
+              <div
+                key={i}
+                className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-sm border border-white/5"
+              >
                 {['👤', '👩', '👨', '🧑', '👱'][i % 5]}
               </div>
             ))}
-            {activeSpace.listeners > 18 && (
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold ${isDark ? 'bg-gray-800 text-purple-300' : 'bg-gray-200 text-gray-600'}`}>
-                +{activeSpace.listeners - 18}
-              </div>
-            )}
           </div>
         </div>
       </div>
     );
   }
 
+  // Directory View
   return (
-    <div>
+    <div className={`min-h-screen ${isDark ? 'bg-black text-white' : 'bg-white text-gray-900'} pb-20`}>
       {/* Header */}
       <div className={`sticky top-0 z-30 backdrop-blur-xl border-b ${isDark ? 'bg-black/80 border-gray-800/50' : 'bg-white/80 border-gray-200'}`}>
-        <div className="flex items-center gap-6 px-4 py-2">
-          <button className={`p-2 rounded-full transition-colors ${isDark ? 'hover:bg-gray-800/50' : 'hover:bg-gray-100'}`}>
-            <ArrowLeft />
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-bold">Spaces</h1>
+          </div>
+          <button
+            onClick={() => setShowStartModal(true)}
+            className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold text-xs rounded-full flex items-center gap-1.5 shadow-lg shadow-purple-500/25 transition-all"
+          >
+            <span>🎙️</span> Anzisha Space
           </button>
-          <h1 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Spaces</h1>
         </div>
       </div>
 
-      {/* Start Space Button */}
-      <div className="px-4 py-4">
-        <button className="w-full py-3 bg-purple-500 hover:bg-purple-600 text-white font-bold rounded-full transition-colors flex items-center justify-center gap-2">
-          <span>🎙️</span>
-          Start a Space
-        </button>
+      {/* Hero Banner */}
+      <div className="p-4">
+        <div className="p-5 rounded-2xl bg-gradient-to-r from-purple-950/60 via-indigo-950/60 to-blue-950/60 border border-purple-500/40 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-black text-white">Sauti za Moja kwa Moja (Live Audio)</h2>
+            <p className="text-xs text-purple-200/80 mt-1 max-w-md">
+              Zungumza na wafuasi wako kwa sauti yenye uwazi wa hali ya juu na muda halisi (0ms delay).
+            </p>
+          </div>
+          <button
+            onClick={() => setShowStartModal(true)}
+            className="px-4 py-2.5 bg-purple-500 hover:bg-purple-600 text-white font-bold text-xs rounded-xl flex-shrink-0 shadow-md ml-3"
+          >
+            + Unda Chumba
+          </button>
+        </div>
       </div>
 
       {/* Live Spaces */}
-      {liveSpaces.length > 0 && (
-        <div className="mb-4">
-          <h2 className={`px-4 text-lg font-extrabold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            🔴 Live now
-          </h2>
-          {liveSpaces.map(space => (
+      <div className="mb-6">
+        <h2 className={`px-4 text-base font-extrabold mb-3 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+          🔴 Zinaendelea Sasa (Live Now)
+        </h2>
+
+        {liveSpaces.length === 0 ? (
+          <div className="mx-4 p-8 text-center rounded-2xl border border-dashed border-gray-800">
+            <p className="text-sm text-gray-500">Hakuna space inayoendelea sasa hivi. Kuwa wa kwanza kuanzisha!</p>
+          </div>
+        ) : (
+          liveSpaces.map(space => (
             <div
               key={space.id}
               onClick={() => joinSpace(space)}
-              className={`mx-4 mb-2 p-4 rounded-2xl border cursor-pointer transition-all hover:scale-[1.01] ${
+              className={`mx-4 mb-3 p-4 rounded-2xl border cursor-pointer transition-all hover:scale-[1.01] shadow-lg ${
                 isDark
-                  ? 'bg-gradient-to-br from-purple-900/30 to-pink-900/30 border-purple-500/30 hover:border-purple-500/50'
+                  ? 'bg-gradient-to-br from-purple-950/40 to-pink-950/30 border-purple-500/30 hover:border-purple-500/60'
                   : 'bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200 hover:border-purple-300'
               }`}
             >
-              <div className="flex items-start justify-between mb-3">
+              <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="flex items-center gap-1 text-xs font-bold text-red-500">
                       <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                       LIVE
                     </span>
-                    <span className="text-xs text-gray-500">{space.listeners.toLocaleString()} listening</span>
+                    <span className="text-xs text-gray-400">
+                      👥 {space.listeners.toLocaleString()} wanasikiliza
+                    </span>
+                    <span className="text-xs text-purple-400 font-semibold">#{space.tags[0] || 'Live'}</span>
                   </div>
-                  <h3 className={`font-bold text-[17px] ${isDark ? 'text-white' : 'text-gray-900'}`}>{space.title}</h3>
+                  <h3 className={`font-bold text-base ${isDark ? 'text-white' : 'text-gray-900'}`}>{space.title}</h3>
+                  {space.description && (
+                    <p className="text-xs text-gray-400 mt-1 line-clamp-1">{space.description}</p>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                {space.speakers.slice(0, 3).map(speaker => (
-                  <div key={speaker.id} className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm border-2 border-black">
-                    {speaker.avatar}
-                  </div>
-                ))}
-                <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {space.speakers.map(s => s.name.split(' ')[0]).join(', ')}
+
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-purple-500/20">
+                <div className="flex items-center gap-2">
+                  {space.speakers.slice(0, 3).map(speaker => (
+                    <div
+                      key={speaker.id}
+                      className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm border-2 border-black"
+                    >
+                      {speaker.avatar}
+                    </div>
+                  ))}
+                  <span className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Mwenyeji: {space.host.name}
+                  </span>
+                </div>
+
+                <span className="px-3 py-1 rounded-full bg-purple-500 text-white font-bold text-xs">
+                  Sikiliza Sasa →
                 </span>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
 
       {/* Upcoming Spaces */}
-      {upcomingSpaces.length > 0 && (
-        <div>
-          <h2 className={`px-4 text-lg font-extrabold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            ⏰ Upcoming
-          </h2>
-          {upcomingSpaces.map(space => (
-            <div
-              key={space.id}
-              className={`mx-4 mb-2 p-4 rounded-2xl border ${isDark ? 'border-gray-800/50 bg-gray-900/30' : 'border-gray-200 bg-gray-50'}`}
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs text-gray-500">
-                  Started {Math.floor((Date.now() - space.startedAt.getTime()) / 3600000)}h ago
-                </span>
-              </div>
-              <h3 className={`font-bold text-[17px] mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>{space.title}</h3>
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm">
-                  {space.host.avatar}
+      <div>
+        <h2 className={`px-4 text-base font-extrabold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          ⏰ Zilizopangwa Hivi Karibuni (Upcoming)
+        </h2>
+
+        {upcomingSpaces.length === 0 ? (
+          <div className="mx-4 p-8 text-center rounded-2xl border border-dashed border-gray-800">
+            <p className="text-sm text-gray-500">Hakuna space iliyopangwa kwa sasa.</p>
+          </div>
+        ) : (
+          upcomingSpaces.map(space => {
+            const hasReminder = remindedSpaces.includes(space.id);
+            return (
+              <div
+                key={space.id}
+                className={`mx-4 mb-3 p-4 rounded-2xl border ${
+                  isDark ? 'border-gray-800 bg-gray-900/40' : 'border-gray-200 bg-gray-50'
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-1 text-xs text-purple-400 font-semibold">
+                  <span>📅 {new Date(space.startedAt).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                  <span>·</span>
+                  <span>#{space.tags[0] || 'Event'}</span>
                 </div>
-                <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Hosted by {space.host.name}
-                </span>
+                <h3 className={`font-bold text-base mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>{space.title}</h3>
+                {space.description && (
+                  <p className="text-xs text-gray-400 mb-2">{space.description}</p>
+                )}
+                <div className="flex items-center justify-between mt-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xs">
+                      {space.host.avatar}
+                    </div>
+                    <span className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Mwenyeji: {space.host.name}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => toggleReminder(space.id)}
+                    className={`px-3 py-1.5 rounded-full font-bold text-xs transition-colors ${
+                      hasReminder
+                        ? 'bg-purple-500 text-white shadow-md'
+                        : 'bg-purple-500/20 text-purple-300 hover:bg-purple-500/30'
+                    }`}
+                  >
+                    {hasReminder ? '🔔 Kikumbusho Kimewekwa' : '🔔 Weka Kikumbusho'}
+                  </button>
+                </div>
               </div>
-              <button className="mt-3 px-4 py-1.5 rounded-full bg-purple-500/20 text-purple-400 font-bold text-sm hover:bg-purple-500/30 transition-colors">
-                Set Reminder
+            );
+          })
+        )}
+      </div>
+
+      {/* Start Space Modal */}
+      {showStartModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowStartModal(false)} />
+          <div className={`relative w-full max-w-lg ${isDark ? 'bg-[#15181c] text-white' : 'bg-white text-gray-900'} rounded-2xl border ${isDark ? 'border-gray-800' : 'border-gray-200'} p-6 shadow-2xl`}>
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-800">
+              <h2 className="text-xl font-black">🎙️ Anzisha Space Yako</h2>
+              <button
+                onClick={() => setShowStartModal(false)}
+                className="p-1.5 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white"
+              >
+                ✕
               </button>
             </div>
-          ))}
+
+            <form onSubmit={handleCreateSpace} className="space-y-4">
+              {/* Title */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                  Mada Kuu ya Mazungumzo *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={spaceTitle}
+                  onChange={e => setSpaceTitle(e.target.value)}
+                  placeholder="mf. Maendeleo ya AI na Ajira Afrika 2026"
+                  className={`w-full px-4 py-2.5 rounded-xl border ${isDark ? 'border-gray-800 bg-gray-900 text-white' : 'border-gray-300 bg-gray-50 text-black'} text-sm outline-none focus:border-purple-500`}
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                  Maelezo Mafupi
+                </label>
+                <textarea
+                  rows={2}
+                  value={spaceDescription}
+                  onChange={e => setSpaceDescription(e.target.value)}
+                  placeholder="Eleza nini mtakachojadili na nani anayekaribishwa..."
+                  className={`w-full px-4 py-2.5 rounded-xl border ${isDark ? 'border-gray-800 bg-gray-900 text-white' : 'border-gray-300 bg-gray-50 text-black'} text-sm outline-none focus:border-purple-500 resize-none`}
+                />
+              </div>
+
+              {/* Topic Selector */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                  Kategoria
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {topicOptions.map(t => (
+                    <button
+                      type="button"
+                      key={t}
+                      onClick={() => setSpaceTopic(t)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                        spaceTopic === t
+                          ? 'bg-purple-600 text-white font-bold'
+                          : isDark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Live Now vs Schedule */}
+              <div className="pt-2 border-t border-gray-800">
+                <div className="flex gap-4 mb-3">
+                  <label className="flex items-center gap-2 cursor-pointer text-sm font-bold">
+                    <input
+                      type="radio"
+                      name="scheduleMode"
+                      checked={!isScheduled}
+                      onChange={() => setIsScheduled(false)}
+                      className="accent-purple-500"
+                    />
+                    <span>🔴 Anza Moja kwa Moja Sasa</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer text-sm font-bold">
+                    <input
+                      type="radio"
+                      name="scheduleMode"
+                      checked={isScheduled}
+                      onChange={() => setIsScheduled(true)}
+                      className="accent-purple-500"
+                    />
+                    <span>⏰ Panga Kwa Baadaye</span>
+                  </label>
+                </div>
+
+                {isScheduled && (
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                      Tarehe na Muda wa Space
+                    </label>
+                    <input
+                      type="datetime-local"
+                      required
+                      value={scheduledDateTime}
+                      onChange={e => setScheduledDateTime(e.target.value)}
+                      className={`w-full px-4 py-2 rounded-xl border ${isDark ? 'border-gray-800 bg-gray-900 text-white' : 'border-gray-300 bg-gray-50 text-black'} text-xs outline-none`}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Submit Buttons */}
+              <div className="flex gap-3 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowStartModal(false)}
+                  className={`flex-1 py-2.5 rounded-full border ${isDark ? 'border-gray-700 hover:bg-gray-800' : 'border-gray-300 hover:bg-gray-100'} text-sm font-bold`}
+                >
+                  Ghairi
+                </button>
+                <button
+                  type="submit"
+                  disabled={!spaceTitle.trim() || (isScheduled && !scheduledDateTime)}
+                  className="flex-1 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:opacity-40 text-white font-bold text-sm rounded-full shadow-lg shadow-purple-500/30 transition-all"
+                >
+                  {isScheduled ? 'Panga Space' : 'Anzisha Sasa 🎙️'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
