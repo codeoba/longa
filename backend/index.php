@@ -57,6 +57,7 @@ $paymentController = new PaymentController();
 $storeController = new StoreController();
 $bountyController = new BountyController();
 $adminController = new AdminController();
+$reelsController = new ReelsController();
 
 // Health check
 $router->get('/', function() {
@@ -143,6 +144,10 @@ $router->get('/bounties', [$bountyController, 'index']);
 $router->post('/bounties', [$bountyController, 'store']);
 $router->post('/bounties/{id}/submit', [$bountyController, 'submit']);
 $router->post('/bounties/{id}/award', [$bountyController, 'award']);
+
+// ==================== LONGA REELS ROUTES ====================
+$router->get('/reels', [$reelsController, 'index']);
+$router->post('/reels', [$reelsController, 'store']);
 
 // ==================== WEBRTC SIGNALING ROUTES ====================
 $router->get('/signaling/rooms', [$signalingController, 'rooms']);
